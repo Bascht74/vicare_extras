@@ -16,6 +16,7 @@ class DeviceInfo:
     name: str | None = None
     manufacturer: str | None = None
     model: str | None = None
+    via_device_id: str | None = None
 
 
 class DeviceRegistry:

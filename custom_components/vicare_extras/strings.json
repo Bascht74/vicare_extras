@@ -5,7 +5,7 @@
     },
     "step": {
       "user": {
-        "description": "ViCare Extras adds read-only actions and sensors on top of the built-in Viessmann ViCare integration. It reuses the existing login, needs no credentials of its own and does not poll the Viessmann API.\n\nThe Viessmann ViCare integration must be set up and loaded.",
+        "description": "ViCare Extras adds sensors, climate entities and actions on top of the built-in Viessmann ViCare integration. It reuses the existing login, needs no credentials of its own and does not poll the Viessmann API.\n\nIt reads only, with two exceptions: it sends a command when you change the target temperature of one of its climate entities or call the action send_command.\n\nThe Viessmann ViCare integration must be set up and loaded.",
         "title": "ViCare Extras"
       }
     }
@@ -499,6 +499,9 @@
     "command_not_available": {
       "message": "The Viessmann API offers no command to change this value."
     },
+    "device_ambiguous": {
+      "message": "Several gateways have a device with this id ({gateways}). Name the gateway serial number."
+    },
     "device_not_found": {
       "message": "No ViCare device matches the selection."
     },
@@ -617,6 +620,32 @@
         }
       },
       "name": "Get features"
+    },
+    "send_command": {
+      "name": "Send command (expert)",
+      "description": "Sends exactly one command to the Viessmann API as given, also one the feature does not advertise, and returns the answer of the API. For diagnosis by administrators: a command can change settings of the heating system. One API call.",
+      "fields": {
+        "vicare_device_id": {
+          "name": "ViCare device id",
+          "description": "Viessmann device id, for example RoomControl-1, 0 or zigbee-…"
+        },
+        "feature": {
+          "name": "Feature",
+          "description": "Name of the feature, for example rooms.0.temperature.levels.normal.perceived."
+        },
+        "command": {
+          "name": "Command",
+          "description": "Name of the command, for example setTemperature."
+        },
+        "params": {
+          "name": "Parameters",
+          "description": "Parameters of the command as an object, for example {\"targetTemperature\": 21}. They are sent unchecked."
+        },
+        "gateway_serial": {
+          "name": "Gateway serial number",
+          "description": "Only needed when several gateways have a device with this id."
+        }
+      }
     }
   }
 }

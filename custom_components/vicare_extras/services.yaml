@@ -86,3 +86,29 @@ get_features:
       default: false
       selector:
         boolean:
+
+send_command:
+  fields:
+    vicare_device_id:
+      required: true
+      example: RoomControl-1
+      selector:
+        text:
+    feature:
+      required: true
+      example: rooms.0.temperature.levels.normal.perceived
+      selector:
+        text:
+    command:
+      required: true
+      example: setTemperature
+      selector:
+        text:
+    params:
+      default: {}
+      example: '{"targetTemperature": 21}'
+      selector:
+        object:
+    gateway_serial:
+      selector:
+        text:

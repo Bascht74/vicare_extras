@@ -35,6 +35,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from functools import partial
 import logging
+import re
 from typing import Any
 
 from .errors import ViCareExtrasError
@@ -189,3 +190,71 @@ def execute(service: Any, accessor: Any, command: NumberCommand, value: Any) -> 
     _check_response(response)
     _LOGGER.debug("Command %s on %s sent", command.name, command.feature)
     return number
+
+
+# --------------------------------------------------------------------------
+# send: one command exactly as given (action vicare_extras.send_command)
+# --------------------------------------------------------------------------
+
+_STATUS_CODE = re.compile(r"status code (\d{3})")
+_VI_ERROR_ID = re.compile(r"ErrorId: (\S+)")
+
+
+def advertised(feature: dict[str, Any] | None, command: str) -> tuple[bool, bool | None]:
+    """Return (advertised, executable) for a command of a cached feature.
+
+    ``advertised`` is True when the feature's ``commands`` object names the
+    command, ``executable`` its ``isExecutable`` flag (None when unknown).
+    """
+    commands = feature.get("commands") if isinstance(feature, dict) else None
+    if isinstance(commands, dict) and command in commands:
+        entry = commands[command]
+        executable = entry.get("isExecutable") if isinstance(entry, dict) else None
+        return True, executable if isinstance(executable, bool) else None
+    if isinstance(commands, (list, tuple)) and command in commands:
+        return True, None
+    return False, None
+
+
+def _failed(response: Any) -> bool:
+    """Return True when the answer of the API reports a failed command."""
+    try:
+        _check_response(response)
+    except ViCareExtrasError:
+        return True
+    return False
+
+
+def _error_details(err: Exception) -> dict[str, Any]:
+    """Describe an exception of PyViCare: type, message, status, error id."""
+    message = _short(getattr(err, "message", None) or err)
+    details: dict[str, Any] = {"error_type": type(err).__name__, "message": message}
+    if match := _STATUS_CODE.search(message):
+        details["status_code"] = int(match.group(1))
+    if match := _VI_ERROR_ID.search(message):
+        details["vi_error_id"] = match.group(1).rstrip(".")
+    return details
+
+
+def send(
+    service: Any, accessor: Any, feature: str, command: str, params: dict[str, Any]
+) -> dict[str, Any]:
+    """Post one command as given (blocking, exactly one API call).
+
+    Unlike ``execute`` this neither requires the API to advertise the command
+    nor checks the parameters: it exists to find out what the API answers.
+    The answer is returned, also when the API rejects the command; PyViCare
+    turns most rejections into exceptions, which are returned as a
+    description (type, message, status code and ViCare error id if given).
+    Only a service that cannot send at all raises.
+    """
+    post = _sender(service)
+    if accessor is None or post is None:
+        raise ViCareExtrasError(
+            "vicare_incompatible", {"detail": "service.setProperty is not available"}
+        )
+    try:
+        response = post(accessor, feature, command, params)
+    except Exception as err:  # noqa: BLE001 - reported to the caller as data
+        return {"success": False, "response": _error_details(err)}
+    return {"success": not _failed(response), "response": response}

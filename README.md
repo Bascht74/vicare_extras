@@ -13,7 +13,9 @@ eigenen Zugangsdaten.
 - **Befehle nur auf Wunsch.** Seit Version 0.3.0 gibt es Klima-Entitäten für
   Räume und Heizkörperthermostate. Wird dort die Solltemperatur geändert,
   sendet ViCare Extras genau diesen einen Befehl – nie von sich aus und nie
-  nach Zeitplan. Die Integration ist damit nicht mehr rein lesend.
+  nach Zeitplan. Dazu kommt die Experten-Aktion
+  [`send_command`](#aktion-vicare_extrassend_command-experten). Die
+  Integration ist damit nicht mehr rein lesend.
 - **Keine eigenen regelmäßigen API-Abfragen.** Alle Entitäten lesen
   ausschließlich Daten, die die eingebaute Integration ohnehin schon abgerufen
   hat.
@@ -51,8 +53,19 @@ Mit Version 0.2.0 (gleicher Stand, nach einem Neustart von Home Assistant):
 - Ein Update über den Marketplace wird erst nach einem **Neustart von Home
   Assistant** wirksam; ein Neuladen des Eintrags genügt nicht.
 
-Version 0.3.0 (Abfrageintervall, Klima-Entitäten, neu formulierte
-Meldungstabelle) ist **noch nicht in einer laufenden Instanz geprüft**, siehe
+Mit Version 0.3.0 (drei weitere Instanzen mit Core 2026.11.1 und echten
+Raumregler-Daten):
+
+- Die Integration lädt und arbeitet. Raum-Geräte und Raum-Klima-Entitäten
+  werden angelegt (7 Entitäten je Raum), die Klima-Entitäten der
+  Heizkörperthermostate hängen an den Geräten der eingebauten Integration.
+- Mit dem kostenlosen Zugang liefert die API für Räume und Thermostate keine
+  Befehle, keine Namen und keine Ist-Temperatur der Thermostate, siehe
+  [Was der kostenlose Zugang liefert](#was-der-kostenlose-zugang-basic-liefert).
+  Die Klima-Entitäten sind dort reine Anzeigen.
+
+Nicht live bestätigt sind das Senden eines Befehls, die Option für das
+Abfrageintervall und alles Neue in Version 0.3.1, siehe
 [Teststand](#teststand).
 
 Bekannte Einschränkungen:
@@ -64,10 +77,10 @@ Bekannte Einschränkungen:
   eigenen Attribute heißen deshalb `device_time` und
   `newest_status_device_time`. Die Zeiten der Ereignishistorie sind dagegen
   echte UTC-Zeiten.
-- Räume, Klima-Entitäten und Heizkörperthermostate konnten nur gegen
-  nachgebaute Daten geprüft werden. Der Raumregler der geprüften Anlage
-  (Modell `E3_RoomControl_One_05`) liefert nur `rooms.features.*` (8
-  Features) und keine Räume; dort entstehen keine Raum-Entitäten.
+- Ein Raumregler ohne eingerichtete Räume liefert nur `rooms.features.*`;
+  dort entstehen keine Raum-Entitäten.
+- Das Einstellen einer Solltemperatur konnte nur gegen nachgebaute Daten
+  geprüft werden: Mit dem kostenlosen Zugang bietet die API keinen Befehl an.
 
 ## Entitäten
 
@@ -257,8 +270,20 @@ PyViCare 2.63.0 und dessen Testdaten):
 - **Räume** liefert die Viessmann-API am virtuellen Gerät `RoomControl-1`
   (Typ `roomControl`) als Features `rooms.<n>` (Name, Typ, `actors`) und
   `rooms.<n>.*`. Die eingebaute Integration richtet dieses Gerät nicht ein.
-  ViCare Extras legt deshalb **je Raum ein eigenes Gerät** an (Name = Raumname
-  aus der API, sonst „Room n“).
+  ViCare Extras legt deshalb **je Raum ein eigenes Gerät** an. Es heißt wie
+  der Raum in der API; liefert die API keinen Namen (so beim kostenlosen
+  Zugang), heißt es „Raum n“ bei deutscher Spracheinstellung von Home
+  Assistant, sonst „Room n“. Ein in Home Assistant selbst vergebener
+  Gerätename bleibt erhalten.
+- Das Raum-Gerät ist mit dem Gerät des Wärmeerzeugers verknüpft („verbunden
+  über“): dem ersten Heizgerät desselben Gateways, das die eingebaute
+  Integration eingerichtet hat. So erscheint der Raum bei der Wärmepumpe
+  unter den verbundenen Geräten. Zum Eintrag der eingebauten Integration
+  selbst kann ein fremdes Gerät nicht gehören. Bestehende Raum-Geräte
+  erhalten Verknüpfung und Namen beim nächsten Start.
+- **Raumtemperatur und Luftfeuchtigkeit sind eigene Sensor-Entitäten** am
+  Raum-Gerät (`state_class: measurement`, also mit Langzeitstatistik) – nicht
+  nur Attribute der Klima-Entität.
 - **Heizkörperthermostate, Klimasensoren und Fußbodenthermostate** sind
   eigene Zigbee-Geräte (`trv.*`, `fht.*`, `device.sensors.*`,
   `device.power.battery`). Sie werden in der ViCare-App einem Raum
@@ -277,6 +302,43 @@ Die Thermostate gehören in Home Assistant zur eingebauten Integration und
 lassen sich deshalb nicht als Untergeräte unter das Raum-Gerät hängen. Die
 Zuordnung steht in Attributen: `actors` an der Raum-Klima-Entität, `room` an
 der Thermostat-Klima-Entität.
+
+#### Was der kostenlose Zugang (Basic) liefert
+
+Viessmann kennzeichnet in seiner Datenpunktliste
+(api.viessmann-climatesolutions.com/documentation/data-points) jeden
+Datenpunkt mit „View Basic Feature Data“, „View Advanced Feature Data“
+und/oder „Control Advanced Features“. Für die Einzelraumregelung heißt das,
+und so zeigte es sich auch an echten Anlagen mit kostenlosem Zugang:
+
+| Datenpunkte | Basic (kostenlos) | Advanced |
+| --- | --- | --- |
+| `rooms.<n>.sensors.*` (Temperatur, Feuchte), `rooms.<n>.temperature.levels.*`, `trv.*` | lesbar | lesbar |
+| `device.name`, `device.sensors.temperature`, `device.sensors.humidity` der Zigbee-Geräte | – | lesbar |
+| `rooms.<n>.operating.programs.*`, `rooms.<n>.schedule`, `rooms.<n>.quickmodes.*` | – | lesbar und steuerbar |
+| Raumnamen | – | kein eigener Datenpunkt (nur `rooms.others`) |
+
+Folgen mit dem kostenlosen Zugang:
+
+- **Thermostate haben keine Ist-Temperatur und keinen Namen** in den Daten
+  (`device.sensors.temperature` und `device.name` fehlen). Die Klima-Entität
+  eines Thermostats zeigt deshalb Solltemperatur und Ventil, aber keine
+  Ist-Temperatur. Die Ist-Temperatur gibt es am Raum
+  (`rooms.<n>.sensors.temperature`).
+- **Räume haben keinen Namen**, kein `rooms.<n>` (Typ, `actors`) und kein
+  `rooms.<n>.operating.state`. Die Geräte heißen „Raum n“; die Attribute
+  `actors`, `level`, `demand` und die Aktion der Klima-Entität bleiben leer,
+  die Zuordnung Thermostat ↔ Raum ist nicht erkennbar.
+- **Alle `commands`-Objekte sind leer**, auch an `trv.temperature`. Die
+  Klima-Entitäten sind damit **reine Anzeigen**: Sie zeigen Ist- und
+  Solltemperatur, lassen sich aber nicht verstellen (`setpoint_writable:
+  false`). Ob die API einen nicht angebotenen Befehl trotzdem annimmt, lässt
+  sich mit der Aktion
+  [`send_command`](#aktion-vicare_extrassend_command-experten) ausprobieren.
+
+Die Datenpunktliste selbst wurde für dieses Projekt nicht automatisiert
+ausgewertet; die Tabelle gibt den Befund aus der Liste und von den echten
+Anlagen wieder.
 
 #### Klima-Entitäten
 
@@ -335,8 +397,9 @@ der Thermostat-Klima-Entität.
   keine Ist-Temperatur. Ohne `prefix` zeigt derselbe Aufruf alle Features der
   Zigbee-Geräte, mit `full: true` auch die angebotenen Befehle.
 
-**Nicht an einer echten Anlage geprüft.** Räume, Thermostate und das Senden
-von Befehlen sind aus PyViCare 2.63.0 (Code und Testdaten
+**Das Einstellen ist nicht an einer echten Anlage geprüft.** Anlegen und
+Anzeigen der Räume und Thermostate sind live bestätigt (kostenloser Zugang,
+ohne Befehle). Das Datenmodell mit Befehlen ist aus PyViCare 2.63.0 (Code und Testdaten
 `RoomControl.json`, `gatewayWithDevices/heatbox2/Vitodens-300-W-WB3D-with-TRV.json`,
 `zigbee_zk03840_trv.json`, `zigbee_zk03838_fht_*.json`,
 `zigbee_zk03839_cs.json`), ViEventLog und der Serviceanleitung 6221420
@@ -498,9 +561,78 @@ data:
 response_variable: ergebnis
 ```
 
-Die Aktionen liefern nur eine Antwort. In den Entwicklerwerkzeugen unter
-„Aktionen“ wird sie direkt angezeigt; in Skripten und Automationen ist
+`get_features` und `get_event_history` liefern nur eine Antwort. In den
+Entwicklerwerkzeugen unter „Aktionen“ wird sie direkt angezeigt; in Skripten und Automationen ist
 `response_variable` nötig.
+
+## Aktion `vicare_extras.send_command` (Experten)
+
+> **Achtung.** Diese Aktion schreibt. Sie sendet einen Befehl unverändert an
+> die Viessmann-API und kann Einstellungen der Heizung ändern. Sie prüft
+> weder, ob die API den Befehl anbietet, noch die Parameter. Nur verwenden,
+> wenn klar ist, was der Befehl bewirkt. Sie ist **Administratoren
+> vorbehalten** und gedacht für Diagnose, nicht für Automationen.
+
+Zweck: herausfinden, ob die API einen Befehl annimmt, den sie am Feature
+nicht anbietet (z. B. mit dem kostenlosen Zugang, siehe
+[oben](#was-der-kostenlose-zugang-basic-liefert)). ViEventLog etwa sendet
+`rooms.<n>.temperature.levels.normal.perceived` → `setTemperature` ohne diese
+Prüfung.
+
+| Feld | Pflicht | Bedeutung |
+| --- | --- | --- |
+| `vicare_device_id` | ja | Viessmann-Geräte-ID, z. B. `RoomControl-1`, `0` oder `zigbee-…` (siehe `get_features`) |
+| `feature` | ja | Name des Features, z. B. `rooms.0.temperature.levels.normal.perceived` |
+| `command` | ja | Name des Befehls, z. B. `setTemperature` |
+| `params` | nein | Parameter als Objekt, Standard `{}`; werden ungeprüft gesendet |
+| `gateway_serial` | nein | nur nötig, wenn mehrere Gateways ein Gerät mit derselben ID haben |
+
+```yaml
+action: vicare_extras.send_command
+data:
+  vicare_device_id: RoomControl-1
+  feature: rooms.0.temperature.levels.normal.perceived
+  command: setTemperature
+  params:
+    targetTemperature: 21
+response_variable: antwort
+```
+
+Antwort:
+
+```yaml
+sent: true           # der Befehl wurde gesendet
+advertised: false    # das Feature im Zwischenspeicher nennt den Befehl (nicht)
+executable: null     # dessen isExecutable; null, wenn unbekannt
+api_calls: 1         # immer genau ein Aufruf (ein POST)
+success: true        # false, wenn die API den Befehl abgelehnt hat
+response:            # Antwort der API …
+  data: {success: true, reason: COMMAND_EXECUTION_SUCCESS}
+```
+
+Lehnt die API ab, meldet die Aktion **keinen Fehler**, sondern gibt die
+Ablehnung zurück (`success: false`). `response` ist dann die Antwort der API
+oder – wenn PyViCare sie in einen Fehler umwandelt – dessen Beschreibung:
+
+```yaml
+success: false
+response:
+  error_type: PyViCareCommandError
+  message: "Command failed with status code 404. Reason given was: COMMAND_NOT_FOUND"
+  status_code: 404            # wenn in der Meldung enthalten
+  vi_error_id: "…"            # ViCare-Fehler-ID, wenn in der Meldung enthalten
+```
+
+Einen Fehler meldet die Aktion nur bei lokalen Problemen: Gerät nicht
+gefunden oder mehrdeutig, eingebaute Integration nicht geladen, ungültige
+Namen (erlaubt sind Buchstaben, Ziffern, Punkt, `-` und `_`).
+
+- **Genau ein API-Aufruf** je Aufruf, auch bei Ablehnung; kein erneuter
+  Versuch. Der Zwischenspeicher der eingebauten Integration wird nicht
+  geleert, die Wirkung ist also erst nach deren nächster Abfrage sichtbar.
+- `advertised` und `executable` stammen aus dem Zwischenspeicher (kein
+  Aufruf).
+- **Nicht gegen die echte API geprüft.**
 
 ## Aktion `vicare_extras.get_event_history`
 
@@ -638,6 +770,7 @@ Kontingent teilt sich ViCare Extras mit der eingebauten Integration.
   Ausweichpfad hinzu; der funktionierende Pfad wird bis zum nächsten Neustart
   gemerkt.
 - Solltemperatur an einer Klima-Entität ändern: **1 Aufruf je Änderung**.
+- `send_command`: **1 Aufruf je Aufruf**.
 
 Empfehlung: `max_pages: 1` verwenden, die Aktion nicht in kurzen Abständen
 automatisieren und `api_calls` in der Antwort beachten. Ist das Limit
@@ -769,8 +902,10 @@ und neu starten. Die eingebaute Integration bleibt unberührt.
   Integration einrichtet, für Räume eines Raumreglers und (nur Klima) für
   Heizkörperthermostate, die die eingebaute Integration einrichtet.
   `get_features` erreicht alle Geräte des Kontos.
-- **Befehle** gibt es nur für die Solltemperatur von Räumen und
-  Heizkörperthermostaten. Betriebsarten, Zeitprogramme, Stufen, Warmwasser
+- **Befehle** sendet ViCare Extras von sich aus nur für die Solltemperatur
+  von Räumen und Heizkörperthermostaten (und nur, wenn die API den Befehl
+  anbietet – beim kostenlosen Zugang also gar nicht); alles Weitere nur über
+  die Experten-Aktion `send_command`. Betriebsarten, Zeitprogramme, Stufen, Warmwasser
   usw. werden nicht geschaltet. Die Option für das Abfrageintervall greift in
   die eingebaute Integration ein (siehe oben); alles andere liest nur.
 - Der Betriebszustand und die Liste der aktiven Statusmeldungen beruhen auf
@@ -850,12 +985,14 @@ Nicht ausgeführt bzw. nicht geprüft:
 
 - `pytest tests/ha` (Tests mit echtem Home Assistant; benötigt
   `pytest-homeassistant-custom-component` und `PyViCare`),
-- Version 0.3.0 in einer laufenden Instanz (0.2.0 lief dort, siehe oben),
+- Version 0.3.1 in einer laufenden Instanz (0.3.0 lief dort, siehe oben):
+  Verknüpfung der Raum-Geräte mit dem Wärmeerzeuger, Raumname „Raum n“,
+  Aktion `send_command`,
 - der Options-Dialog und das Abfrageintervall in einem echten Home Assistant
   (insbesondere, dass die eingebaute Integration danach tatsächlich seltener
   abfragt),
-- Klima-Entitäten, Räume und Heizkörperthermostate an einer echten Anlage,
-- das Senden eines Befehls an die Viessmann-API.
+- das Einstellen einer Solltemperatur und überhaupt das Senden eines Befehls
+  an die Viessmann-API (auch über `send_command`).
 
 `tests/unit` und `tests/ha` müssen getrennt gestartet werden.
 

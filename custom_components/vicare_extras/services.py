@@ -1,7 +1,9 @@
 """Actions of the ViCare Extras integration.
 
-Both actions are response-only and read-only. They are registered once in
-``async_setup`` and look up the loaded ``vicare`` config entry at call time.
+``get_features`` and ``get_event_history`` are response-only and read-only.
+``send_command`` is an expert action for administrators that posts one
+command as given. All are registered once in ``async_setup`` and look up the
+loaded ``vicare`` config entry at call time.
 
 API usage
 ---------
@@ -9,6 +11,7 @@ API usage
 ``get_event_history``  1 API call per page fetched (at most ``max_pages``),
                        plus 1 call when the first path answers "not found"
                        and the fallback path is tried.
+``send_command``       exactly 1 API call (one POST), whatever the answer.
 """
 
 from __future__ import annotations
@@ -17,6 +20,7 @@ import asyncio
 import copy
 from functools import partial
 import logging
+import re
 from typing import Any
 
 import voluptuous as vol
@@ -30,20 +34,25 @@ from homeassistant.core import (
 )
 from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
 from homeassistant.helpers import config_validation as cv, device_registry as dr
+from homeassistant.helpers.service import async_register_admin_service
 
-from . import bridge
+from . import bridge, commands
 from .const import (
+    ATTR_COMMAND,
     ATTR_CURSOR,
     ATTR_DEVICE_ID,
     ATTR_DEVICE_TYPE,
     ATTR_EDITED_BY,
     ATTR_EVENT_TYPE,
+    ATTR_FEATURE,
     ATTR_FULL,
+    ATTR_GATEWAY_SERIAL,
     ATTR_GATEWAY_SERIALS,
     ATTR_INSTALLATION_ID,
     ATTR_LAST_N_DAYS,
     ATTR_LIMIT,
     ATTR_MAX_PAGES,
+    ATTR_PARAMS,
     ATTR_PREFIX,
     ATTR_VICARE_DEVICE_ID,
     CACHE_WAIT_ATTEMPTS,
@@ -60,6 +69,7 @@ from .const import (
     MAX_MAX_PAGES,
     SERVICE_GET_EVENT_HISTORY,
     SERVICE_GET_FEATURES,
+    SERVICE_SEND_COMMAND,
     VICARE_DOMAIN,
 )
 from .errors import ViCareExtrasError
@@ -90,6 +100,20 @@ def _id_string(value: Any) -> str:
     return text
 
 
+# Feature and command names end up in the URL of the request.
+_FEATURE_NAME = re.compile(r"[A-Za-z0-9_-]+(\.[A-Za-z0-9_-]+)*")
+_COMMAND_NAME = re.compile(r"[A-Za-z0-9_-]+")
+
+
+def _name(pattern: re.Pattern[str]) -> Any:
+    def validate(value: Any) -> str:
+        if not isinstance(value, str) or not pattern.fullmatch(text := value.strip()):
+            raise vol.Invalid("not a valid name")
+        return text
+
+    return validate
+
+
 GET_EVENT_HISTORY_SCHEMA = vol.Schema(
     {
         vol.Optional(ATTR_LAST_N_DAYS, default=DEFAULT_LAST_N_DAYS): vol.All(
@@ -116,6 +140,19 @@ GET_FEATURES_SCHEMA = vol.Schema(
         vol.Optional(ATTR_DEVICE_TYPE): cv.string,
         vol.Optional(ATTR_PREFIX): cv.string,
         vol.Optional(ATTR_FULL, default=False): cv.boolean,
+    }
+)
+
+
+SEND_COMMAND_SCHEMA = vol.Schema(
+    {
+        vol.Required(ATTR_VICARE_DEVICE_ID): _id_string,
+        vol.Required(ATTR_FEATURE): _name(_FEATURE_NAME),
+        vol.Required(ATTR_COMMAND): _name(_COMMAND_NAME),
+        # No schema default: the handler treats a missing value as {}.
+        vol.Optional(ATTR_PARAMS): dict,
+        # Only needed when several gateways have a device with the same id.
+        vol.Optional(ATTR_GATEWAY_SERIAL): _id_string,
     }
 )
 
@@ -323,6 +360,94 @@ async def _async_get_features(call: ServiceCall) -> ServiceResponse:
     return await hass.async_add_executor_job(copy.deepcopy, response)
 
 
+# --------------------------------------------------------------------------
+# send_command
+# --------------------------------------------------------------------------
+
+
+def _command_target(hass: HomeAssistant, data: Any) -> bridge.DeviceRef:
+    """Return the one device a send_command call names."""
+    refs = [
+        ref
+        for ref in bridge.collect_all_devices(hass)
+        if ref.device_id == data[ATTR_VICARE_DEVICE_ID]
+    ]
+    if serial := data.get(ATTR_GATEWAY_SERIAL):
+        refs = [ref for ref in refs if ref.gateway_serial == serial]
+    if not refs:
+        raise ViCareExtrasError("device_not_found", validation=True)
+    if len(refs) > 1:
+        raise ViCareExtrasError(
+            "device_ambiguous",
+            {"gateways": ", ".join(sorted({ref.gateway_serial for ref in refs}))},
+            validation=True,
+        )
+    return refs[0]
+
+
+def _cached_feature(ref: bridge.DeviceRef, name: str) -> dict[str, Any] | None:
+    """Return the cached feature object, if there is one (no API call)."""
+    try:
+        payload = bridge.peek_payload(ref.service)
+    except ViCareExtrasError:
+        return None
+    if payload is None:
+        return None
+    for feature in bridge.device_features(payload, ref.device_id):
+        if feature.get("feature") == name:
+            return feature
+    return None
+
+
+async def _async_send_command(call: ServiceCall) -> ServiceResponse:
+    """Post one command as given (expert action, exactly one API call).
+
+    Not limited to commands the feature advertises: the point is to see what
+    the API answers. Rejections by the API are returned, not raised.
+    """
+    hass = call.hass
+    data = call.data
+    feature: str = data[ATTR_FEATURE]
+    command: str = data[ATTR_COMMAND]
+    try:
+        ref = _command_target(hass, data)
+        is_advertised, executable = commands.advertised(
+            _cached_feature(ref, feature), command
+        )
+        # PyViCare uses requests: executor. The plain ViCareService.setProperty
+        # is used, so the cache of the built-in integration is not emptied.
+        result = await hass.async_add_executor_job(
+            commands.send,
+            ref.service,
+            ref.accessor,
+            feature,
+            command,
+            dict(data.get(ATTR_PARAMS) or {}),
+        )
+    except ViCareExtrasError as err:
+        raise _ha_error(err) from err
+
+    _LOGGER.debug(
+        "send_command %s on %s (device %s): success=%s",
+        command,
+        feature,
+        ref.device_id,
+        result["success"],
+    )
+    if not call.return_response:
+        return None
+    return {
+        "sent": True,
+        "advertised": is_advertised,
+        "executable": executable,
+        "api_calls": 1,
+        "success": result["success"],
+        "response": await hass.async_add_executor_job(
+            copy.deepcopy, result["response"]
+        ),
+    }
+
+
 @callback
 def async_setup_services(hass: HomeAssistant) -> None:
     """Register the actions."""
@@ -339,4 +464,13 @@ def async_setup_services(hass: HomeAssistant) -> None:
         _async_get_features,
         schema=GET_FEATURES_SCHEMA,
         supports_response=SupportsResponse.ONLY,
+    )
+    # Writes to the heating system: administrators only.
+    async_register_admin_service(
+        hass,
+        DOMAIN,
+        SERVICE_SEND_COMMAND,
+        _async_send_command,
+        schema=SEND_COMMAND_SCHEMA,
+        supports_response=SupportsResponse.OPTIONAL,
     )

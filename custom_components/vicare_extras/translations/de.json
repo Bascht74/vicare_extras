@@ -5,7 +5,7 @@
     },
     "step": {
       "user": {
-        "description": "ViCare Extras ergänzt die eingebaute Integration Viessmann ViCare um rein lesende Aktionen und Sensoren. Es nutzt die vorhandene Anmeldung, braucht keine eigenen Zugangsdaten und fragt die Viessmann-API nicht regelmäßig ab.\n\nDie Integration Viessmann ViCare muss eingerichtet und geladen sein.",
+        "description": "ViCare Extras ergänzt die eingebaute Integration Viessmann ViCare um Sensoren, Klima-Entitäten und Aktionen. Es nutzt die vorhandene Anmeldung, braucht keine eigenen Zugangsdaten und fragt die Viessmann-API nicht regelmäßig ab.\n\nEs liest nur, mit zwei Ausnahmen: Ein Befehl wird gesendet, wenn du an einer Klima-Entität von ViCare Extras die Solltemperatur änderst oder die Aktion send_command aufrufst.\n\nDie Integration Viessmann ViCare muss eingerichtet und geladen sein.",
         "title": "ViCare Extras"
       }
     }
@@ -499,6 +499,9 @@
     "command_not_available": {
       "message": "Die Viessmann-API bietet keinen Befehl an, um diesen Wert zu ändern."
     },
+    "device_ambiguous": {
+      "message": "Mehrere Gateways haben ein Gerät mit dieser ID ({gateways}). Bitte die Gateway-Seriennummer angeben."
+    },
     "device_not_found": {
       "message": "Kein ViCare-Gerät passt zur Auswahl."
     },
@@ -617,6 +620,32 @@
         }
       },
       "name": "Features abrufen"
+    },
+    "send_command": {
+      "name": "Befehl senden (Experten)",
+      "description": "Sendet genau einen Befehl unverändert an die Viessmann-API – auch einen, den das Feature nicht anbietet – und gibt die Antwort der API zurück. Zur Diagnose durch Administratoren: Ein Befehl kann Einstellungen der Heizung ändern. Ein API-Aufruf.",
+      "fields": {
+        "vicare_device_id": {
+          "name": "ViCare-Geräte-ID",
+          "description": "Viessmann-Geräte-ID, zum Beispiel RoomControl-1, 0 oder zigbee-…"
+        },
+        "feature": {
+          "name": "Feature",
+          "description": "Name des Features, zum Beispiel rooms.0.temperature.levels.normal.perceived."
+        },
+        "command": {
+          "name": "Befehl",
+          "description": "Name des Befehls, zum Beispiel setTemperature."
+        },
+        "params": {
+          "name": "Parameter",
+          "description": "Parameter des Befehls als Objekt, zum Beispiel {\"targetTemperature\": 21}. Sie werden ungeprüft gesendet."
+        },
+        "gateway_serial": {
+          "name": "Gateway-Seriennummer",
+          "description": "Nur nötig, wenn mehrere Gateways ein Gerät mit dieser ID haben."
+        }
+      }
     }
   }
 }

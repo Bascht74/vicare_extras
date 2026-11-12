@@ -256,6 +256,26 @@ for node in ast.walk(sources[COMPONENT / "services.py"]):
         }
         schema_fields[node.targets[0].id.removesuffix("_SCHEMA").lower()] = fields
 check(set(schema_fields) == set(services_yaml), f"schemas {sorted(schema_fields)} != services.yaml {sorted(services_yaml)}")
+# Fields the schema requires must be marked as required in services.yaml.
+for node in ast.walk(sources[COMPONENT / "services.py"]):
+    if isinstance(node, ast.Assign) and getattr(node.targets[0], "id", "").endswith("_SCHEMA"):
+        service_name = node.targets[0].id.removesuffix("_SCHEMA").lower()
+        required = {
+            const_values[call.args[0].id]
+            for call in ast.walk(node.value)
+            if isinstance(call, ast.Call) and getattr(call.func, "attr", None) == "Required" and isinstance(call.args[0], ast.Name)
+        }
+        marked = {name for name, field in services_yaml.get(service_name, {}).get("fields", {}).items() if (field or {}).get("required")}
+        check(required == marked, f"{service_name}: schema requires {sorted(required)}, services.yaml marks {sorted(marked)}")
+# send_command writes: it must be registered as an admin action and nothing else may be.
+services_source = (COMPONENT / "services.py").read_text(encoding="utf-8")
+admin_actions = set(re.findall(r"async_register_admin_service\(\s*hass,\s*DOMAIN,\s*(\w+)", services_source))
+check(admin_actions == {"SERVICE_SEND_COMMAND"}, f"admin actions are {sorted(admin_actions)}, expected SERVICE_SEND_COMMAND only")
+check(const_values.get("SERVICE_SEND_COMMAND") == "send_command" and "send_command" in services_yaml, "action send_command missing")
+for language, content in all_texts.items():
+    description = content["config"]["step"]["user"]["description"].lower()
+    check("read-only" not in description and "rein lesend" not in description, f"{language}: the setup dialog still calls the integration read-only")
+    check("send_command" in description, f"{language}: the setup dialog must mention send_command")
 check(set(icons["services"]) == set(services_yaml), "icons.json services differ from services.yaml")
 for service, definition in services_yaml.items():
     yaml_fields = set(definition.get("fields", {}))

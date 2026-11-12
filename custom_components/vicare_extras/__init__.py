@@ -5,10 +5,11 @@ PyViCare client the built-in integration has authenticated (through the
 ``runtime_data`` of the loaded ``vicare`` config entry) and never performs an
 API request on its own schedule.
 
-Sensors, binary sensors and both actions are read-only. The climate entities
-(rooms, radiator thermostats) send a command only when the user changes a
-target temperature. The optional poll interval changes how often the built-in
-integration polls.
+Sensors, binary sensors and the actions ``get_features`` and
+``get_event_history`` are read-only. The climate entities (rooms, radiator
+thermostats) send a command only when the user changes a target temperature,
+and the admin-only action ``send_command`` posts one command as given. The
+optional poll interval changes how often the built-in integration polls.
 """
 
 from __future__ import annotations

@@ -61,6 +61,37 @@ def find_vicare_device(hass: HomeAssistant, device: DeviceRef) -> Any | None:
         return None
 
 
+def find_gateway_heating_device(
+    coordinator: ViCareExtrasCoordinator, device: DeviceRef
+) -> Any | None:
+    """Return the built-in integration's device of the heat generator.
+
+    The first heating device on the same gateway that the built-in integration
+    has set up. Room devices name it as their "via device", so a room shows up
+    as a connected device of the heat pump. None when there is no such device.
+    """
+    for snapshot in (coordinator.data or {}).values():
+        other = snapshot.device
+        if (
+            other.device_type == DEVICE_TYPE_HEATING
+            and other.identifier is not None
+            and other.gateway_serial == device.gateway_serial
+            and other.installation_id == device.installation_id
+            and (entry := find_vicare_device(coordinator.hass, other)) is not None
+        ):
+            return entry
+    return None
+
+
+def default_room_name(hass: HomeAssistant, room: int) -> str:
+    """Return the name of a room the API gives no name for.
+
+    "Raum N" when Home Assistant's language is German, otherwise "Room N".
+    """
+    language = str(getattr(hass.config, "language", "") or "").lower()
+    return f"Raum {room}" if language.startswith("de") else f"Room {room}"
+
+
 def iter_targets(
     snapshot: DeviceSnapshot,
 ) -> Iterator[tuple[str, Target, dict[str, dict[str, Any]]]]:
@@ -132,13 +163,22 @@ class ViCareExtrasEntity(CoordinatorEntity[ViCareExtrasCoordinator]):
             self.device_entry = find_vicare_device(coordinator.hass, target.device)
         else:
             # The built-in integration has no device for rooms: one device per
-            # room, owned by this integration.
-            self._attr_device_info = DeviceInfo(
-                identifiers={(DOMAIN, target.unique_prefix)},
-                name=target.room_name or f"Room {target.room}",
-                manufacturer="Viessmann",
-                model="ViCare room",
-            )
+            # room, owned by this integration. A device cannot belong to the
+            # built-in integration's entry, so the room is linked to the heat
+            # generator of its gateway as "via device" instead. Home Assistant
+            # applies name and link to an existing device on every start; a
+            # name the user set (name_by_user) is kept.
+            info: dict[str, Any] = {
+                "identifiers": {(DOMAIN, target.unique_prefix)},
+                "name": target.room_name
+                or default_room_name(coordinator.hass, target.room),
+                "manufacturer": "Viessmann",
+                "model": "ViCare room",
+            }
+            via = find_gateway_heating_device(coordinator, target.device)
+            if via is not None and getattr(via, "id", None):
+                info["via_device_id"] = via.id
+            self._attr_device_info = DeviceInfo(**info)
 
     @property
     def _features(self) -> dict[str, dict[str, Any]]:

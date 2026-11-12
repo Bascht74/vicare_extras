@@ -418,3 +418,60 @@ def test_only_radiator_thermostats_count_as_trv(name, is_trv) -> None:
         assert thermostats.trv_setpoint(features).command.name == "setTargetTemperature"
         assert thermostats.sensor_value(features["device.sensors.temperature"]) == 21.5
         assert thermostats.trv_action(features) == "heating"  # valve at 2 %
+
+
+# ------------------------------------------------------------ send (as given)
+
+
+def test_send_posts_an_unadvertised_command_through_real_pyvicare() -> None:
+    session = FakeSession(FakeResponse(200, {"data": {"success": True, "reason": "COMMAND_EXECUTION_SUCCESS"}}))
+    service = ViCareCachedServiceViaGateway(Manager(session), 60)
+    payload = fakes.gateway_payload()
+    service._cache = payload
+    service._cacheTime = datetime.now()
+
+    result = commands.send(
+        service,
+        ROOM_ACCESSOR,
+        "rooms.0.temperature.levels.normal.perceived",
+        "setTemperature",
+        {"targetTemperature": 21.5},
+    )
+
+    assert result == {"success": True, "response": {"data": {"success": True, "reason": "COMMAND_EXECUTION_SUCCESS"}}}
+    assert session.posts == [
+        (
+            f"{API_BASE_URL}/features/installations/{fakes.INSTALLATION_ID}/gateways/"
+            f"{fakes.GATEWAY_SERIAL}/devices/RoomControl-1/features/"
+            "rooms.0.temperature.levels.normal.perceived/commands/setTemperature",
+            '{"targetTemperature": 21.5}',
+        )
+    ]
+    assert session.urls == []
+    assert bridge.peek_payload(service) is payload  # cache untouched
+
+
+def test_send_returns_what_real_pyvicare_reports_for_a_rejection() -> None:
+    body = {
+        "viErrorId": "req-123",
+        "statusCode": 404,
+        "errorType": "COMMAND_NOT_FOUND",
+        "message": "Command not found",
+        "extendedPayload": {"reason": "COMMAND_NOT_FOUND"},
+    }
+    session = FakeSession(FakeResponse(404, body))
+    service = ViCareCachedServiceViaGateway(Manager(session), 60)
+
+    result = commands.send(service, ROOM_ACCESSOR, "rooms.0.schedule", "setSchedule", {})
+
+    assert result["success"] is False
+    # PyViCare raises PyViCareCommandError, or hands the answer back when its
+    # "raise on command failure" switch is off: both are reported as data.
+    response = result["response"]
+    if "error_type" in response:
+        assert response["error_type"] == "PyViCareCommandError"
+        assert response["status_code"] == 404
+        assert "COMMAND_NOT_FOUND" in response["message"]
+    else:
+        assert response == body
+    assert len(session.posts) == 1

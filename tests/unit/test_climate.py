@@ -210,7 +210,7 @@ def test_room_action_and_missing_sensors() -> None:
     assert entity.native_current_temperature is None
     assert entity.current_humidity is None
     assert entity.hvac_action is None
-    assert entity.device_info.name == "Room 1"
+    assert entity.device_info.name == "Raum 1"  # Home Assistant runs in German here
 
 
 def test_no_command_is_sent_without_a_user_action() -> None:

@@ -28,15 +28,22 @@ def call(hass, name, data=None):
     return asyncio.run(hass.services.async_call(DOMAIN, name, data))
 
 
-def test_actions_are_response_only() -> None:
+def test_registered_actions() -> None:
     hass, _ = setup()
     assert set(hass.services.registered) == {
         (DOMAIN, "get_event_history"),
         (DOMAIN, "get_features"),
+        (DOMAIN, "send_command"),
     }
-    for registration in hass.services.registered.values():
-        assert registration["supports_response"] is SupportsResponse.ONLY
+    for (_, name), registration in hass.services.registered.items():
         assert registration["schema"] is not None
+        if name == "send_command":
+            # The only action that writes: administrators only.
+            assert registration.get("admin") is True
+            assert registration["supports_response"] is SupportsResponse.OPTIONAL
+        else:
+            assert not registration.get("admin")
+            assert registration["supports_response"] is SupportsResponse.ONLY
 
 
 # ---------------------------------------------------------------- event history
@@ -367,3 +374,187 @@ def test_features_service_without_cache() -> None:
     with pytest.raises(HomeAssistantError) as err:
         call(hass, "get_features")
     assert err.value.translation_key == "cache_unsupported"
+
+
+# ----------------------------------------------------------------- send_command
+
+PERCEIVED = "rooms.0.temperature.levels.normal.perceived"
+ROOM_COMMAND = {
+    "vicare_device_id": "RoomControl-1",
+    "feature": PERCEIVED,
+    "command": "setTemperature",
+    "params": {"targetTemperature": 21.5},
+}
+
+
+def command_setup(rooms=None, answer=None, **kwargs):
+    payload = fakes.gateway_payload(None, fakes.room_features(0) if rooms is None else rooms)
+    service = fakes.FakeCommandService(payload, answer)
+    hass, _ = fakes.make_hass(service=service, **kwargs)
+    services.async_setup_services(hass)
+    return hass, service
+
+
+def test_send_command_posts_a_command_the_api_does_not_advertise() -> None:
+    """Basic plan: the commands objects are empty; the command is sent anyway."""
+    hass, service = command_setup()
+
+    result = call(hass, "send_command", ROOM_COMMAND)
+
+    assert service.commands == [
+        ("RoomControl-1", PERCEIVED, "setTemperature", {"targetTemperature": 21.5})
+    ]
+    assert result == {
+        "sent": True,
+        "advertised": False,
+        "executable": None,
+        "api_calls": 1,
+        "success": True,
+        "response": {"data": {"success": True, "reason": "COMMAND_EXECUTION_SUCCESS"}},
+    }
+    # One POST, no read, and the cache of the built-in integration is kept.
+    assert service.api_calls == 0
+    assert service.cache_clears == 0
+    assert service._cache is not None
+    assert len(hass.executor_jobs) == 2  # the POST and the copy of the answer
+
+
+@pytest.mark.parametrize(("executable", "expected"), [(True, True), (False, False)])
+def test_send_command_reports_what_the_feature_advertises(executable, expected) -> None:
+    rooms = fakes.room_features(0, writable="temperature.levels.normal.perceived", executable=executable)
+    hass, service = command_setup(rooms)
+    result = call(hass, "send_command", ROOM_COMMAND)
+    assert (result["advertised"], result["executable"]) == (True, expected)
+    assert len(service.commands) == 1  # sent even when not executable
+
+
+def test_send_command_defaults_and_unknown_feature() -> None:
+    hass, service = command_setup()
+    data = {"vicare_device_id": "RoomControl-1", "feature": "rooms.0.quickmodes.manual", "command": "activate"}
+    result = call(hass, "send_command", data)
+    assert service.commands == [("RoomControl-1", "rooms.0.quickmodes.manual", "activate", {})]
+    assert (result["advertised"], result["executable"]) == (False, None)
+
+
+@pytest.mark.parametrize(
+    ("answer", "response"),
+    [
+        (
+            fakes.PyViCareCommandError("COMMAND_NOT_FOUND"),
+            {
+                "error_type": "PyViCareCommandError",
+                "message": "Command failed with status code 502. Reason given was: COMMAND_NOT_FOUND",
+                "status_code": 502,
+            },
+        ),
+        (
+            {"viErrorId": "abc", "statusCode": 404, "errorType": "COMMAND_NOT_FOUND", "message": "Command not found"},
+            {"viErrorId": "abc", "statusCode": 404, "errorType": "COMMAND_NOT_FOUND", "message": "Command not found"},
+        ),
+        (
+            {"data": {"success": False, "reason": "COMMAND_EXECUTION_ERROR"}},
+            {"data": {"success": False, "reason": "COMMAND_EXECUTION_ERROR"}},
+        ),
+    ],
+)
+def test_send_command_returns_rejections_instead_of_raising(answer, response) -> None:
+    hass, service = command_setup(answer=answer)
+    result = call(hass, "send_command", ROOM_COMMAND)
+    assert result["sent"] is True
+    assert result["success"] is False
+    assert result["api_calls"] == 1
+    assert result["response"] == response
+    assert len(service.commands) == 1  # not retried
+
+
+def test_send_command_reports_other_api_errors_as_data() -> None:
+    for answer, error_type in (
+        (fakes.PyViCareRateLimitError(), "PyViCareRateLimitError"),
+        (fakes.PyViCareInternalServerError("boom"), "PyViCareInternalServerError"),
+    ):
+        hass, _ = command_setup(answer=answer)
+        result = call(hass, "send_command", ROOM_COMMAND)
+        assert result["success"] is False
+        assert result["response"]["error_type"] == error_type
+        assert result["response"]["message"]
+
+
+def test_send_command_raises_only_for_local_problems() -> None:
+    hass, service = command_setup()
+    with pytest.raises(ServiceValidationError) as err:
+        call(hass, "send_command", {**ROOM_COMMAND, "vicare_device_id": "nope"})
+    assert err.value.translation_key == "device_not_found"
+    with pytest.raises(ServiceValidationError) as err:
+        call(hass, "send_command", {**ROOM_COMMAND, "gateway_serial": "0000"})
+    assert err.value.translation_key == "device_not_found"
+    assert service.commands == []
+
+    fakes.vicare_entry(hass).state = ConfigEntryState.NOT_LOADED
+    with pytest.raises(HomeAssistantError) as err:
+        call(hass, "send_command", ROOM_COMMAND)
+    assert err.value.translation_key == "vicare_not_loaded"
+    assert service.commands == []
+
+
+def test_send_command_with_gateway_serial() -> None:
+    hass, service = command_setup()
+    result = call(hass, "send_command", {**ROOM_COMMAND, "gateway_serial": fakes.GATEWAY_SERIAL})
+    assert result["success"] is True
+    assert len(service.commands) == 1
+
+
+@pytest.mark.parametrize(
+    "data",
+    [
+        {k: v for k, v in ROOM_COMMAND.items() if k != "vicare_device_id"},
+        {k: v for k, v in ROOM_COMMAND.items() if k != "feature"},
+        {k: v for k, v in ROOM_COMMAND.items() if k != "command"},
+        {**ROOM_COMMAND, "params": "targetTemperature=21"},
+        {**ROOM_COMMAND, "params": [21]},
+        # Names go into the URL: nothing but letters, digits, dots, "-" and "_".
+        {**ROOM_COMMAND, "feature": "rooms.0/../../x"},
+        {**ROOM_COMMAND, "feature": "rooms..0"},
+        {**ROOM_COMMAND, "feature": ""},
+        {**ROOM_COMMAND, "command": "set Temperature"},
+        {**ROOM_COMMAND, "command": "a/b"},
+        {**ROOM_COMMAND, "command": "setTemperature?x=1"},
+        {**ROOM_COMMAND, "unknown": 1},
+    ],
+)
+def test_send_command_rejects_invalid_input_before_sending(data) -> None:
+    hass, service = command_setup()
+    with pytest.raises(vol.Invalid):
+        call(hass, "send_command", data)
+    assert service.commands == []
+
+
+def test_send_command_without_response_requested() -> None:
+    hass, service = command_setup()
+    registration = hass.services.registered[(DOMAIN, "send_command")]
+    from homeassistant.core import ServiceCall  # noqa: PLC0415
+
+    validated = registration["schema"](dict(ROOM_COMMAND))
+    service_call = ServiceCall(hass, DOMAIN, "send_command", validated, return_response=False)
+    assert asyncio.run(registration["func"](service_call)) is None
+    assert len(service.commands) == 1
+
+
+def test_send_command_to_a_thermostat() -> None:
+    payload = fakes.gateway_payload(None, None, fakes.trv_features(executable=False))
+    service = fakes.FakeCommandService(payload)
+    hass, _ = fakes.make_hass(with_trv=True, service=service)
+    services.async_setup_services(hass)
+    result = call(
+        hass,
+        "send_command",
+        {
+            "vicare_device_id": fakes.TRV_DEVICE_ID,
+            "feature": "trv.temperature",
+            "command": "setTargetTemperature",
+            "params": {"temperature": 20},
+        },
+    )
+    assert service.commands == [
+        (fakes.TRV_DEVICE_ID, "trv.temperature", "setTargetTemperature", {"temperature": 20})
+    ]
+    assert result["success"] is True

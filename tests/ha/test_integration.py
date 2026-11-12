@@ -104,6 +104,8 @@ async def test_vitocal_entities_and_rooms(hass: HomeAssistant, vicare) -> None:
     assert len(on_heat_pump) == 46 + 18
     room_devices = dr.async_entries_for_config_entry(dr.async_get(hass), entry.entry_id)
     assert [device.name for device in room_devices] == ["Wohnzimmer"]
+    # The room is shown as a connected device of the heat pump.
+    assert room_devices[0].via_device_id == vicare_device.id
 
     by_unique_id = {entity.unique_id: entity for entity in entities}
     prefix = fakes.HEAT_PUMP_IDENTIFIER
@@ -272,3 +274,56 @@ async def test_climate_entities_and_set_temperature(hass: HomeAssistant) -> None
             {"temperature": 20},
         )
         assert service.api_calls == 0
+
+
+async def test_send_command_action_is_admin_only(hass: HomeAssistant, hass_read_only_user) -> None:
+    """One POST as given; the API's rejection comes back as data."""
+    from homeassistant.core import Context  # noqa: PLC0415
+    from homeassistant.exceptions import Unauthorized  # noqa: PLC0415
+
+    vicare_entry = MockConfigEntry(domain="vicare", title="ViCare", data={})
+    vicare_entry.add_to_hass(hass)
+    service = fakes.FakeCommandService(
+        fakes.gateway_payload(None, fakes.room_features(0)),
+        fakes.PyViCareCommandError("COMMAND_NOT_FOUND"),
+    )
+    runtime_data, _ = fakes.make_runtime_data(service=service)
+
+    async def fake_setup_entry(hass: HomeAssistant, config_entry) -> None:
+        config_entry.runtime_data = runtime_data
+
+    data = {
+        "vicare_device_id": "RoomControl-1",
+        "feature": "rooms.0.temperature.levels.normal.perceived",
+        "command": "setTemperature",
+        "params": {"targetTemperature": 21},
+    }
+    with (
+        patch("homeassistant.components.vicare.async_setup_entry", fake_setup_entry),
+        patch("homeassistant.components.vicare.async_unload_entry", return_value=None),
+    ):
+        assert await hass.config_entries.async_setup(vicare_entry.entry_id)
+        await hass.async_block_till_done()
+        await _setup_extras(hass)
+
+        with pytest.raises(Unauthorized):
+            await hass.services.async_call(
+                DOMAIN,
+                "send_command",
+                data,
+                blocking=True,
+                return_response=True,
+                context=Context(user_id=hass_read_only_user.id),
+            )
+        assert service.commands == []
+
+        response = await hass.services.async_call(
+            DOMAIN, "send_command", data, blocking=True, return_response=True
+        )
+        assert response["sent"] is True
+        assert response["advertised"] is False
+        assert response["success"] is False
+        assert response["api_calls"] == 1
+        assert response["response"]["error_type"] == "PyViCareCommandError"
+        assert len(service.commands) == 1
+        assert service.cache_clears == 0

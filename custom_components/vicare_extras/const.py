@@ -86,6 +86,7 @@ MAX_MAX_PAGES: Final = 20
 # --- Actions -----------------------------------------------------------------
 SERVICE_GET_EVENT_HISTORY: Final = "get_event_history"
 SERVICE_GET_FEATURES: Final = "get_features"
+SERVICE_SEND_COMMAND: Final = "send_command"
 
 ATTR_LAST_N_DAYS: Final = "last_n_days"
 ATTR_LIMIT: Final = "limit"
@@ -101,6 +102,11 @@ ATTR_VICARE_DEVICE_ID: Final = "vicare_device_id"
 ATTR_DEVICE_TYPE: Final = "device_type"
 ATTR_PREFIX: Final = "prefix"
 ATTR_FULL: Final = "full"
+
+ATTR_FEATURE: Final = "feature"
+ATTR_COMMAND: Final = "command"
+ATTR_PARAMS: Final = "params"
+ATTR_GATEWAY_SERIAL: Final = "gateway_serial"
 
 # get_features waits this long for the built-in integration to finish a
 # refresh (its cache is empty while the refresh request is running).
