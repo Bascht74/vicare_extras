@@ -64,6 +64,7 @@ def rows() -> list[dict[str, str]]:
                 "en": en[spec.platform][spec.key],
                 "unit": "" if spec.kind != specs.KIND_NUMBER else (spec.unit or ""),
                 "enabled": "ja" if spec.enabled else "nein",
+                "category": "Diagnose" if spec.diagnostic else "",
                 "source": " / ".join(f"`{feature}` → `{prop}`" for feature, prop in spec.sources),
             }
         )
@@ -77,6 +78,7 @@ def rows() -> list[dict[str, str]]:
                 "en": en["sensor"][spec.key],
                 "unit": SPECIAL_UNITS.get(spec.kind, ""),
                 "enabled": "ja" if spec.enabled else "nein",
+                "category": "Diagnose" if spec.diagnostic else "",
                 "source": (" + " if spec.require == "all" else " / ").join(f"`{feature}`" for feature in spec.features),
             }
         )
@@ -88,18 +90,18 @@ def main() -> int:
     for scope, title in ((specs.SCOPE_HEATING, "Heizgerät"), (specs.SCOPE_ROOM, "Räume")):
         print(f"\n**{title}**\n")
         if report:
-            print("| Plattform | Key | Name (de) | Name (en) | Einheit | Standard aktiv | Quelle |")
-            print("| --- | --- | --- | --- | --- | --- | --- |")
+            print("| Plattform | Key | Name (de) | Name (en) | Einheit | Standard aktiv | Kategorie | Quelle |")
+            print("| --- | --- | --- | --- | --- | --- | --- | --- |")
         else:
-            print("| Plattform | Name | Einheit | Standard aktiv | Quelle |")
-            print("| --- | --- | --- | --- | --- |")
+            print("| Plattform | Name | Einheit | Standard aktiv | Kategorie | Quelle |")
+            print("| --- | --- | --- | --- | --- | --- |")
         for row in rows():
             if row["scope"] != scope:
                 continue
             if report:
-                print(f"| {row['platform']} | `{row['key']}` | {row['de']} | {row['en']} | {row['unit']} | {row['enabled']} | {row['source']} |")
+                print(f"| {row['platform']} | `{row['key']}` | {row['de']} | {row['en']} | {row['unit']} | {row['enabled']} | {row['category']} | {row['source']} |")
             else:
-                print(f"| {row['platform']} | {row['de']} | {row['unit']} | {row['enabled']} | {row['source']} |")
+                print(f"| {row['platform']} | {row['de']} | {row['unit']} | {row['enabled']} | {row['category']} | {row['source']} |")
     print_climate()
     return 0
 

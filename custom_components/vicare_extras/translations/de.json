@@ -454,6 +454,9 @@
       "room_setpoint_comfort_perceived": {
         "name": "Solltemperatur Komfort (gefühlt)"
       },
+      "room_setpoint_heating": {
+        "name": "Solltemperatur wirksam"
+      },
       "room_setpoint_normal_cooling": {
         "name": "Solltemperatur Kühlen Normal"
       },

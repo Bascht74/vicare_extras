@@ -412,93 +412,96 @@ Ob die API die Befehle so annimmt, ist offen. Ein Raumregler ohne Räume (nur
 
 ### Liste aller Entitäten
 
-Erzeugt mit `python scripts/list_entities.py`.
+Erzeugt mit `python scripts/list_entities.py`. Spalte „Kategorie“: „Diagnose“ heißt,
+die Entität steht auf der Geräteseite unter „Diagnose“ (Werte für die
+Fachkraft, nicht für den Alltag).
 
 **Heizgerät**
 
-| Plattform | Name | Einheit | Standard aktiv | Quelle |
-| --- | --- | --- | --- | --- |
-| sensor | 4/3-Wege-Ventil Position |  | ja | `heating.valves.fourThreeWay.position` → `value` |
-| sensor | Sekundärkreis Betriebszustand |  | ja | `heating.secondaryCircuit.operation.state` → `currentValue` |
-| sensor | 4/3-Wege-Ventil Stellung Ist | % | ja | `heating.secondaryCircuit.valves.fourThreeWay` → `current` |
-| sensor | 4/3-Wege-Ventil Stellung Soll | % | ja | `heating.secondaryCircuit.valves.fourThreeWay` → `target` |
-| sensor | Wärmeleistung aktuell | kW | ja | `heating.heat.production.current` → `value` |
-| sensor | Leistungsaufnahme aktuell | kW | ja | `heating.power.consumption.current` → `value` |
-| sensor | Verdichter{suffix} Drehzahl | rps | ja | `heating.compressors.{n}.speed.current` → `value` |
-| sensor | Verdichter{suffix} Drehzahl Soll | rps | ja | `heating.compressors.{n}.speed.setpoint` → `value` |
-| sensor | Verdichter{suffix} Öltemperatur | °C | ja | `heating.compressors.{n}.sensors.temperature.oil` → `value` |
-| sensor | Verdichter{suffix} Motorraumtemperatur | °C | ja | `heating.compressors.{n}.sensors.temperature.motorChamber` → `value` |
-| binary_sensor | Verdichter{suffix} Kurbelwannenheizung |  | ja | `heating.compressors.{n}.heater.crankcase` → `active` |
-| sensor | Economizer{suffix} Flüssiggastemperatur | °C | ja | `heating.economizers.{n}.sensors.temperature.liquid` → `value` |
-| sensor | Expansionsventil {number} Soll | % | ja | `heating.sensors.valve.{n}.expansion.target` → `value` |
-| sensor | Ventilator {number} | % | ja | `heating.primaryCircuit.fans.{n}.current` → `value` |
-| binary_sensor | Abtauen |  | ja | `heating.outdoor.defrosting` → `active` |
-| binary_sensor | Verdampfer{suffix} Sockelheizung |  | ja | `heating.evaporators.{n}.heater.base` → `active` |
-| binary_sensor | Kondensatwannenheizung |  | ja | `heating.heater.condensatePan` → `active` |
-| binary_sensor | Ventilatorringheizung |  | ja | `heating.heater.fanRing` → `active` |
-| binary_sensor | Primärkreis 4/3-Wege-Ventil aktiv |  | nein | `heating.primaryCircuit.valves.fourThreeWay` → `active` |
-| binary_sensor | Interne Pumpe |  | ja | `heating.boiler.pumps.internal` → `status` |
-| sensor | Interne Pumpe Drehzahl | % | ja | `heating.boiler.pumps.internal.current` → `value` |
-| sensor | Interne Pumpe Drehzahl Soll | % | ja | `heating.boiler.pumps.internal.target` → `value` |
-| binary_sensor | Heizstab aktiv |  | ja | `heating.heatingRod` → `active` |
-| binary_sensor | Heizstab Freigabe Warmwasser |  | nein | `heating.configuration.heatingRod.dhw` → `useApproved` |
-| binary_sensor | Heizstab Freigabe Heizung |  | nein | `heating.configuration.heatingRod.heating` → `useApproved` |
-| sensor | Heizstab maximale Außentemperatur | °C | nein | `heating.heatingRod.maximumOutsideTemperature` → `value` |
-| binary_sensor | Externer Wärmeerzeuger |  | ja | `heating.secondaryHeatGenerator` → `active` |
-| sensor | Heizkreis {number} aktives Programm |  | ja | `heating.circuits.{n}.operating.programs.active` → `value` |
-| sensor | Heizkreis {number} Temperaturgrenze Minimum | °C | nein | `heating.circuits.{n}.temperature.levels` → `min` |
-| sensor | Heizkreis {number} Temperaturgrenze Maximum | °C | nein | `heating.circuits.{n}.temperature.levels` → `max` |
-| sensor | Heizkreis {number} Sommer-Eco Schwelle | °C | nein | `heating.circuits.{n}.configuration.summerEco.absolute` → `threshold` |
-| sensor | Sekundärkreis Rücklauftemperatur Minimum | °C | nein | `heating.secondaryCircuit.temperature.return.minimum` → `value` |
-| sensor | Kesseltemperatur | °C | nein | `heating.boiler.temperature.current` → `value` |
-| sensor | Leistungsbegrenzung §14a |  | ja | `device.power.consumption.limitation` → `value` |
-| sensor | Leistungsbegrenzung Status Verbrauch |  | ja | `device.power.statusReport.consumption` → `status` |
-| sensor | Leistungsbegrenzung Limit Verbrauch | W | ja | `device.power.statusReport.consumption` → `limit` |
-| sensor | Leistungsbegrenzung Status Erzeugung |  | nein | `device.power.statusReport.production` → `status` |
-| binary_sensor | Warmwasser Hygienefunktion |  | ja | `heating.dhw.hygiene` → `enabled` |
-| binary_sensor | Warmwasser Verbrühschutz |  | ja | `heating.dhw.scaldProtection` → `active` |
-| binary_sensor | Externe Sperre |  | ja | `heating.external.lock` → `active` |
-| binary_sensor | Externe Sperre (Gerät) |  | nein | `device.lock.external` → `active` |
-| binary_sensor | Störungssperre |  | ja | `device.lock.malfunction` → `active` |
-| binary_sensor | Ferienprogramm |  | ja | `heating.operating.programs.holiday` → `active` |
-| binary_sensor | Ferien zu Hause |  | ja | `heating.operating.programs.holidayAtHome` → `active` |
-| sensor | Stromverbrauch Warmwasser Verlauf | kWh | ja | `heating.power.consumption.dhw` |
-| sensor | Stromverbrauch Heizung Verlauf | kWh | ja | `heating.power.consumption.heating` |
-| sensor | Stromverbrauch gesamt Verlauf | kWh | ja | `heating.power.consumption.total` |
-| sensor | Wärmeerzeugung Warmwasser | kWh | ja | `heating.heat.production.summary.dhw` |
-| sensor | Wärmeerzeugung Heizung | kWh | ja | `heating.heat.production.summary.heating` |
-| sensor | Wärmeerzeugung Kühlen | kWh | nein | `heating.heat.production.summary.cooling` |
-| sensor | Stromverbrauch Kühlen | kWh | nein | `heating.power.consumption.summary.cooling` |
-| sensor | Heizstab Stromverbrauch Warmwasser | kWh | ja | `heating.heatingRod.power.consumption.summary.dhw` |
-| sensor | Heizstab Stromverbrauch Heizung | kWh | ja | `heating.heatingRod.power.consumption.summary.heating` |
-| sensor | Meldungen |  | ja | `device.messages.status.raw` / `device.messages.info.raw` / `device.messages.service.raw` |
-| sensor | Letzte Statusmeldung |  | ja | `device.messages.status.raw` |
-| sensor | Aktive Statusmeldungen |  | ja | `device.messages.status.raw` |
-| sensor | Betriebszustand |  | ja | `device.messages.status.raw` / `heating.compressors.0` |
-| sensor | Heizstab aktive Stufen |  | ja | `device.messages.status.raw` + `heating.heatingRod` |
-| sensor | COP aktuell |  | ja | `heating.heat.production.current` + `heating.power.consumption.current` |
-| sensor | Warmwasser Zeitprogramm |  | ja | `heating.dhw.schedule` |
-| sensor | Zirkulation Zeitprogramm |  | ja | `heating.dhw.pumps.circulation.schedule` |
-| sensor | Heizkreis {number} Zeitprogramm |  | ja | `heating.circuits.{n}.heating.schedule` |
+| Plattform | Name | Einheit | Standard aktiv | Kategorie | Quelle |
+| --- | --- | --- | --- | --- | --- |
+| sensor | 4/3-Wege-Ventil Position |  | ja |  | `heating.valves.fourThreeWay.position` → `value` |
+| sensor | Sekundärkreis Betriebszustand |  | ja |  | `heating.secondaryCircuit.operation.state` → `currentValue` |
+| sensor | 4/3-Wege-Ventil Stellung Ist | % | ja | Diagnose | `heating.secondaryCircuit.valves.fourThreeWay` → `current` |
+| sensor | 4/3-Wege-Ventil Stellung Soll | % | ja | Diagnose | `heating.secondaryCircuit.valves.fourThreeWay` → `target` |
+| sensor | Wärmeleistung aktuell | kW | ja |  | `heating.heat.production.current` → `value` |
+| sensor | Leistungsaufnahme aktuell | kW | ja |  | `heating.power.consumption.current` → `value` |
+| sensor | Verdichter{suffix} Drehzahl | rps | ja |  | `heating.compressors.{n}.speed.current` → `value` |
+| sensor | Verdichter{suffix} Drehzahl Soll | rps | ja | Diagnose | `heating.compressors.{n}.speed.setpoint` → `value` |
+| sensor | Verdichter{suffix} Öltemperatur | °C | ja | Diagnose | `heating.compressors.{n}.sensors.temperature.oil` → `value` |
+| sensor | Verdichter{suffix} Motorraumtemperatur | °C | ja | Diagnose | `heating.compressors.{n}.sensors.temperature.motorChamber` → `value` |
+| binary_sensor | Verdichter{suffix} Kurbelwannenheizung |  | ja | Diagnose | `heating.compressors.{n}.heater.crankcase` → `active` |
+| sensor | Economizer{suffix} Flüssiggastemperatur | °C | ja | Diagnose | `heating.economizers.{n}.sensors.temperature.liquid` → `value` |
+| sensor | Expansionsventil {number} Soll | % | ja | Diagnose | `heating.sensors.valve.{n}.expansion.target` → `value` |
+| sensor | Ventilator {number} | % | ja | Diagnose | `heating.primaryCircuit.fans.{n}.current` → `value` |
+| binary_sensor | Abtauen |  | ja |  | `heating.outdoor.defrosting` → `active` |
+| binary_sensor | Verdampfer{suffix} Sockelheizung |  | ja | Diagnose | `heating.evaporators.{n}.heater.base` → `active` |
+| binary_sensor | Kondensatwannenheizung |  | ja | Diagnose | `heating.heater.condensatePan` → `active` |
+| binary_sensor | Ventilatorringheizung |  | ja | Diagnose | `heating.heater.fanRing` → `active` |
+| binary_sensor | Primärkreis 4/3-Wege-Ventil aktiv |  | nein | Diagnose | `heating.primaryCircuit.valves.fourThreeWay` → `active` |
+| binary_sensor | Interne Pumpe |  | ja |  | `heating.boiler.pumps.internal` → `status` |
+| sensor | Interne Pumpe Drehzahl | % | ja |  | `heating.boiler.pumps.internal.current` → `value` |
+| sensor | Interne Pumpe Drehzahl Soll | % | ja | Diagnose | `heating.boiler.pumps.internal.target` → `value` |
+| binary_sensor | Heizstab aktiv |  | ja | Diagnose | `heating.heatingRod` → `active` |
+| binary_sensor | Heizstab Freigabe Warmwasser |  | nein | Diagnose | `heating.configuration.heatingRod.dhw` → `useApproved` |
+| binary_sensor | Heizstab Freigabe Heizung |  | nein | Diagnose | `heating.configuration.heatingRod.heating` → `useApproved` |
+| sensor | Heizstab maximale Außentemperatur | °C | nein | Diagnose | `heating.heatingRod.maximumOutsideTemperature` → `value` |
+| binary_sensor | Externer Wärmeerzeuger |  | ja | Diagnose | `heating.secondaryHeatGenerator` → `active` |
+| sensor | Heizkreis {number} aktives Programm |  | ja |  | `heating.circuits.{n}.operating.programs.active` → `value` |
+| sensor | Heizkreis {number} Temperaturgrenze Minimum | °C | nein | Diagnose | `heating.circuits.{n}.temperature.levels` → `min` |
+| sensor | Heizkreis {number} Temperaturgrenze Maximum | °C | nein | Diagnose | `heating.circuits.{n}.temperature.levels` → `max` |
+| sensor | Heizkreis {number} Sommer-Eco Schwelle | °C | nein | Diagnose | `heating.circuits.{n}.configuration.summerEco.absolute` → `threshold` |
+| sensor | Sekundärkreis Rücklauftemperatur Minimum | °C | nein | Diagnose | `heating.secondaryCircuit.temperature.return.minimum` → `value` |
+| sensor | Kesseltemperatur | °C | nein | Diagnose | `heating.boiler.temperature.current` → `value` |
+| sensor | Leistungsbegrenzung §14a |  | ja | Diagnose | `device.power.consumption.limitation` → `value` |
+| sensor | Leistungsbegrenzung Status Verbrauch |  | ja | Diagnose | `device.power.statusReport.consumption` → `status` |
+| sensor | Leistungsbegrenzung Limit Verbrauch | W | ja | Diagnose | `device.power.statusReport.consumption` → `limit` |
+| sensor | Leistungsbegrenzung Status Erzeugung |  | nein | Diagnose | `device.power.statusReport.production` → `status` |
+| binary_sensor | Warmwasser Hygienefunktion |  | ja | Diagnose | `heating.dhw.hygiene` → `enabled` |
+| binary_sensor | Warmwasser Verbrühschutz |  | ja | Diagnose | `heating.dhw.scaldProtection` → `active` |
+| binary_sensor | Externe Sperre |  | ja | Diagnose | `heating.external.lock` → `active` |
+| binary_sensor | Externe Sperre (Gerät) |  | nein | Diagnose | `device.lock.external` → `active` |
+| binary_sensor | Störungssperre |  | ja | Diagnose | `device.lock.malfunction` → `active` |
+| binary_sensor | Ferienprogramm |  | ja |  | `heating.operating.programs.holiday` → `active` |
+| binary_sensor | Ferien zu Hause |  | ja |  | `heating.operating.programs.holidayAtHome` → `active` |
+| sensor | Stromverbrauch Warmwasser Verlauf | kWh | ja |  | `heating.power.consumption.dhw` |
+| sensor | Stromverbrauch Heizung Verlauf | kWh | ja |  | `heating.power.consumption.heating` |
+| sensor | Stromverbrauch gesamt Verlauf | kWh | ja |  | `heating.power.consumption.total` |
+| sensor | Wärmeerzeugung Warmwasser | kWh | ja |  | `heating.heat.production.summary.dhw` |
+| sensor | Wärmeerzeugung Heizung | kWh | ja |  | `heating.heat.production.summary.heating` |
+| sensor | Wärmeerzeugung Kühlen | kWh | nein |  | `heating.heat.production.summary.cooling` |
+| sensor | Stromverbrauch Kühlen | kWh | nein |  | `heating.power.consumption.summary.cooling` |
+| sensor | Heizstab Stromverbrauch Warmwasser | kWh | ja |  | `heating.heatingRod.power.consumption.summary.dhw` |
+| sensor | Heizstab Stromverbrauch Heizung | kWh | ja |  | `heating.heatingRod.power.consumption.summary.heating` |
+| sensor | Meldungen |  | ja | Diagnose | `device.messages.status.raw` / `device.messages.info.raw` / `device.messages.service.raw` |
+| sensor | Letzte Statusmeldung |  | ja |  | `device.messages.status.raw` |
+| sensor | Aktive Statusmeldungen |  | ja | Diagnose | `device.messages.status.raw` |
+| sensor | Betriebszustand |  | ja |  | `device.messages.status.raw` / `heating.compressors.0` |
+| sensor | Heizstab aktive Stufen |  | ja |  | `device.messages.status.raw` + `heating.heatingRod` |
+| sensor | COP aktuell |  | ja |  | `heating.heat.production.current` + `heating.power.consumption.current` |
+| sensor | Warmwasser Zeitprogramm |  | ja |  | `heating.dhw.schedule` |
+| sensor | Zirkulation Zeitprogramm |  | ja |  | `heating.dhw.pumps.circulation.schedule` |
+| sensor | Heizkreis {number} Zeitprogramm |  | ja |  | `heating.circuits.{n}.heating.schedule` |
 
 **Räume**
 
-| Plattform | Name | Einheit | Standard aktiv | Quelle |
-| --- | --- | --- | --- | --- |
-| sensor | Temperatur | °C | ja | `rooms.{n}.sensors.temperature` → `value` |
-| sensor | Luftfeuchtigkeit | % | ja | `rooms.{n}.sensors.humidity` → `value` |
-| sensor | CO2 | ppm | ja | `rooms.{n}.co2` → `concentration` / `rooms.{n}.sensors.co2` → `value` |
-| sensor | Solltemperatur Normal | °C | ja | `rooms.{n}.temperature.levels.normal.heating` → `temperature` / `rooms.{n}.operating.programs.normalHeating` → `temperature` |
-| sensor | Solltemperatur Reduziert | °C | ja | `rooms.{n}.temperature.levels.reduced.heating` → `temperature` / `rooms.{n}.operating.programs.reducedHeating` → `temperature` |
-| sensor | Solltemperatur Komfort | °C | ja | `rooms.{n}.temperature.levels.comfort.heating` → `temperature` / `rooms.{n}.operating.programs.comfortHeating` → `temperature` |
-| sensor | Solltemperatur Kühlen Normal | °C | nein | `rooms.{n}.temperature.levels.normal.cooling` → `temperature` |
-| sensor | Solltemperatur Kühlen Reduziert | °C | nein | `rooms.{n}.temperature.levels.reduced.cooling` → `temperature` |
-| sensor | Solltemperatur Normal (gefühlt) | °C | nein | `rooms.{n}.temperature.levels.normal.perceived` → `temperature` |
-| sensor | Solltemperatur Komfort (gefühlt) | °C | nein | `rooms.{n}.temperature.levels.comfort.perceived` → `temperature` |
-| sensor | Betriebsstufe |  | ja | `rooms.{n}.operating.state` → `level` |
-| binary_sensor | Fenster |  | ja | `rooms.{n}.sensors.openWindow` → `value` / `rooms.{n}.sensors.window.openState` → `value` |
-| binary_sensor | Kondensationsrisiko |  | ja | `rooms.{n}.condensationRisk` → `value` |
-| binary_sensor | Kindersicherung |  | ja | `rooms.{n}.childLock` → `active` |
+| Plattform | Name | Einheit | Standard aktiv | Kategorie | Quelle |
+| --- | --- | --- | --- | --- | --- |
+| sensor | Temperatur | °C | ja |  | `rooms.{n}.sensors.temperature` → `value` |
+| sensor | Luftfeuchtigkeit | % | ja |  | `rooms.{n}.sensors.humidity` → `value` |
+| sensor | CO2 | ppm | ja |  | `rooms.{n}.co2` → `concentration` / `rooms.{n}.sensors.co2` → `value` |
+| sensor | Solltemperatur Normal | °C | ja |  | `rooms.{n}.temperature.levels.normal.heating` → `temperature` / `rooms.{n}.operating.programs.normalHeating` → `temperature` |
+| sensor | Solltemperatur Reduziert | °C | ja |  | `rooms.{n}.temperature.levels.reduced.heating` → `temperature` / `rooms.{n}.operating.programs.reducedHeating` → `temperature` |
+| sensor | Solltemperatur Komfort | °C | ja |  | `rooms.{n}.temperature.levels.comfort.heating` → `temperature` / `rooms.{n}.operating.programs.comfortHeating` → `temperature` |
+| sensor | Solltemperatur wirksam | °C | ja |  | `rooms.{n}.temperature.levels.heating` → `temperature` |
+| sensor | Solltemperatur Kühlen Normal | °C | nein |  | `rooms.{n}.temperature.levels.normal.cooling` → `temperature` |
+| sensor | Solltemperatur Kühlen Reduziert | °C | nein |  | `rooms.{n}.temperature.levels.reduced.cooling` → `temperature` |
+| sensor | Solltemperatur Normal (gefühlt) | °C | nein |  | `rooms.{n}.temperature.levels.normal.perceived` → `temperature` |
+| sensor | Solltemperatur Komfort (gefühlt) | °C | nein |  | `rooms.{n}.temperature.levels.comfort.perceived` → `temperature` |
+| sensor | Betriebsstufe |  | ja |  | `rooms.{n}.operating.state` → `level` |
+| binary_sensor | Fenster |  | ja |  | `rooms.{n}.sensors.openWindow` → `value` / `rooms.{n}.sensors.window.openState` → `value` |
+| binary_sensor | Kondensationsrisiko |  | ja |  | `rooms.{n}.condensationRisk` → `value` |
+| binary_sensor | Kindersicherung |  | ja | Diagnose | `rooms.{n}.childLock` → `active` |
 
 **Klima (Räume und Heizkörperthermostate)**
 

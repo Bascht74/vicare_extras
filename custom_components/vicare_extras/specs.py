@@ -14,7 +14,7 @@ index (``heating.compressors.0...``, ``rooms.3...``).
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 import re
 from typing import Any
 
@@ -328,6 +328,43 @@ HEATING_SPECS: tuple[ValueSpec, ...] = (
     ),
 )
 
+# Entities for service technicians rather than for daily use: shown under
+# "Diagnostic" on the device page. Applied here so the list above stays
+# readable.
+DIAGNOSTIC_KEYS = frozenset(
+    {
+        "four_three_way_valve_current",
+        "four_three_way_valve_target",
+        "primary_four_three_way_valve",
+        "compressor_speed_setpoint",
+        "compressor_oil_temperature",
+        "compressor_motor_chamber_temperature",
+        "crankcase_heater",
+        "economizer_liquid_temperature",
+        "expansion_valve_target",
+        "primary_fan_speed",
+        "evaporator_base_heater",
+        "condensate_pan_heater",
+        "fan_ring_heater",
+        "internal_pump_target",
+        "boiler_temperature",
+        "heating_rod",
+        "secondary_heat_generator",
+        "power_limitation",
+        "power_status_consumption",
+        "power_consumption_limit",
+        "power_status_production",
+        "external_lock",
+        "device_external_lock",
+        "malfunction_lock",
+    }
+)
+
+HEATING_SPECS = tuple(
+    replace(spec, diagnostic=True) if spec.key in DIAGNOSTIC_KEYS else spec
+    for spec in HEATING_SPECS
+)
+
 ROOM = {"scope": SCOPE_ROOM}
 ROOM_SETPOINT = {**TEMPERATURE, **ROOM, "measurement": False}
 
@@ -371,6 +408,13 @@ ROOM_SPECS: tuple[ValueSpec, ...] = (
             ("rooms.{n}.temperature.levels.comfort.heating", "temperature"),
             ("rooms.{n}.operating.programs.comfortHeating", "temperature"),
         ),
+        **ROOM_SETPOINT,
+    ),
+    # The setpoint the room control works with right now.
+    _spec(
+        "room_setpoint_heating",
+        "rooms.{n}.temperature.levels.heating",
+        "temperature",
         **ROOM_SETPOINT,
     ),
     _spec(
@@ -501,6 +545,7 @@ class SpecialSpec:
     require: str = "any"
     enabled: bool = True
     numbering: str = NUMBER_NONE
+    diagnostic: bool = False
 
     @property
     def indexed(self) -> bool:
@@ -534,9 +579,10 @@ SPECIAL_SPECS: tuple[SpecialSpec, ...] = (
         "messages",
         SPECIAL_MESSAGES,
         (_STATUS, "device.messages.info.raw", "device.messages.service.raw"),
+        diagnostic=True,
     ),
     SpecialSpec("last_status_message", SPECIAL_LAST_STATUS, (_STATUS,)),
-    SpecialSpec("active_status_messages", SPECIAL_ACTIVE_STATUS, (_STATUS,)),
+    SpecialSpec("active_status_messages", SPECIAL_ACTIVE_STATUS, (_STATUS,), diagnostic=True),
     SpecialSpec("operating_state", SPECIAL_OPERATING_STATE, (_STATUS, "heating.compressors.0")),
     SpecialSpec(
         "heating_rod_stage",

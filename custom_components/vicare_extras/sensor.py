@@ -191,6 +191,8 @@ class ViCareExtrasSpecialSensor(ViCareExtrasEntity, SensorEntity):
             specs.special_placeholders(spec, index),
         )
         self._attr_entity_registry_enabled_default = spec.enabled
+        if spec.diagnostic:
+            self._attr_entity_category = EntityCategory.DIAGNOSTIC
 
     @property
     def _language(self) -> str:

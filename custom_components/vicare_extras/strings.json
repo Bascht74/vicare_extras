@@ -454,6 +454,9 @@
       "room_setpoint_comfort_perceived": {
         "name": "Setpoint comfort (perceived)"
       },
+      "room_setpoint_heating": {
+        "name": "Setpoint effective"
+      },
       "room_setpoint_normal_cooling": {
         "name": "Setpoint cooling normal"
       },
