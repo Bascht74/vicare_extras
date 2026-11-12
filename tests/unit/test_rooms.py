@@ -6,6 +6,8 @@ accessors and fixtures. No real installation with rooms was available.
 
 from __future__ import annotations
 
+import pytest
+
 from homeassistant.components.binary_sensor import BinarySensorDeviceClass
 from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
 from homeassistant.const import EntityCategory
@@ -92,9 +94,43 @@ def test_each_room_gets_its_own_device() -> None:
     assert first.device_info.name == "Wohnzimmer"
     assert first.device_info.manufacturer == "Viessmann"
     assert second.device_info.identifiers == {("vicare_extras", f"{ROOM_CONTROL}_room_2")}
-    assert second.device_info.name == "Room 2"  # the API gave no name
+    assert second.device_info.name == "Raum 2"  # no name from the API, German system
     assert first.translation_placeholders == {}
     assert len(room_entities(platforms, 0)) == len(room_entities(platforms, 2)) == 12
+
+
+@pytest.mark.parametrize(
+    ("language", "name"),
+    [("de", "Raum 2"), ("de-CH", "Raum 2"), ("en", "Room 2"), ("fr", "Room 2"), (None, "Room 2")],
+)
+def test_default_room_name_follows_the_language(language, name) -> None:
+    hass, _ = fakes.make_hass(fakes.gateway_payload(None, fakes.room_features(2, None)))
+    hass.config.language = language
+    platforms = Platforms(hass).setup()
+    assert room_entities(platforms, 2)["room_temperature"].device_info.name == name
+    # A name from the API always wins over the default.
+    hass, _ = fakes.make_hass(fakes.gateway_payload(None, fakes.room_features(0)))
+    hass.config.language = language
+    assert room_entities(Platforms(hass).setup(), 0)["room_temperature"].device_info.name == "Wohnzimmer"
+
+
+def test_room_device_is_linked_to_the_heat_pump_of_its_gateway() -> None:
+    """via_device_id = the device of the built-in integration for the heat pump."""
+    platforms, _ = setup(fakes.room_features(0))
+    for entity in room_entities(platforms, 0).values():
+        assert entity.device_info.via_device_id == "ha-device-heat-pump"
+        assert entity.device_entry is None  # still a device of its own
+
+
+def test_room_device_without_a_heating_device_has_no_via_device() -> None:
+    # The built-in integration has not registered a device for the heat pump.
+    hass, _ = fakes.make_hass(
+        fakes.gateway_payload(None, fakes.room_features(0)), register_device=False
+    )
+    platforms = Platforms(hass).setup()
+    entity = room_entities(platforms, 0)["room_temperature"]
+    assert entity.device_info.via_device_id is None
+    assert entity.device_info.name == "Wohnzimmer"
 
 
 def test_room_control_without_rooms_creates_nothing() -> None:

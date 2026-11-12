@@ -45,7 +45,12 @@ from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from . import commands, specs, thermostats
 from .const import DEVICE_TYPE_ROOM_CONTROL, DOMAIN
 from .coordinator import ViCareExtrasConfigEntry, ViCareExtrasCoordinator
-from .entity import Target, ViCareExtrasEntity, async_setup_discovery
+from .entity import (
+    Target,
+    ViCareExtrasEntity,
+    async_setup_discovery,
+    default_room_name,
+)
 from .errors import ViCareExtrasError
 from .features import prop_value
 
@@ -282,5 +287,9 @@ class ViCareExtrasThermostatClimate(ViCareExtrasClimate):
         return {
             **self._base_attributes(),
             "valve_position": thermostats.trv_valve_position(self._features),
-            "room": (room[1] or f"Room {room[0]}") if room else None,
+            "room": (
+                (room[1] or default_room_name(self.coordinator.hass, room[0]))
+                if room
+                else None
+            ),
         }
