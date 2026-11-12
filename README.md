@@ -66,9 +66,15 @@ Raumregler-Daten):
 
 Nicht live bestätigt sind das Senden eines Befehls, die Option für das
 Abfrageintervall und alles Neue in Version 0.3.1, siehe
-[Teststand](#teststand). Die gelernte Raumzuordnung der Thermostate (0.3.3)
-ist mit Unit-Tests und an den Sollwerten einer echten Anlage geprüft, das
-Verknüpfen und Benennen der Geräte in einer laufenden Instanz noch nicht.
+[Teststand](#teststand).
+
+Die gelernte Raumzuordnung der Thermostate (0.3.3) lief am 12.11.2026 in
+einer Instanz mit 12 Räumen und 16 Thermostaten: Nach 30 Minuten waren 6
+Thermostate drei Räumen zugeordnet, mit dem Raum-Gerät verknüpft, und die
+drei Räume hatten Namen und Bereich ihrer Thermostate; die übrigen zeigten
+ihre Kandidaten, ohne Fehler im Protokoll. Nicht live bestätigt sind dabei
+das Wiedereinlesen nach einem Neustart, das Zurücknehmen einer Verknüpfung
+und der Vorrang von `actors` aus der API (nur Unit-Tests).
 
 Bekannte Einschränkungen:
 
