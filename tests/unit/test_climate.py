@@ -63,6 +63,8 @@ def test_room_climate_entity() -> None:
         "level": "normal",
         "demand": "heating",
         "actors": [fakes.TRV_DEVICE_ID],
+        # No thermostat device in this setup, so none can be named.
+        "thermostats": [],
     }
     # Main entity of the room device this integration creates.
     assert entity._attr_name is None
@@ -244,6 +246,8 @@ def test_thermostat_climate_entity() -> None:
         "setpoint_writable": True,
         "valve_position": 17,
         "room": "Küche",
+        "room_source": "api",
+        "room_candidates": ["Küche"],
     }
     # Attached to the device the built-in integration created for the thermostat.
     assert entity.device_entry is platforms.hass.device_registry.async_get("ha-device-trv")

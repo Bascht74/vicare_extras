@@ -66,7 +66,9 @@ Raumregler-Daten):
 
 Nicht live bestätigt sind das Senden eines Befehls, die Option für das
 Abfrageintervall und alles Neue in Version 0.3.1, siehe
-[Teststand](#teststand).
+[Teststand](#teststand). Die gelernte Raumzuordnung der Thermostate (0.3.3)
+ist mit Unit-Tests und an den Sollwerten einer echten Anlage geprüft, das
+Verknüpfen und Benennen der Geräte in einer laufenden Instanz noch nicht.
 
 Bekannte Einschränkungen:
 
@@ -298,10 +300,60 @@ PyViCare 2.63.0 und dessen Testdaten):
   Zeitprogramm des Raums. Die Raumtemperatur ist der Mittelwert der
   Klimasensoren des Raums, ohne Klimasensor der Mittelwert der Thermostate.
 
-Die Thermostate gehören in Home Assistant zur eingebauten Integration und
-lassen sich deshalb nicht als Untergeräte unter das Raum-Gerät hängen. Die
-Zuordnung steht in Attributen: `actors` an der Raum-Klima-Entität, `room` an
-der Thermostat-Klima-Entität.
+#### Welches Thermostat gehört zu welchem Raum?
+
+Die API nennt die Thermostate eines Raums nur in `rooms.<n>.actors`, und das
+fehlt beim kostenlosen Zugang. ViCare Extras **lernt die Zuordnung deshalb
+aus den Solltemperaturen** (ab Version 0.3.3, ohne API-Abruf):
+
+- Jedes Thermostat meldet seine Solltemperatur (`trv.temperature`), jeder
+  Raum seine Solltemperaturen (Normal, Reduziert, Komfort). Ein Thermostat
+  folgt dem Sollwert seines Raums. Passt der Sollwert eines Thermostats
+  30 Minuten lang unverändert zu **keinem** Sollwert eines Raums, scheidet
+  dieser Raum für das Thermostat aus.
+- Bleibt genau ein Raum übrig, ist das Thermostat zugeordnet. Bis dahin
+  nennt das Attribut `room_candidates` der Thermostat-Klima-Entität die noch
+  möglichen Räume.
+- Welche Stufe (Normal/Reduziert) in einem Raum gerade gilt, liefert der
+  kostenlose Zugang nicht. Verglichen wird deshalb mit allen Sollwerten des
+  Raums. Das ist langsamer, schließt aber nie den richtigen Raum aus, nur
+  weil das Zeitprogramm umgeschaltet hat.
+- **Räume mit gleichen Sollwerten lassen sich nicht unterscheiden.** Sie
+  trennen sich, sobald die Sollwerte auseinanderlaufen: durch die
+  Nachtabsenkung oder indem man in der ViCare-App einen Raum für mindestens
+  eine halbe Stunde um 0,5 °C anders einstellt.
+- Wird ein Thermostat von Hand verstellt (sein Sollwert passt dann zu keinem
+  Raum), wird nichts ausgeschlossen. Scheiden einmal alle Räume aus, etwa
+  weil ein Thermostat in einen anderen Raum umgezogen ist, beginnt das
+  Lernen für dieses Thermostat von vorn.
+- Nennt die API die Zuordnung (`actors`), gilt diese und nicht die gelernte.
+  Das Attribut `room_source` sagt, woher die Zuordnung stammt: `api` oder
+  `learned`.
+
+Was aus der Zuordnung folgt:
+
+- Das Thermostat-Gerät (es gehört der eingebauten Integration) bekommt das
+  Raum-Gerät als „verbunden über“ und erscheint damit beim Raum. Eine
+  Verknüpfung, die jemand anderes gesetzt hat, bleibt unangetastet; fällt
+  die Zuordnung weg, nimmt ViCare Extras die eigene Verknüpfung zurück.
+- **Der Raum bekommt einen Namen:** Liefert die API keinen, heißt das
+  Raum-Gerät wie der Home-Assistant-Bereich, in dem seine Thermostate
+  liegen. Teilen sich mehrere Räume denselben Bereich, heißt ein Raum mit
+  genau einem Thermostat wie dieses Thermostat (sofern es in Home Assistant
+  umbenannt wurde). Ersetzt wird nur der Standardname „Raum n“; ein selbst
+  vergebener Name bleibt. Die Entitäts-IDs ändern sich dadurch nicht.
+- Ein Raum-Gerät ohne Bereich bekommt einmalig den Bereich seiner
+  Thermostate.
+- Attribute: `room`, `room_source`, `room_candidates` an der
+  Thermostat-Klima-Entität; `thermostats` (Namen der zugeordneten
+  Thermostate) und `actors` (Geräte-IDs laut API) an der Raum-Klima-Entität.
+
+Das Gelernte liegt in `.storage/vicare_extras.<Eintrag>.rooms`, übersteht
+Neustarts und wird mit dem Löschen der Integration entfernt.
+
+Geprüft an den Daten einer echten Anlage (12 Räume, 16 Thermostate): 6
+Thermostate waren sofort eindeutig, weitere trennen sich mit der ersten
+Nachtabsenkung, der Rest braucht einmalig einen geänderten Raum-Sollwert.
 
 #### Was der kostenlose Zugang (Basic) liefert
 

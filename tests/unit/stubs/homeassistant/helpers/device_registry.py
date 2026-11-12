@@ -8,6 +8,10 @@ class DeviceEntry:
     id: str
     identifiers: set = field(default_factory=set)
     config_entry_id: str | None = None
+    name: str | None = None
+    name_by_user: str | None = None
+    area_id: str | None = None
+    via_device_id: str | None = None
 
 
 @dataclass
@@ -35,6 +39,13 @@ class DeviceRegistry:
             if identifier in device.identifiers and device.config_entry_id == config_entry_id:
                 return device
         return None
+
+    def async_update_device(self, device_id, **changes):
+        # Like Home Assistant: the entry is replaced, not changed in place.
+        from dataclasses import replace
+
+        self.devices[device_id] = replace(self.devices[device_id], **changes)
+        return self.devices[device_id]
 
 
 def async_get(hass):

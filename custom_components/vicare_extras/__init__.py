@@ -17,11 +17,13 @@ from __future__ import annotations
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import config_validation as cv
+from homeassistant.helpers.storage import Store
 from homeassistant.helpers.typing import ConfigType
 
 from . import messages
 from .const import DOMAIN
 from .coordinator import ViCareExtrasConfigEntry, ViCareExtrasCoordinator
+from .room_links import STORAGE_VERSION, storage_key
 from .services import async_setup_services
 
 PLATFORMS: list[Platform] = [
@@ -53,6 +55,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ViCareExtrasConfigEntry)
     # Registered before the first refresh, which already applies the option:
     # Home Assistant also runs these callbacks when the setup fails.
     entry.async_on_unload(coordinator.poll_manager.restore)
+    # The rooms of the thermostats learned before the last restart.
+    await coordinator.room_links.async_load()
     await coordinator.async_config_entry_first_refresh()
     entry.runtime_data = coordinator
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
@@ -62,3 +66,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ViCareExtrasConfigEntry)
 async def async_unload_entry(hass: HomeAssistant, entry: ViCareExtrasConfigEntry) -> bool:
     """Unload a config entry."""
     return await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
+
+
+async def async_remove_entry(hass: HomeAssistant, entry: ViCareExtrasConfigEntry) -> None:
+    """Delete the stored room assignment together with the config entry."""
+    await Store(hass, STORAGE_VERSION, storage_key(entry.entry_id)).async_remove()

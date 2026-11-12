@@ -55,6 +55,8 @@ async def async_get_config_entry_diagnostics(
                 else None
             ),
         },
+        # Rooms of the thermostats: room index, how it was found, candidates.
+        "room_assignment": coordinator.room_links.diagnostics(),
         "devices": [],
     }
 

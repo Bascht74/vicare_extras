@@ -6,6 +6,7 @@ from typing import Any
 
 from homeassistant.config_entries import ConfigEntry, ConfigEntryState
 from homeassistant.core import ServiceCall
+from homeassistant.helpers.area_registry import AreaRegistry
 from homeassistant.helpers.device_registry import DeviceEntry, DeviceRegistry
 
 from ..vicare_fakes import *  # noqa: F403
@@ -75,6 +76,7 @@ class FakeHass:
         self.config_entries = FakeConfigEntries()
         self.services = FakeServices(self)
         self.device_registry = DeviceRegistry()
+        self.area_registry = AreaRegistry()
         self.executor_jobs: list[Any] = []
 
     async def async_add_executor_job(self, func, *args):

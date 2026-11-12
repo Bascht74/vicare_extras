@@ -18,6 +18,8 @@ Radiator thermostat (attached to the device of the built-in integration)
     current temperature  ``device.sensors.temperature`` (only when connected)
     target temperature   ``trv.temperature`` with ``setTargetTemperature``
     action               heating while ``trv.valve.position`` is above 0
+    room                 from ``rooms.<n>.actors`` or learned from the
+                         setpoints (``room_links.py``)
 
 If the API offers no executable command for a setpoint, the entity is created
 without the target temperature feature and shows the setpoint as attribute.
@@ -43,14 +45,9 @@ from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
 from . import commands, specs, thermostats
-from .const import DEVICE_TYPE_ROOM_CONTROL, DOMAIN
+from .const import DOMAIN
 from .coordinator import ViCareExtrasConfigEntry, ViCareExtrasCoordinator
-from .entity import (
-    Target,
-    ViCareExtrasEntity,
-    async_setup_discovery,
-    default_room_name,
-)
+from .entity import Target, ViCareExtrasEntity, async_setup_discovery
 from .errors import ViCareExtrasError
 from .features import prop_value
 
@@ -247,6 +244,10 @@ class ViCareExtrasRoomClimate(ViCareExtrasClimate):
             "level": prop_value(state, "level"),
             "demand": prop_value(state, "demand"),
             "actors": thermostats.room_actors(self._features, self._room),
+            # Names of the thermostats assigned to the room (API or learned).
+            "thermostats": self.coordinator.room_links.thermostats_of(
+                self._target.unique_prefix
+            ),
         }
 
 
@@ -268,28 +269,23 @@ class ViCareExtrasThermostatClimate(ViCareExtrasClimate):
         """Return heating while the valve is open."""
         return ACTIONS.get(thermostats.trv_action(self._features) or "")
 
-    def _find_room(self) -> tuple[int, str | None] | None:
-        device = self._target.device
-        for snapshot in (self.coordinator.data or {}).values():
-            other = snapshot.device
-            if (
-                other.device_type == DEVICE_TYPE_ROOM_CONTROL
-                and other.gateway_serial == device.gateway_serial
-                and (found := thermostats.room_of_device(snapshot.features, device.device_id))
-            ):
-                return found
-        return None
-
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
-        """Return the valve opening and the room the thermostat belongs to."""
-        room = self._find_room()
+        """Return the valve opening and the room the thermostat belongs to.
+
+        ``room`` is set once the room is known: listed by the API
+        (``room_source`` "api") or learned from the setpoints ("learned").
+        Until then ``room_candidates`` names the rooms that are still possible.
+        """
+        links = self.coordinator.room_links
+        device = self._target.device
+        room = links.room_of(device)
         return {
             **self._base_attributes(),
             "valve_position": thermostats.trv_valve_position(self._features),
-            "room": (
-                (room[1] or default_room_name(self.coordinator.hass, room[0]))
-                if room
-                else None
-            ),
+            "room": links.room_label(room) if room else None,
+            "room_source": room.source if room else None,
+            "room_candidates": [
+                links.room_label(candidate) for candidate in links.candidates_of(device)
+            ],
         }

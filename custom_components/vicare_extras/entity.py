@@ -170,7 +170,10 @@ class ViCareExtrasEntity(CoordinatorEntity[ViCareExtrasCoordinator]):
             # name the user set (name_by_user) is kept.
             info: dict[str, Any] = {
                 "identifiers": {(DOMAIN, target.unique_prefix)},
+                # The API's name, else the name found through the room's
+                # thermostats (room_links.py), else "Raum N".
                 "name": target.room_name
+                or coordinator.room_links.learned_name(target.unique_prefix)
                 or default_room_name(coordinator.hass, target.room),
                 "manufacturer": "Viessmann",
                 "model": "ViCare room",

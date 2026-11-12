@@ -11,7 +11,8 @@ entities are built from (by reference, nothing is copied):
 * zigbee devices the built-in integration has set up (radiator thermostats).
 
 On every look it also makes sure the optional poll interval of the built-in
-integration is applied (``polling.py``) and adapts its own interval to it.
+integration is applied (``polling.py``) and adapts its own interval to it,
+and it lets ``room_links.py`` work out the rooms of the thermostats.
 """
 
 from __future__ import annotations
@@ -42,6 +43,7 @@ from .const import (
 )
 from .errors import ViCareExtrasError
 from .polling import PollIntervalManager, builtin_interval_seconds
+from .room_links import RoomLinkManager
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -76,6 +78,8 @@ class ViCareExtrasCoordinator(DataUpdateCoordinator[dict[str, DeviceSnapshot]]):
         # Values of commands sent from Home Assistant, shown until the
         # built-in integration has polled again: (device, feature, property).
         self._overrides: dict[tuple[str, str, str], Any] = {}
+        # Which thermostat belongs to which room (learned, see room_links.py).
+        self.room_links = RoomLinkManager(hass, config_entry)
 
     def set_override(self, ref_id: str, feature: str, prop: str, value: Any) -> None:
         """Remember a value that was just sent to the API."""
@@ -147,6 +151,7 @@ class ViCareExtrasCoordinator(DataUpdateCoordinator[dict[str, DeviceSnapshot]]):
                 updated=now,
                 source=payload,
             )
+        self.room_links.observe(snapshots, now)
         return snapshots
 
 
