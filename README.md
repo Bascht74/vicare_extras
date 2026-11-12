@@ -33,12 +33,25 @@ Version 0.1.0:
   Dokumentation genannte Pfad `/eventhistory/…` antwortete mit „nicht
   gefunden“. Ereignisse der Gateway-Ebene kommen auch ohne `gateway_serials`.
 
-**Neu in 0.2.0 und noch nicht live geprüft:** die zusätzlichen Sensoren und
-Binärsensoren, der Betriebszustand, die Meldungsdekodierung und die
-Raum-Entitäten. Sie sind gegen die Feature-Liste einer echten Vitocal 250-A
-(156 Features) und mit nachgebildeten Home-Assistant-Klassen getestet, siehe
-[Teststand](#teststand). Raum-Entitäten konnten nur gegen nachgebaute Daten
-geprüft werden.
+Mit Version 0.2.0 (gleicher Stand, nach einem Neustart von Home Assistant):
+
+- 46 Sensoren und 18 Binärsensoren werden am Gerät der eingebauten
+  Integration angelegt, ohne Fehler im Protokoll.
+- Betriebszustand, 4/3-Wege-Ventil, aktive Statusmeldungen und die
+  Meldungsdekodierung liefern plausible Werte.
+- `get_event_history` liefert die Ereignisse mit Klartext (`decoded`,
+  `summary`) über einen API-Aufruf.
+- Ein Update über den Marketplace wird erst nach einem **Neustart von Home
+  Assistant** wirksam; ein Neuladen des Eintrags genügt nicht.
+
+Bekannte Einschränkungen:
+
+- Die Zeitstempel in `device.messages.*.raw` sind offenbar die Uhrzeit des
+  Geräts (Ortszeit, als UTC gekennzeichnet). Die Zeiten in den Attributen der
+  Meldungs-Sensoren können deshalb um die Zeitzone und die Abweichung der
+  Geräteuhr verschoben sein. Die Ereignishistorie ist davon nicht betroffen.
+- Raum-Entitäten konnten nur gegen nachgebaute Daten geprüft werden, siehe
+  [Teststand](#teststand).
 
 ## Entitäten
 
