@@ -1,0 +1,14 @@
+{
+  "domain": "vicare_extras",
+  "name": "ViCare Extras",
+  "codeowners": ["@Bascht74"],
+  "config_flow": true,
+  "dependencies": ["vicare"],
+  "documentation": "https://github.com/Bascht74/vicare_extras",
+  "integration_type": "service",
+  "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/Bascht74/vicare_extras/issues",
+  "requirements": [],
+  "single_config_entry": true,
+  "version": "0.1.0"
+}

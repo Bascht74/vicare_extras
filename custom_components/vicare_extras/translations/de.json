@@ -1,0 +1,286 @@
+{
+  "config": {
+    "abort": {
+      "single_instance_allowed": "ViCare Extras ist bereits eingerichtet. Es ist nur eine Instanz möglich."
+    },
+    "step": {
+      "user": {
+        "description": "ViCare Extras ergänzt die eingebaute Integration Viessmann ViCare um rein lesende Aktionen und Sensoren. Es nutzt die vorhandene Anmeldung, braucht keine eigenen Zugangsdaten und fragt die Viessmann-API nicht regelmäßig ab.\n\nDie Integration Viessmann ViCare muss eingerichtet und geladen sein.",
+        "title": "ViCare Extras"
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "heat_production_dhw_summary": {
+        "name": "Wärmeerzeugung Warmwasser",
+        "state_attributes": {
+          "current_day": {
+            "name": "Aktueller Tag"
+          },
+          "current_month": {
+            "name": "Aktueller Monat"
+          },
+          "current_year": {
+            "name": "Aktuelles Jahr"
+          },
+          "last_month": {
+            "name": "Letzter Monat"
+          },
+          "last_seven_days": {
+            "name": "Letzte sieben Tage"
+          },
+          "last_year": {
+            "name": "Letztes Jahr"
+          }
+        }
+      },
+      "heat_production_heating_summary": {
+        "name": "Wärmeerzeugung Heizung",
+        "state_attributes": {
+          "current_day": {
+            "name": "Aktueller Tag"
+          },
+          "current_month": {
+            "name": "Aktueller Monat"
+          },
+          "current_year": {
+            "name": "Aktuelles Jahr"
+          },
+          "last_month": {
+            "name": "Letzter Monat"
+          },
+          "last_seven_days": {
+            "name": "Letzte sieben Tage"
+          },
+          "last_year": {
+            "name": "Letztes Jahr"
+          }
+        }
+      },
+      "messages": {
+        "name": "Meldungen",
+        "state_attributes": {
+          "info": {
+            "name": "Infomeldungen"
+          },
+          "info_count": {
+            "name": "Anzahl Infomeldungen"
+          },
+          "newest_status_timestamp": {
+            "name": "Neueste Statusmeldung am"
+          },
+          "service": {
+            "name": "Servicemeldungen"
+          },
+          "service_count": {
+            "name": "Anzahl Servicemeldungen"
+          },
+          "status": {
+            "name": "Statusmeldungen"
+          },
+          "status_count": {
+            "name": "Anzahl Statusmeldungen"
+          }
+        }
+      },
+      "power_consumption_dhw_history": {
+        "name": "Stromverbrauch Warmwasser Verlauf",
+        "state_attributes": {
+          "day": {
+            "name": "Tage (heute zuerst)"
+          },
+          "day_value_read_at": {
+            "name": "Tageswerte gelesen am"
+          },
+          "month": {
+            "name": "Monate (aktueller zuerst)"
+          },
+          "month_value_read_at": {
+            "name": "Monatswerte gelesen am"
+          },
+          "week": {
+            "name": "Wochen (aktuelle zuerst)"
+          },
+          "week_value_read_at": {
+            "name": "Wochenwerte gelesen am"
+          },
+          "year": {
+            "name": "Jahre (aktuelles zuerst)"
+          },
+          "year_value_read_at": {
+            "name": "Jahreswerte gelesen am"
+          }
+        }
+      },
+      "power_consumption_heating_history": {
+        "name": "Stromverbrauch Heizung Verlauf",
+        "state_attributes": {
+          "day": {
+            "name": "Tage (heute zuerst)"
+          },
+          "day_value_read_at": {
+            "name": "Tageswerte gelesen am"
+          },
+          "month": {
+            "name": "Monate (aktueller zuerst)"
+          },
+          "month_value_read_at": {
+            "name": "Monatswerte gelesen am"
+          },
+          "week": {
+            "name": "Wochen (aktuelle zuerst)"
+          },
+          "week_value_read_at": {
+            "name": "Wochenwerte gelesen am"
+          },
+          "year": {
+            "name": "Jahre (aktuelles zuerst)"
+          },
+          "year_value_read_at": {
+            "name": "Jahreswerte gelesen am"
+          }
+        }
+      },
+      "power_consumption_total_history": {
+        "name": "Stromverbrauch gesamt Verlauf",
+        "state_attributes": {
+          "day": {
+            "name": "Tage (heute zuerst)"
+          },
+          "day_value_read_at": {
+            "name": "Tageswerte gelesen am"
+          },
+          "month": {
+            "name": "Monate (aktueller zuerst)"
+          },
+          "month_value_read_at": {
+            "name": "Monatswerte gelesen am"
+          },
+          "week": {
+            "name": "Wochen (aktuelle zuerst)"
+          },
+          "week_value_read_at": {
+            "name": "Wochenwerte gelesen am"
+          },
+          "year": {
+            "name": "Jahre (aktuelles zuerst)"
+          },
+          "year_value_read_at": {
+            "name": "Jahreswerte gelesen am"
+          }
+        }
+      }
+    }
+  },
+  "exceptions": {
+    "api_error": {
+      "message": "Die Viessmann-API hat mit einem Fehler geantwortet (Status {status}, Typ {error_type}): {message}"
+    },
+    "cache_unsupported": {
+      "message": "Der PyViCare-Client der Integration Viessmann ViCare hat keinen lesbaren Feature-Cache. Diese Version von ViCare Extras passt nicht zur installierten Home-Assistant-Version."
+    },
+    "device_not_found": {
+      "message": "Kein ViCare-Gerät passt zur Auswahl."
+    },
+    "event_history_forbidden": {
+      "message": "Die Viessmann-API hat den Zugriff auf die Ereignishistorie verweigert (Status {status}): {message}"
+    },
+    "event_history_not_found": {
+      "message": "Der Endpunkt der Ereignishistorie wurde nicht gefunden oder hat nicht mit JSON geantwortet. Versucht: {endpoints}"
+    },
+    "installation_not_found": {
+      "message": "Die Anlage {installation_id} ist unbekannt. Bekannte Anlagen: {known}"
+    },
+    "invalid_response": {
+      "message": "Unerwartete Antwort der Viessmann-API ({detail})."
+    },
+    "no_cached_data": {
+      "message": "Die Integration Viessmann ViCare hält gerade keine Daten für {device} bereit. ViCare Extras fragt selbst nie Daten ab; bitte in einer Minute erneut versuchen."
+    },
+    "no_installation": {
+      "message": "Die Integration Viessmann ViCare kennt keine Anlage."
+    },
+    "rate_limited": {
+      "message": "Das Abfragelimit der Viessmann-API ist ausgeschöpft. Es wird zurückgesetzt am: {reset}"
+    },
+    "server_error": {
+      "message": "Die Viessmann-API war nicht erreichbar oder hat einen Serverfehler gemeldet: {message}"
+    },
+    "unexpected_error": {
+      "message": "Unerwarteter Fehler beim Aufruf der Viessmann-API: {error}"
+    },
+    "vicare_incompatible": {
+      "message": "Die Daten der Integration Viessmann ViCare haben einen unerwarteten Aufbau ({detail}). Diese Version von ViCare Extras passt nicht zur installierten Home-Assistant-Version."
+    },
+    "vicare_not_loaded": {
+      "message": "Die Integration Viessmann ViCare ist nicht eingerichtet oder nicht geladen."
+    }
+  },
+  "services": {
+    "get_event_history": {
+      "description": "Ruft die Ereignishistorie einer Anlage aus der Viessmann-Cloud ab. Jede abgerufene Seite ist ein API-Aufruf, der auf das Tageskontingent angerechnet wird.",
+      "fields": {
+        "cursor": {
+          "description": "Setzt einen früheren Aufruf mit dessen next_cursor fort.",
+          "name": "Cursor"
+        },
+        "edited_by": {
+          "description": "Nur Ereignisse, die von diesem Benutzer oder System stammen (wird als editedBy an die API übergeben).",
+          "name": "Bearbeitet von"
+        },
+        "event_type": {
+          "description": "Nur diese Ereignistypen zurückgeben. Ein einzelner Typ wird von der API gefiltert, mehrere Typen werden nach dem Abruf gefiltert.",
+          "name": "Ereignistyp"
+        },
+        "gateway_serials": {
+          "description": "Seriennummern der Gateways für Ereignisse auf Gateway-Ebene (wird als gatewaySerials an die API übergeben).",
+          "name": "Gateway-Seriennummern"
+        },
+        "installation_id": {
+          "description": "Abzufragende Anlage. Standard ist die erste Anlage der ViCare-Integration.",
+          "name": "Anlagen-ID"
+        },
+        "last_n_days": {
+          "description": "Wie viele Tage zurückgeschaut wird.",
+          "name": "Letzte n Tage"
+        },
+        "limit": {
+          "description": "Ereignisse pro Seite (API-Maximum 1000).",
+          "name": "Ereignisse pro Seite"
+        },
+        "max_pages": {
+          "description": "Höchstzahl abzurufender Seiten. Jede Seite ist ein API-Aufruf.",
+          "name": "Maximale Seitenzahl"
+        }
+      },
+      "name": "Ereignishistorie abrufen"
+    },
+    "get_features": {
+      "description": "Gibt die rohen Feature-Objekte eines ViCare-Geräts aus den Daten zurück, die die eingebaute Integration bereits abgerufen hat. Löst nie einen API-Aufruf aus.",
+      "fields": {
+        "device_id": {
+          "description": "Gerät der Integration Viessmann ViCare. Standard ist das Heizgerät.",
+          "name": "Gerät"
+        },
+        "device_type": {
+          "description": "Viessmann-Gerätetyp, zum Beispiel heating, tcu oder roomControl.",
+          "name": "Gerätetyp"
+        },
+        "full": {
+          "description": "Vollständige Feature-Objekte samt Befehlen und URIs zurückgeben statt nur Name, Zeitstempel und Eigenschaften.",
+          "name": "Vollständige Objekte"
+        },
+        "prefix": {
+          "description": "Nur Features zurückgeben, deren Name mit diesem Text beginnt.",
+          "name": "Feature-Präfix"
+        },
+        "vicare_device_id": {
+          "description": "Viessmann-Geräte-ID, zum Beispiel 0 oder RoomControl-1. Findet auch Geräte, die die eingebaute Integration nicht einrichtet.",
+          "name": "ViCare-Geräte-ID"
+        }
+      },
+      "name": "Features abrufen"
+    }
+  }
+}

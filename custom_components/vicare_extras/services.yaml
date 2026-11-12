@@ -1,0 +1,88 @@
+get_event_history:
+  fields:
+    last_n_days:
+      default: 30
+      selector:
+        number:
+          min: 1
+          max: 365
+          mode: box
+          unit_of_measurement: d
+    limit:
+      default: 1000
+      selector:
+        number:
+          min: 1
+          max: 1000
+          mode: box
+    max_pages:
+      default: 5
+      selector:
+        number:
+          min: 1
+          max: 20
+          mode: box
+    event_type:
+      selector:
+        select:
+          multiple: true
+          custom_value: true
+          options:
+            - device-error
+            - device-message-info
+            - device-message-service
+            - device-message-status
+            - device-message-warning
+            - feature-changed
+            - firmware-update-status
+            - gateway-online
+            - gateway-reset-command
+            - device-bmu-serial-changed
+            - device-boiler-serial-changed
+            - src-status-changed
+            - remote-diagnose-session-opened
+            - remote-diagnose-session-closed
+            - installation-address-changed
+            - invitation-accepted
+            - invitation-terminated
+            - geofencing-activation-changed
+            - diy-heating-rod-run-too-long
+            - diy-heating-curve-not-optimal
+            - diy-dhw-schedule-not-optimal
+            - dynamic-smart-tip
+            - snapshot-restore-status-changed
+    gateway_serials:
+      selector:
+        text:
+          multiple: true
+    edited_by:
+      selector:
+        text:
+    installation_id:
+      selector:
+        text:
+    cursor:
+      selector:
+        text:
+
+get_features:
+  fields:
+    device_id:
+      selector:
+        device:
+          filter:
+            - integration: vicare
+    vicare_device_id:
+      selector:
+        text:
+    device_type:
+      selector:
+        text:
+    prefix:
+      example: heating.power.consumption
+      selector:
+        text:
+    full:
+      default: false
+      selector:
+        boolean:

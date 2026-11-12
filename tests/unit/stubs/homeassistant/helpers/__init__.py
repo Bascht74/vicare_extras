@@ -1,0 +1,1 @@
+"""Stub of homeassistant.helpers."""

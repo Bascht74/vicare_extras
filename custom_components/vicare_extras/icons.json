@@ -1,0 +1,32 @@
+{
+  "entity": {
+    "sensor": {
+      "heat_production_dhw_summary": {
+        "default": "mdi:water-boiler"
+      },
+      "heat_production_heating_summary": {
+        "default": "mdi:radiator"
+      },
+      "messages": {
+        "default": "mdi:message-alert-outline"
+      },
+      "power_consumption_dhw_history": {
+        "default": "mdi:chart-bar"
+      },
+      "power_consumption_heating_history": {
+        "default": "mdi:chart-bar"
+      },
+      "power_consumption_total_history": {
+        "default": "mdi:chart-bar"
+      }
+    }
+  },
+  "services": {
+    "get_event_history": {
+      "service": "mdi:history"
+    },
+    "get_features": {
+      "service": "mdi:code-json"
+    }
+  }
+}

@@ -1,0 +1,200 @@
+{
+  "config": {
+    "abort": {
+      "single_instance_allowed": "ViCare Extras is already configured. Only a single instance is possible."
+    },
+    "step": {
+      "user": {
+        "description": "ViCare Extras adds read-only actions and sensors on top of the built-in Viessmann ViCare integration. It reuses the existing login, needs no credentials of its own and does not poll the Viessmann API.\n\nThe Viessmann ViCare integration must be set up and loaded.",
+        "title": "ViCare Extras"
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "heat_production_dhw_summary": {
+        "name": "Heat production DHW",
+        "state_attributes": {
+          "current_day": { "name": "Current day" },
+          "current_month": { "name": "Current month" },
+          "current_year": { "name": "Current year" },
+          "last_month": { "name": "Last month" },
+          "last_seven_days": { "name": "Last seven days" },
+          "last_year": { "name": "Last year" }
+        }
+      },
+      "heat_production_heating_summary": {
+        "name": "Heat production heating",
+        "state_attributes": {
+          "current_day": { "name": "Current day" },
+          "current_month": { "name": "Current month" },
+          "current_year": { "name": "Current year" },
+          "last_month": { "name": "Last month" },
+          "last_seven_days": { "name": "Last seven days" },
+          "last_year": { "name": "Last year" }
+        }
+      },
+      "messages": {
+        "name": "Messages",
+        "state_attributes": {
+          "info": { "name": "Info messages" },
+          "info_count": { "name": "Number of info messages" },
+          "newest_status_timestamp": { "name": "Newest status message at" },
+          "service": { "name": "Service messages" },
+          "service_count": { "name": "Number of service messages" },
+          "status": { "name": "Status messages" },
+          "status_count": { "name": "Number of status messages" }
+        }
+      },
+      "power_consumption_dhw_history": {
+        "name": "Power consumption DHW history",
+        "state_attributes": {
+          "day": { "name": "Days (today first)" },
+          "day_value_read_at": { "name": "Day values read at" },
+          "month": { "name": "Months (current first)" },
+          "month_value_read_at": { "name": "Month values read at" },
+          "week": { "name": "Weeks (current first)" },
+          "week_value_read_at": { "name": "Week values read at" },
+          "year": { "name": "Years (current first)" },
+          "year_value_read_at": { "name": "Year values read at" }
+        }
+      },
+      "power_consumption_heating_history": {
+        "name": "Power consumption heating history",
+        "state_attributes": {
+          "day": { "name": "Days (today first)" },
+          "day_value_read_at": { "name": "Day values read at" },
+          "month": { "name": "Months (current first)" },
+          "month_value_read_at": { "name": "Month values read at" },
+          "week": { "name": "Weeks (current first)" },
+          "week_value_read_at": { "name": "Week values read at" },
+          "year": { "name": "Years (current first)" },
+          "year_value_read_at": { "name": "Year values read at" }
+        }
+      },
+      "power_consumption_total_history": {
+        "name": "Power consumption total history",
+        "state_attributes": {
+          "day": { "name": "Days (today first)" },
+          "day_value_read_at": { "name": "Day values read at" },
+          "month": { "name": "Months (current first)" },
+          "month_value_read_at": { "name": "Month values read at" },
+          "week": { "name": "Weeks (current first)" },
+          "week_value_read_at": { "name": "Week values read at" },
+          "year": { "name": "Years (current first)" },
+          "year_value_read_at": { "name": "Year values read at" }
+        }
+      }
+    }
+  },
+  "exceptions": {
+    "api_error": {
+      "message": "The Viessmann API answered with an error (status {status}, type {error_type}): {message}"
+    },
+    "cache_unsupported": {
+      "message": "The PyViCare client of the Viessmann ViCare integration has no readable feature cache. This version of ViCare Extras does not match the installed Home Assistant version."
+    },
+    "device_not_found": {
+      "message": "No ViCare device matches the selection."
+    },
+    "event_history_forbidden": {
+      "message": "The Viessmann API denied access to the event history (status {status}): {message}"
+    },
+    "event_history_not_found": {
+      "message": "The event history endpoint was not found or did not answer with JSON. Tried: {endpoints}"
+    },
+    "installation_not_found": {
+      "message": "Installation {installation_id} is unknown. Known installations: {known}"
+    },
+    "invalid_response": {
+      "message": "Unexpected answer from the Viessmann API ({detail})."
+    },
+    "no_cached_data": {
+      "message": "The Viessmann ViCare integration currently holds no data for {device}. ViCare Extras never requests data itself; try again in a minute."
+    },
+    "no_installation": {
+      "message": "The Viessmann ViCare integration knows no installation."
+    },
+    "rate_limited": {
+      "message": "The rate limit of the Viessmann API is exhausted. It resets at: {reset}"
+    },
+    "server_error": {
+      "message": "The Viessmann API could not be reached or reported a server error: {message}"
+    },
+    "unexpected_error": {
+      "message": "Unexpected error while calling the Viessmann API: {error}"
+    },
+    "vicare_incompatible": {
+      "message": "The data of the Viessmann ViCare integration has an unexpected structure ({detail}). This version of ViCare Extras does not match the installed Home Assistant version."
+    },
+    "vicare_not_loaded": {
+      "message": "The Viessmann ViCare integration is not set up or not loaded."
+    }
+  },
+  "services": {
+    "get_event_history": {
+      "description": "Fetches the event history of an installation from the Viessmann cloud. Every page fetched is one API call that counts against the daily quota.",
+      "fields": {
+        "cursor": {
+          "description": "Continue a previous call with the next_cursor it returned.",
+          "name": "Cursor"
+        },
+        "edited_by": {
+          "description": "Only events edited by this user or system (passed to the API as editedBy).",
+          "name": "Edited by"
+        },
+        "event_type": {
+          "description": "Only return these event types. A single type is filtered by the API, several types are filtered after the download.",
+          "name": "Event type"
+        },
+        "gateway_serials": {
+          "description": "Gateway serial numbers for gateway-level events (passed to the API as gatewaySerials).",
+          "name": "Gateway serials"
+        },
+        "installation_id": {
+          "description": "Installation to query. Defaults to the first installation of the ViCare integration.",
+          "name": "Installation ID"
+        },
+        "last_n_days": {
+          "description": "How many days to look back.",
+          "name": "Last n days"
+        },
+        "limit": {
+          "description": "Events per page (API maximum 1000).",
+          "name": "Events per page"
+        },
+        "max_pages": {
+          "description": "Maximum number of pages to fetch. Each page is one API call.",
+          "name": "Maximum pages"
+        }
+      },
+      "name": "Get event history"
+    },
+    "get_features": {
+      "description": "Returns the raw feature objects of a ViCare device from the data the built-in integration has already fetched. Never causes an API call.",
+      "fields": {
+        "device_id": {
+          "description": "Device of the Viessmann ViCare integration. Defaults to the heating device.",
+          "name": "Device"
+        },
+        "device_type": {
+          "description": "Viessmann device type, for example heating, tcu or roomControl.",
+          "name": "Device type"
+        },
+        "full": {
+          "description": "Return the complete feature objects including commands and URIs instead of name, timestamp and properties.",
+          "name": "Complete objects"
+        },
+        "prefix": {
+          "description": "Only return features whose name starts with this text.",
+          "name": "Feature prefix"
+        },
+        "vicare_device_id": {
+          "description": "Viessmann device ID, for example 0 or RoomControl-1. Also finds devices the built-in integration does not set up.",
+          "name": "ViCare device ID"
+        }
+      },
+      "name": "Get features"
+    }
+  }
+}
