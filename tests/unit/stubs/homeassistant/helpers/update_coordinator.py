@@ -55,3 +55,6 @@ class CoordinatorEntity(Generic[_T]):
     @property
     def available(self):
         return self.coordinator.last_update_success
+
+    def _handle_coordinator_update(self):
+        """Real Home Assistant writes the state here."""

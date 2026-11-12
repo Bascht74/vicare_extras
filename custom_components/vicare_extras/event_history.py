@@ -1,11 +1,16 @@
 """On-demand access to the Viessmann event history.
 
-Documented endpoint (Viessmann API documentation)::
+Endpoint (relative to PyViCare's base URL ``.../iot/v2``)::
 
-    GET /iot/v2/eventhistory/installations/{installationId}/events
+    GET /events-history/installations/{installationId}/events
     query: lastNDays | date | timestamp (mutually exclusive), limit (default
            50, max 1000), cursor, eventType, gatewaySerials, editedBy, origins
     response: {"cursor": {"next": "<opaque>"}, "data": [event, ...]}
+
+The hyphenated path is the one that answers when called through PyViCare
+(confirmed live). Viessmann's API documentation names
+``/eventhistory/installations/{installationId}/events``; that path answered
+"not found" and is only kept as a fallback.
 
 The request goes through ``oauth_manager.get()`` of the PyViCare client the
 built-in integration already authenticated. PyViCare prepends its base URL

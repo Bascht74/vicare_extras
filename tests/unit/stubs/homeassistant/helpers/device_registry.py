@@ -10,6 +10,14 @@ class DeviceEntry:
     config_entry_id: str | None = None
 
 
+@dataclass
+class DeviceInfo:
+    identifiers: set = field(default_factory=set)
+    name: str | None = None
+    manufacturer: str | None = None
+    model: str | None = None
+
+
 class DeviceRegistry:
     def __init__(self):
         self.devices: dict[str, DeviceEntry] = {}

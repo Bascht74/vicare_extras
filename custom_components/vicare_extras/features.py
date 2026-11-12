@@ -28,6 +28,7 @@ from .const import (
     FEATURE_MESSAGES_STATUS,
     MESSAGE_LIST_LIMIT,
 )
+from .messages import decode_entries
 
 HISTORY_PERIODS = ("day", "week", "month", "year")
 MESSAGE_KEYS = ("errorCode", "timestamp", "priority")
@@ -135,15 +136,19 @@ def message_entries(feature: dict[str, Any] | None) -> list[dict[str, Any]]:
 
 
 def messages_state(
-    features: dict[str, dict[str, Any]],
+    features: dict[str, dict[str, Any]], language: str = "de"
 ) -> tuple[str | None, dict[str, Any]]:
-    """Return the newest status code and the message attributes."""
+    """Return the newest status code and the message attributes.
+
+    Every entry gets a ``text`` with the decoded message (None for codes the
+    table does not know) and, when known, the ``source`` of that text.
+    """
     attributes: dict[str, Any] = {}
     newest_status: dict[str, Any] | None = None
     for name, feature_name in MESSAGE_FEATURES.items():
         if feature_name not in features:
             continue
-        entries = message_entries(features[feature_name])
+        entries = decode_entries(message_entries(features[feature_name]), language)
         attributes[name] = entries[:MESSAGE_LIST_LIMIT]
         attributes[f"{name}_count"] = len(entries)
         if name == "status" and entries:
@@ -151,6 +156,9 @@ def messages_state(
     code = newest_status.get("errorCode") if newest_status else None
     attributes["newest_status_timestamp"] = (
         newest_status.get("timestamp") if newest_status else None
+    )
+    attributes["newest_status_text"] = (
+        newest_status.get("text") if newest_status else None
     )
     return (str(code) if code is not None else None), attributes
 

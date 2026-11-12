@@ -11,79 +11,478 @@
     }
   },
   "entity": {
+    "binary_sensor": {
+      "condensate_pan_heater": {
+        "name": "Condensate pan heater"
+      },
+      "crankcase_heater": {
+        "name": "Compressor{suffix} crankcase heater"
+      },
+      "defrosting": {
+        "name": "Defrosting"
+      },
+      "device_external_lock": {
+        "name": "External lock (device)"
+      },
+      "dhw_hygiene": {
+        "name": "DHW hygiene function"
+      },
+      "dhw_scald_protection": {
+        "name": "DHW scald protection"
+      },
+      "evaporator_base_heater": {
+        "name": "Evaporator{suffix} base heater"
+      },
+      "external_lock": {
+        "name": "External lock"
+      },
+      "fan_ring_heater": {
+        "name": "Fan ring heater"
+      },
+      "heating_rod": {
+        "name": "Heating rod active"
+      },
+      "heating_rod_dhw_approved": {
+        "name": "Heating rod approved for DHW"
+      },
+      "heating_rod_heating_approved": {
+        "name": "Heating rod approved for heating"
+      },
+      "holiday_at_home_program": {
+        "name": "Holiday at home"
+      },
+      "holiday_program": {
+        "name": "Holiday program"
+      },
+      "internal_pump": {
+        "name": "Internal pump"
+      },
+      "malfunction_lock": {
+        "name": "Malfunction lock"
+      },
+      "primary_four_three_way_valve": {
+        "name": "Primary circuit 4/3-way valve active"
+      },
+      "room_child_lock": {
+        "name": "Child lock"
+      },
+      "room_condensation_risk": {
+        "name": "Condensation risk"
+      },
+      "room_window_open": {
+        "name": "Window"
+      },
+      "secondary_heat_generator": {
+        "name": "Secondary heat generator"
+      }
+    },
     "sensor": {
+      "active_status_messages": {
+        "name": "Active status messages"
+      },
+      "boiler_temperature": {
+        "name": "Boiler temperature"
+      },
+      "circuit_active_program": {
+        "name": "Heating circuit {number} active program",
+        "state": {
+          "comfort": "Comfort",
+          "comfort_heating": "Comfort heating",
+          "comfort_cooling": "Comfort cooling",
+          "comfort_energy_saving": "Comfort (energy saving)",
+          "comfort_cooling_energy_saving": "Comfort cooling (energy saving)",
+          "eco": "Eco",
+          "fixed": "Fixed",
+          "forced_last_from_schedule": "Schedule extended",
+          "frostprotection": "Frost protection",
+          "normal": "Normal",
+          "normal_heating": "Normal heating",
+          "normal_cooling": "Normal cooling",
+          "normal_energy_saving": "Normal (energy saving)",
+          "normal_cooling_energy_saving": "Normal cooling (energy saving)",
+          "reduced": "Reduced",
+          "reduced_heating": "Reduced heating",
+          "reduced_cooling": "Reduced cooling",
+          "reduced_energy_saving": "Reduced (energy saving)",
+          "reduced_cooling_energy_saving": "Reduced cooling (energy saving)",
+          "standby": "Standby",
+          "summer_eco": "Summer eco"
+        }
+      },
+      "circuit_heating_schedule": {
+        "name": "Heating circuit {number} schedule",
+        "state": {
+          "none": "No time slot",
+          "inactive": "Schedule off",
+          "on": "On",
+          "off": "Off",
+          "normal": "Normal",
+          "reduced": "Reduced",
+          "comfort": "Comfort",
+          "5_25_cycles": "5/25 cycles",
+          "5_10_cycles": "5/10 cycles"
+        }
+      },
+      "circuit_summer_eco_threshold": {
+        "name": "Heating circuit {number} summer eco threshold"
+      },
+      "circuit_temperature_level_max": {
+        "name": "Heating circuit {number} temperature limit maximum"
+      },
+      "circuit_temperature_level_min": {
+        "name": "Heating circuit {number} temperature limit minimum"
+      },
+      "compressor_motor_chamber_temperature": {
+        "name": "Compressor{suffix} motor chamber temperature"
+      },
+      "compressor_oil_temperature": {
+        "name": "Compressor{suffix} oil temperature"
+      },
+      "compressor_speed": {
+        "name": "Compressor{suffix} speed"
+      },
+      "compressor_speed_setpoint": {
+        "name": "Compressor{suffix} speed setpoint"
+      },
+      "cop_current": {
+        "name": "COP current"
+      },
+      "dhw_circulation_schedule": {
+        "name": "DHW circulation schedule",
+        "state": {
+          "none": "No time slot",
+          "inactive": "Schedule off",
+          "on": "On",
+          "off": "Off",
+          "normal": "Normal",
+          "reduced": "Reduced",
+          "comfort": "Comfort",
+          "5_25_cycles": "5/25 cycles",
+          "5_10_cycles": "5/10 cycles"
+        }
+      },
+      "dhw_schedule": {
+        "name": "DHW schedule",
+        "state": {
+          "none": "No time slot",
+          "inactive": "Schedule off",
+          "on": "On",
+          "off": "Off",
+          "normal": "Normal",
+          "reduced": "Reduced",
+          "comfort": "Comfort",
+          "5_25_cycles": "5/25 cycles",
+          "5_10_cycles": "5/10 cycles"
+        }
+      },
+      "economizer_liquid_temperature": {
+        "name": "Economizer{suffix} liquid temperature"
+      },
+      "expansion_valve_target": {
+        "name": "Expansion valve {number} target"
+      },
+      "four_three_way_valve_current": {
+        "name": "4/3-way valve opening actual"
+      },
+      "four_three_way_valve_position": {
+        "name": "4/3-way valve position",
+        "state": {
+          "domestic_hot_water": "Domestic hot water",
+          "climate_circuit_one": "Heating/cooling circuit 1",
+          "climat_circuit_two_defrost": "Integrated buffer cylinder",
+          "climate_circuit_two_defrost_domestic_hot_water": "Domestic hot water",
+          "heating": "Heating",
+          "cooling": "Cooling",
+          "defrost": "Defrost",
+          "standby": "Standby",
+          "off": "Off"
+        }
+      },
+      "four_three_way_valve_target": {
+        "name": "4/3-way valve opening target"
+      },
+      "heat_production_cooling_summary": {
+        "name": "Heat production cooling"
+      },
+      "heat_production_current": {
+        "name": "Heat production current"
+      },
       "heat_production_dhw_summary": {
         "name": "Heat production DHW",
         "state_attributes": {
-          "current_day": { "name": "Current day" },
-          "current_month": { "name": "Current month" },
-          "current_year": { "name": "Current year" },
-          "last_month": { "name": "Last month" },
-          "last_seven_days": { "name": "Last seven days" },
-          "last_year": { "name": "Last year" }
+          "current_day": {
+            "name": "Current day"
+          },
+          "current_month": {
+            "name": "Current month"
+          },
+          "current_year": {
+            "name": "Current year"
+          },
+          "last_month": {
+            "name": "Last month"
+          },
+          "last_seven_days": {
+            "name": "Last seven days"
+          },
+          "last_year": {
+            "name": "Last year"
+          }
         }
       },
       "heat_production_heating_summary": {
         "name": "Heat production heating",
         "state_attributes": {
-          "current_day": { "name": "Current day" },
-          "current_month": { "name": "Current month" },
-          "current_year": { "name": "Current year" },
-          "last_month": { "name": "Last month" },
-          "last_seven_days": { "name": "Last seven days" },
-          "last_year": { "name": "Last year" }
+          "current_day": {
+            "name": "Current day"
+          },
+          "current_month": {
+            "name": "Current month"
+          },
+          "current_year": {
+            "name": "Current year"
+          },
+          "last_month": {
+            "name": "Last month"
+          },
+          "last_seven_days": {
+            "name": "Last seven days"
+          },
+          "last_year": {
+            "name": "Last year"
+          }
         }
+      },
+      "heating_rod_max_outside_temperature": {
+        "name": "Heating rod maximum outside temperature"
+      },
+      "heating_rod_power_consumption_dhw_summary": {
+        "name": "Heating rod power consumption DHW"
+      },
+      "heating_rod_power_consumption_heating_summary": {
+        "name": "Heating rod power consumption heating"
+      },
+      "heating_rod_stage": {
+        "name": "Heating rod active stages"
+      },
+      "internal_pump_speed": {
+        "name": "Internal pump speed"
+      },
+      "internal_pump_target": {
+        "name": "Internal pump speed target"
+      },
+      "last_status_message": {
+        "name": "Last status message"
       },
       "messages": {
         "name": "Messages",
         "state_attributes": {
-          "info": { "name": "Info messages" },
-          "info_count": { "name": "Number of info messages" },
-          "newest_status_timestamp": { "name": "Newest status message at" },
-          "service": { "name": "Service messages" },
-          "service_count": { "name": "Number of service messages" },
-          "status": { "name": "Status messages" },
-          "status_count": { "name": "Number of status messages" }
+          "info": {
+            "name": "Info messages"
+          },
+          "info_count": {
+            "name": "Number of info messages"
+          },
+          "newest_status_timestamp": {
+            "name": "Newest status message at"
+          },
+          "service": {
+            "name": "Service messages"
+          },
+          "service_count": {
+            "name": "Number of service messages"
+          },
+          "status": {
+            "name": "Status messages"
+          },
+          "status_count": {
+            "name": "Number of status messages"
+          },
+          "newest_status_text": {
+            "name": "Text of the newest status message"
+          }
         }
+      },
+      "operating_state": {
+        "name": "Operating state",
+        "state": {
+          "off": "Off",
+          "preflow": "Preflow",
+          "heating": "Heating",
+          "dhw": "Domestic hot water",
+          "cooling": "Cooling",
+          "defrost": "Defrost",
+          "afterflow": "Afterflow"
+        }
+      },
+      "power_consumption_cooling_summary": {
+        "name": "Power consumption cooling"
+      },
+      "power_consumption_current": {
+        "name": "Power consumption current"
       },
       "power_consumption_dhw_history": {
         "name": "Power consumption DHW history",
         "state_attributes": {
-          "day": { "name": "Days (today first)" },
-          "day_value_read_at": { "name": "Day values read at" },
-          "month": { "name": "Months (current first)" },
-          "month_value_read_at": { "name": "Month values read at" },
-          "week": { "name": "Weeks (current first)" },
-          "week_value_read_at": { "name": "Week values read at" },
-          "year": { "name": "Years (current first)" },
-          "year_value_read_at": { "name": "Year values read at" }
+          "day": {
+            "name": "Days (today first)"
+          },
+          "day_value_read_at": {
+            "name": "Day values read at"
+          },
+          "month": {
+            "name": "Months (current first)"
+          },
+          "month_value_read_at": {
+            "name": "Month values read at"
+          },
+          "week": {
+            "name": "Weeks (current first)"
+          },
+          "week_value_read_at": {
+            "name": "Week values read at"
+          },
+          "year": {
+            "name": "Years (current first)"
+          },
+          "year_value_read_at": {
+            "name": "Year values read at"
+          }
         }
       },
       "power_consumption_heating_history": {
         "name": "Power consumption heating history",
         "state_attributes": {
-          "day": { "name": "Days (today first)" },
-          "day_value_read_at": { "name": "Day values read at" },
-          "month": { "name": "Months (current first)" },
-          "month_value_read_at": { "name": "Month values read at" },
-          "week": { "name": "Weeks (current first)" },
-          "week_value_read_at": { "name": "Week values read at" },
-          "year": { "name": "Years (current first)" },
-          "year_value_read_at": { "name": "Year values read at" }
+          "day": {
+            "name": "Days (today first)"
+          },
+          "day_value_read_at": {
+            "name": "Day values read at"
+          },
+          "month": {
+            "name": "Months (current first)"
+          },
+          "month_value_read_at": {
+            "name": "Month values read at"
+          },
+          "week": {
+            "name": "Weeks (current first)"
+          },
+          "week_value_read_at": {
+            "name": "Week values read at"
+          },
+          "year": {
+            "name": "Years (current first)"
+          },
+          "year_value_read_at": {
+            "name": "Year values read at"
+          }
         }
+      },
+      "power_consumption_limit": {
+        "name": "Power limitation consumption limit"
       },
       "power_consumption_total_history": {
         "name": "Power consumption total history",
         "state_attributes": {
-          "day": { "name": "Days (today first)" },
-          "day_value_read_at": { "name": "Day values read at" },
-          "month": { "name": "Months (current first)" },
-          "month_value_read_at": { "name": "Month values read at" },
-          "week": { "name": "Weeks (current first)" },
-          "week_value_read_at": { "name": "Week values read at" },
-          "year": { "name": "Years (current first)" },
-          "year_value_read_at": { "name": "Year values read at" }
+          "day": {
+            "name": "Days (today first)"
+          },
+          "day_value_read_at": {
+            "name": "Day values read at"
+          },
+          "month": {
+            "name": "Months (current first)"
+          },
+          "month_value_read_at": {
+            "name": "Month values read at"
+          },
+          "week": {
+            "name": "Weeks (current first)"
+          },
+          "week_value_read_at": {
+            "name": "Week values read at"
+          },
+          "year": {
+            "name": "Years (current first)"
+          },
+          "year_value_read_at": {
+            "name": "Year values read at"
+          }
         }
+      },
+      "power_limitation": {
+        "name": "Power limitation §14a",
+        "state": {
+          "14a_off": "§14a off"
+        }
+      },
+      "power_status_consumption": {
+        "name": "Power limitation status consumption",
+        "state": {
+          "unlimited_autonomous": "Unlimited (autonomous)",
+          "init": "Initializing"
+        }
+      },
+      "power_status_production": {
+        "name": "Power limitation status production",
+        "state": {
+          "unlimited_autonomous": "Unlimited (autonomous)",
+          "init": "Initializing"
+        }
+      },
+      "primary_fan_speed": {
+        "name": "Fan {number}"
+      },
+      "room_co2": {
+        "name": "CO2"
+      },
+      "room_humidity": {
+        "name": "Humidity"
+      },
+      "room_operating_level": {
+        "name": "Operating level",
+        "state": {
+          "normal": "Normal",
+          "reduced": "Reduced",
+          "comfort": "Comfort"
+        }
+      },
+      "room_setpoint_comfort_heating": {
+        "name": "Setpoint comfort"
+      },
+      "room_setpoint_comfort_perceived": {
+        "name": "Setpoint comfort (perceived)"
+      },
+      "room_setpoint_normal_cooling": {
+        "name": "Setpoint cooling normal"
+      },
+      "room_setpoint_normal_heating": {
+        "name": "Setpoint normal"
+      },
+      "room_setpoint_normal_perceived": {
+        "name": "Setpoint normal (perceived)"
+      },
+      "room_setpoint_reduced_cooling": {
+        "name": "Setpoint cooling reduced"
+      },
+      "room_setpoint_reduced_heating": {
+        "name": "Setpoint reduced"
+      },
+      "room_temperature": {
+        "name": "Temperature"
+      },
+      "secondary_circuit_state": {
+        "name": "Secondary circuit state",
+        "state": {
+          "heating": "Heating",
+          "cooling": "Cooling",
+          "standby": "Standby",
+          "off": "Off"
+        }
+      },
+      "secondary_return_minimum_temperature": {
+        "name": "Secondary circuit return temperature minimum"
       }
     }
   },
@@ -133,7 +532,7 @@
   },
   "services": {
     "get_event_history": {
-      "description": "Fetches the event history of an installation from the Viessmann cloud. Every page fetched is one API call that counts against the daily quota.",
+      "description": "Fetches the event history of an installation from the Viessmann cloud. Every page fetched is one API call that counts against the daily quota. Messages get a decoded text (decoded, summary).",
       "fields": {
         "cursor": {
           "description": "Continue a previous call with the next_cursor it returned.",

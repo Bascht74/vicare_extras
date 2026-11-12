@@ -15,8 +15,10 @@ from custom_components.vicare_extras.event_history import (
 
 from . import fakes
 
-PRIMARY = "/eventhistory/installations/2323232/events"
-FALLBACK = "/events-history/installations/2323232/events"
+# The hyphenated path is the one that works live; the path from Viessmann's
+# documentation is the fallback.
+PRIMARY = "/events-history/installations/2323232/events"
+FALLBACK = "/eventhistory/installations/2323232/events"
 NOT_FOUND = {"viErrorId": "x", "statusCode": 404, "errorType": "ROUTE_NOT_FOUND", "message": "Not Found"}
 
 
@@ -43,7 +45,7 @@ def query(url: str) -> dict[str, str]:
     return {key: values[0] for key, values in parse_qs(urlsplit(url).query).items()}
 
 
-def test_documented_path_is_the_primary_one() -> None:
+def test_hyphenated_path_is_tried_first() -> None:
     assert EVENT_HISTORY_PATHS[0].format(installation_id=2323232) == PRIMARY
     assert EVENT_HISTORY_PATHS[1].format(installation_id=2323232) == FALLBACK
 
@@ -233,4 +235,4 @@ def test_non_dict_events_are_dropped() -> None:
 def test_installation_id_is_url_quoted() -> None:
     manager = fakes.FakeOAuthManager(page([]))
     fetch_event_history(manager, "12/../3", last_n_days=1, limit=1, max_pages=1)
-    assert urlsplit(manager.urls[0]).path == "/eventhistory/installations/12%2F..%2F3/events"
+    assert urlsplit(manager.urls[0]).path == "/events-history/installations/12%2F..%2F3/events"

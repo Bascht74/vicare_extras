@@ -2,7 +2,12 @@
 
 The coordinator never talks to the Viessmann API. Once per interval it looks
 at the payload PyViCare holds in memory for the built-in integration (see
-``bridge.peek_payload``) and keeps the handful of features the sensors need.
+``bridge.peek_payload``) and keeps the feature objects of the devices the
+entities are built from (by reference, nothing is copied):
+
+* heating devices the built-in integration has set up,
+* room control devices (``roomControl``), which the built-in integration does
+  not set up.
 """
 
 from __future__ import annotations
@@ -20,10 +25,10 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, Upda
 from . import bridge
 from .const import (
     DEVICE_TYPE_HEATING,
+    DEVICE_TYPE_ROOM_CONTROL,
     DOMAIN,
     MAX_SNAPSHOT_AGE_SECONDS,
     UPDATE_INTERVAL_SECONDS,
-    WATCHED_FEATURES,
 )
 from .errors import ViCareExtrasError
 
@@ -32,7 +37,7 @@ _LOGGER = logging.getLogger(__name__)
 
 @dataclass(slots=True)
 class DeviceSnapshot:
-    """The watched features of one device at the time of the last look."""
+    """The features of one device at the time of the last look."""
 
     device: bridge.DeviceRef
     features: dict[str, dict[str, Any]]
@@ -43,7 +48,7 @@ type ViCareExtrasConfigEntry = ConfigEntry[ViCareExtrasCoordinator]
 
 
 class ViCareExtrasCoordinator(DataUpdateCoordinator[dict[str, DeviceSnapshot]]):
-    """Mirror cached ViCare features, keyed by the vicare device identifier."""
+    """Mirror cached ViCare features, keyed by ``DeviceRef.ref_id``."""
 
     def __init__(self, hass: HomeAssistant, config_entry: ConfigEntry) -> None:
         """Initialize the coordinator."""
@@ -67,7 +72,7 @@ class ViCareExtrasCoordinator(DataUpdateCoordinator[dict[str, DeviceSnapshot]]):
         snapshots: dict[str, DeviceSnapshot] = {}
 
         for device in devices:
-            if device.identifier is None or device.device_type != DEVICE_TYPE_HEATING:
+            if not _wanted(device):
                 continue
             try:
                 payload = bridge.peek_payload(device.service)
@@ -77,21 +82,28 @@ class ViCareExtrasCoordinator(DataUpdateCoordinator[dict[str, DeviceSnapshot]]):
             if payload is None:
                 # The built-in integration is refreshing right now (or its
                 # last refresh failed). Keep the last snapshot for a while.
-                old = previous.get(device.identifier)
+                old = previous.get(device.ref_id)
                 if old is not None and now - old.updated <= MAX_SNAPSHOT_AGE_SECONDS:
-                    snapshots[device.identifier] = old
+                    snapshots[device.ref_id] = old
                 continue
 
-            snapshots[device.identifier] = DeviceSnapshot(
+            snapshots[device.ref_id] = DeviceSnapshot(
                 device=device,
                 features={
                     feature["feature"]: feature
                     for feature in bridge.device_features(payload, device.device_id)
-                    if feature["feature"] in WATCHED_FEATURES
                 },
                 updated=now,
             )
         return snapshots
+
+
+def _wanted(device: bridge.DeviceRef) -> bool:
+    """Return True for the devices entities are created for."""
+    if device.device_type == DEVICE_TYPE_HEATING:
+        # Only heating devices with a device registry entry of vicare.
+        return device.identifier is not None
+    return device.device_type == DEVICE_TYPE_ROOM_CONTROL
 
 
 def _describe(err: ViCareExtrasError) -> str:

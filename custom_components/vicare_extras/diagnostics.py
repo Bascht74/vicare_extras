@@ -1,7 +1,7 @@
 """Diagnostics for ViCare Extras.
 
 Contains no tokens, serial numbers or installation ids: only device models,
-types and which of the watched features are present.
+types and feature names.
 """
 
 from __future__ import annotations
@@ -12,7 +12,6 @@ from typing import Any
 from homeassistant.core import HomeAssistant
 
 from . import bridge
-from .const import WATCHED_FEATURES
 from .coordinator import ViCareExtrasConfigEntry
 from .errors import ViCareExtrasError
 
@@ -31,7 +30,8 @@ async def async_get_config_entry_diagnostics(
                     "model": snapshot.device.model,
                     "device_id": snapshot.device.device_id,
                     "age_seconds": round(now - snapshot.updated, 1),
-                    "features": sorted(snapshot.features),
+                    "device_type": snapshot.device.device_type,
+                    "feature_count": len(snapshot.features),
                 }
                 for snapshot in (coordinator.data or {}).values()
             ],
@@ -69,8 +69,6 @@ async def async_get_config_entry_diagnostics(
                 info["cache"] = "present"
                 info["cache_age_seconds"] = bridge.cache_age_seconds(device.service)
                 info["feature_count"] = len(names)
-                info["watched_features_present"] = sorted(
-                    WATCHED_FEATURES.intersection(names)
-                )
+                info["features"] = sorted(names)
         result["devices"].append(info)
     return result

@@ -61,10 +61,15 @@ class FakeServices:
         return await registration["func"](call)
 
 
+class FakeConfig:
+    language = "de"
+
+
 class FakeHass:
     """The few parts of HomeAssistant this integration touches."""
 
     def __init__(self) -> None:
+        self.config = FakeConfig()
         self.data: dict[str, Any] = {}
         self.config_entries = FakeConfigEntries()
         self.services = FakeServices(self)
@@ -103,3 +108,69 @@ def make_hass(
 
 def vicare_entry(hass: FakeHass) -> ConfigEntry:
     return hass.config_entries.entries[0]
+
+
+class Platforms:
+    """The sensor and binary sensor platforms set up against a fake hass."""
+
+    def __init__(self, hass: FakeHass) -> None:
+        from custom_components.vicare_extras.coordinator import ViCareExtrasCoordinator
+
+        self.hass = hass
+        self.entry = ConfigEntry(domain="vicare_extras", entry_id="extras")
+        self.coordinator = ViCareExtrasCoordinator(hass, self.entry)
+        self.sensors: list[Any] = []
+        self.binary_sensors: list[Any] = []
+
+    def _adder(self, target: list[Any]):
+        def add(entities: list[Any]) -> None:
+            for entity in entities:
+                target.append(entity)
+                # Real Home Assistant subscribes the entity when it is added.
+                self.coordinator.async_add_listener(entity._handle_coordinator_update)
+
+        return add
+
+    def setup(self) -> Platforms:
+        import asyncio
+
+        asyncio.run(self._async_setup())
+        return self
+
+    async def _async_setup(self) -> None:
+        from custom_components.vicare_extras import binary_sensor, sensor
+
+        await self.coordinator.async_config_entry_first_refresh()
+        self.entry.runtime_data = self.coordinator
+        await sensor.async_setup_entry(self.hass, self.entry, self._adder(self.sensors))
+        await binary_sensor.async_setup_entry(
+            self.hass, self.entry, self._adder(self.binary_sensors)
+        )
+
+    def refresh(self) -> None:
+        import asyncio
+
+        asyncio.run(self.coordinator.async_refresh())
+
+    @property
+    def entities(self) -> list[Any]:
+        return [*self.sensors, *self.binary_sensors]
+
+    @staticmethod
+    def _index(entities: list[Any]) -> dict[str, Any]:
+        result: dict[str, Any] = {}
+        for entity in entities:
+            index = getattr(entity, "_index", None)
+            if index is not None:
+                result[f"{entity.translation_key}-{index}"] = entity
+            result.setdefault(entity.translation_key, entity)
+        return result
+
+    def sensor(self, key: str) -> Any:
+        return self._index(self.sensors)[key]
+
+    def binary_sensor(self, key: str) -> Any:
+        return self._index(self.binary_sensors)[key]
+
+    def keys(self, entities: list[Any] | None = None) -> set[str]:
+        return {entity.translation_key for entity in (self.entities if entities is None else entities)}

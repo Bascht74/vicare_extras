@@ -14,17 +14,20 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.typing import ConfigType
 
+from . import messages
 from .const import DOMAIN
 from .coordinator import ViCareExtrasConfigEntry, ViCareExtrasCoordinator
 from .services import async_setup_services
 
-PLATFORMS: list[Platform] = [Platform.SENSOR]
+PLATFORMS: list[Platform] = [Platform.BINARY_SENSOR, Platform.SENSOR]
 
 CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
 
 
 async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
-    """Set up the integration: register the actions."""
+    """Set up the integration: load the message table, register the actions."""
+    # Reads a file, so not in the event loop. Cached for all later lookups.
+    await hass.async_add_executor_job(messages.load_table)
     async_setup_services(hass)
     return True
 

@@ -1,0 +1,2188 @@
+{
+ "version": 1,
+ "sources": {
+  "viessmann": {
+   "title": "Serviceanleitung für die Fachkraft: Viessmann One Base. Systemkonfiguration und Diagnose für Wärmepumpen mit Viessmann One Base",
+   "document": "6200041, DE 6/2024",
+   "products": "Vitocal 150-A, 151-A, 250-A, 252-A",
+   "language": "de"
+  },
+  "vieventlog": {
+   "title": "ViEventLog, error_codes.go",
+   "url": "https://github.com/mschneider82/vieventlog",
+   "commit": "bd40a11e4789c381d5e3ff1712c039dbdcb1a1b9",
+   "license": "MIT, Copyright (c) 2025 Matthias Schneider",
+   "language": "de"
+  }
+ },
+ "codes": {
+  "A.2": {
+   "de": "Frostschutzgrenze unterschritten",
+   "source": "viessmann"
+  },
+  "A.11": {
+   "de": "Anlagendruck zu niedrig",
+   "source": "viessmann"
+  },
+  "A.12": {
+   "de": "Batterie im Elektronikmodul HPMU",
+   "source": "viessmann"
+  },
+  "A.16": {
+   "de": "Mindestvolumenstrom unterschritten",
+   "source": "viessmann"
+  },
+  "A.17": {
+   "de": "Erhöhte Trinkwasserhygiene",
+   "source": "viessmann"
+  },
+  "A.19": {
+   "de": "Temperaturwächter hat ausgelöst",
+   "source": "viessmann"
+  },
+  "A.21": {
+   "de": "Hydraulischer Anlagendruck",
+   "source": "viessmann"
+  },
+  "A.27": {
+   "de": "Batterie geringer Ladezustand",
+   "source": "vieventlog"
+  },
+  "A.62": {
+   "de": "PWM-Signal Heizkreispumpe Heiz-/Kühlkreis 1",
+   "source": "viessmann"
+  },
+  "A.63": {
+   "de": "PWM-Signal Heizkreispumpe Heiz-/Kühlkreis 2",
+   "source": "viessmann"
+  },
+  "A.65": {
+   "de": "Heizkreispumpe Heiz-/Kühlkreis 2 läuft trocken",
+   "source": "viessmann"
+  },
+  "A.66": {
+   "de": "Heizkreispumpe Heiz-/Kühlkreis 1 läuft nicht",
+   "source": "viessmann"
+  },
+  "A.68": {
+   "de": "Heizkreispumpe Heiz-/Kühlkreis 2 läuft nicht",
+   "source": "viessmann"
+  },
+  "A.70": {
+   "de": "Filter im Kugelhahn Außeneinheit",
+   "source": "viessmann"
+  },
+  "A.71": {
+   "de": "Überstrom am Verdichter",
+   "source": "viessmann"
+  },
+  "A.72": {
+   "de": "Strom Leistungsfaktor-Korrekturfilter",
+   "source": "viessmann"
+  },
+  "A.73": {
+   "de": "Frequenzabweichung Verdichterdrehzahl",
+   "source": "viessmann"
+  },
+  "A.74": {
+   "de": "Druckverlust im Sekundärkreis",
+   "source": "viessmann"
+  },
+  "A.75": {
+   "de": "Druckspitzen im Sekundärkreis",
+   "source": "viessmann"
+  },
+  "A.80": {
+   "de": "Ventilator blockiert",
+   "source": "viessmann"
+  },
+  "A.81": {
+   "de": "Unzureichende Wärmeübertragung Verdampfer",
+   "source": "viessmann"
+  },
+  "A.82": {
+   "de": "Fehler Drucksensor CAN-BUS-Teilnehmer",
+   "source": "viessmann"
+  },
+  "A.83": {
+   "de": "Signal Speichertemperatursensor fehlerhaft",
+   "source": "viessmann"
+  },
+  "A.84": {
+   "de": "Signal Rücklauftemperatursensor Sekundärkreis",
+   "source": "viessmann"
+  },
+  "A.85": {
+   "de": "Signal Vorlauftemperatursensor Sekundärkreis",
+   "source": "viessmann"
+  },
+  "A.86": {
+   "de": "Signal Vorlauftemperatursensor Heiz-/Kühlkreis 1",
+   "source": "viessmann"
+  },
+  "A.87": {
+   "de": "Signal Vorlauftemperatursensor Heiz-/Kühlkreis 2",
+   "source": "viessmann"
+  },
+  "A.91": {
+   "de": "Kältekreis vorübergehend aus",
+   "source": "viessmann"
+  },
+  "A.93": {
+   "de": "Heißgasdruck nicht plausibel",
+   "source": "viessmann"
+  },
+  "A.94": {
+   "de": "Sauggasdruck nicht plausibel",
+   "source": "viessmann"
+  },
+  "A.96": {
+   "de": "Luft im Sekundärkreis",
+   "source": "viessmann"
+  },
+  "A.99": {
+   "de": "Vorlauftemperatur Sekundärkreis zu niedrig",
+   "source": "viessmann"
+  },
+  "A.100": {
+   "de": "Einstellungen gelöscht",
+   "source": "viessmann"
+  },
+  "A.101": {
+   "de": "Heißgastemperatur nicht plausibel",
+   "source": "viessmann"
+  },
+  "A.102": {
+   "de": "Sauggastemperatur nicht plausibel",
+   "source": "viessmann"
+  },
+  "A.109": {
+   "de": "Kesseltemperatur-Istwert zu niedrig",
+   "source": "viessmann"
+  },
+  "A.110": {
+   "de": "Temperatur externer Wärmeerzeuger 1",
+   "source": "viessmann"
+  },
+  "A.111": {
+   "de": "Temperatur externer Wärmeerzeuger 2",
+   "source": "viessmann"
+  },
+  "A.130": {
+   "de": "Warnschwelle Einsatzgrenzen für Kühlbetrieb unterschritten",
+   "source": "vieventlog"
+  },
+  "A.152": {
+   "de": "Überlastschutz Wallbox nicht aktiv",
+   "source": "viessmann"
+  },
+  "A.153": {
+   "de": "Kein PV-optmiertes Laden",
+   "source": "viessmann"
+  },
+  "A.159": {
+   "de": "Werkseitige Einstellung Inverter",
+   "source": "viessmann"
+  },
+  "A.162": {
+   "de": "Inverter Überspannung Zwischenkreis",
+   "source": "viessmann"
+  },
+  "A.163": {
+   "de": "Überspannung im Zwischenkreis Inverter",
+   "source": "viessmann"
+  },
+  "A.164": {
+   "de": "Gleichspannung im Zwischenkreis Inverter",
+   "source": "viessmann"
+  },
+  "A.174": {
+   "de": "Innenraumtemperatur zu hoch",
+   "source": "viessmann"
+  },
+  "F.1": {
+   "de": "Unterbrechung Vorlauftemperatursensor",
+   "source": "viessmann"
+  },
+  "F.2": {
+   "de": "Kurzschluss Vorlauftemperatursensor",
+   "source": "viessmann"
+  },
+  "F.3": {
+   "de": "Unterbrechung Rücklauftemperatursensor",
+   "source": "viessmann"
+  },
+  "F.4": {
+   "de": "Kurzschluss Rücklauftemperatursensor",
+   "source": "viessmann"
+  },
+  "F.5": {
+   "de": "Abgastemperatursensor defekt",
+   "source": "vieventlog"
+  },
+  "F.7": {
+   "de": "Unterbrechung Speichertemperatursensor",
+   "source": "viessmann"
+  },
+  "F.8": {
+   "de": "Kurzschluss Speichertemperatursensor",
+   "source": "viessmann"
+  },
+  "F.10": {
+   "de": "Kurzschluss Außentemperatursensor",
+   "source": "vieventlog"
+  },
+  "F.11": {
+   "de": "Kurzschluss Vorlauftemperatursensor",
+   "source": "vieventlog"
+  },
+  "F.12": {
+   "de": "Kurzschluss Speichertemperatursensor",
+   "source": "vieventlog"
+  },
+  "F.13": {
+   "de": "Unterbrechung Außentemperatursensor",
+   "source": "viessmann"
+  },
+  "F.14": {
+   "de": "Kurzschluss Außentemperatursensor",
+   "source": "viessmann"
+  },
+  "F.20": {
+   "de": "Wasserdruck zu niedrig",
+   "source": "vieventlog"
+  },
+  "F.21": {
+   "de": "Wasserdruck zu hoch",
+   "source": "vieventlog"
+  },
+  "F.22": {
+   "de": "Kein Durchfluss",
+   "source": "vieventlog"
+  },
+  "F.23": {
+   "de": "Durchfluss zu gering",
+   "source": "vieventlog"
+  },
+  "F.33": {
+   "de": "Unterbrechung Primäreintrittstemperatursensor Wärmepumpe",
+   "source": "viessmann"
+  },
+  "F.34": {
+   "de": "Kurzschluss Primäreintrittstemperatursensor Wärmepumpe",
+   "source": "viessmann"
+  },
+  "F.74": {
+   "de": "Hydraulischer Anlagendruck zu niedrig",
+   "source": "viessmann"
+  },
+  "F.75": {
+   "de": "Kein Volumenstrom im Hydraulikkreis",
+   "source": "viessmann"
+  },
+  "F.78": {
+   "de": "Keine Kommunikation mit Bedienteil",
+   "source": "viessmann"
+  },
+  "F.87": {
+   "de": "Überdruck Anlage",
+   "source": "viessmann"
+  },
+  "F.91": {
+   "de": "Kommunikationsfehler DIO",
+   "source": "viessmann"
+  },
+  "F.92": {
+   "de": "Kommunikationsfehler ADIO",
+   "source": "viessmann"
+  },
+  "F.100": {
+   "de": "Spannungsfehler PlusBus",
+   "source": "viessmann"
+  },
+  "F.101": {
+   "de": "Kurzschluss PlusBus",
+   "source": "viessmann"
+  },
+  "F.111": {
+   "de": "Unterbrechung Flüssiggastemperatursensor Heizen",
+   "source": "viessmann"
+  },
+  "F.112": {
+   "de": "Kurzschluss Flüssiggastemperatursensor Heizen",
+   "source": "viessmann"
+  },
+  "F.117": {
+   "de": "Unterbrechung Sauggastemperatursensor Verdampfer",
+   "source": "viessmann"
+  },
+  "F.118": {
+   "de": "Kurzschluss Sauggastemperatursensor Verdampfer",
+   "source": "viessmann"
+  },
+  "F.121": {
+   "de": "Fehler Kommunikation Wechselrichter",
+   "source": "viessmann"
+  },
+  "F.123": {
+   "de": "Unterbrechung Flüssiggastemperatursensor Verflüssiger",
+   "source": "viessmann"
+  },
+  "F.124": {
+   "de": "Kurzschluss Flüssiggastemperatursensor Verflüssiger",
+   "source": "viessmann"
+  },
+  "F.134": {
+   "de": "Kommunikationsfehler Inverter",
+   "source": "viessmann"
+  },
+  "F.147": {
+   "de": "Unterbrechung Sauggastemperatursensor Verdichter",
+   "source": "viessmann"
+  },
+  "F.148": {
+   "de": "Kurzschluss Sauggastemperatursensor Verdichter",
+   "source": "viessmann"
+  },
+  "F.149": {
+   "de": "Unterbrechung Flüssiggastemperatursensor Kühlen",
+   "source": "viessmann"
+  },
+  "F.150": {
+   "de": "Kurzschluss Flüssiggastemperatursensor Kühlen",
+   "source": "viessmann"
+  },
+  "F.151": {
+   "de": "Unterbrechung Heißgastemperatursensor",
+   "source": "viessmann"
+  },
+  "F.152": {
+   "de": "Kurzschluss Heißgastemperatursensor",
+   "source": "viessmann"
+  },
+  "F.155": {
+   "de": "Fehler Elektronisches Expansionsventil 1",
+   "source": "viessmann"
+  },
+  "F.156": {
+   "de": "Fehler Elektronisches Expansionsventil 2",
+   "source": "viessmann"
+  },
+  "F.160": {
+   "de": "Kommunikationsstörung CAN-BUS",
+   "source": "viessmann"
+  },
+  "F.425": {
+   "de": "Zeitsynchronisierung fehlgeschlagen",
+   "source": "viessmann"
+  },
+  "F.430": {
+   "de": "Kommunikationsfehler Gateway",
+   "source": "viessmann"
+  },
+  "F.431": {
+   "de": "Kommunikationsfehler KNX",
+   "source": "viessmann"
+  },
+  "F.454": {
+   "de": "Falsche Softwareversion",
+   "source": "viessmann"
+  },
+  "F.472": {
+   "de": "Kommunikation Energiezähler unterbrochen",
+   "source": "viessmann"
+  },
+  "F.518": {
+   "de": "Keine Kommunikation mit Energiezähler",
+   "source": "vieventlog"
+  },
+  "F.519": {
+   "de": "Kommunikationsfehler BACnet",
+   "source": "viessmann"
+  },
+  "F.520": {
+   "de": "Kommunikationsfehler Modbus",
+   "source": "viessmann"
+  },
+  "F.542": {
+   "de": "Mischer schließt",
+   "source": "vieventlog"
+  },
+  "F.543": {
+   "de": "Mischer öffnet",
+   "source": "vieventlog"
+  },
+  "F.544": {
+   "de": "Unterbrechung Vorlauftemperatursensor HK 2",
+   "source": "viessmann"
+  },
+  "F.545": {
+   "de": "Kurzschluss Vorlauftemperatursensor HK 2",
+   "source": "viessmann"
+  },
+  "F.546": {
+   "de": "Unterbrechung Vorlauftemperatursensor HK 3",
+   "source": "viessmann"
+  },
+  "F.547": {
+   "de": "Kurzschluss Vorlauftemperatursensor HK 3",
+   "source": "viessmann"
+  },
+  "F.548": {
+   "de": "Unterbrechung Vorlauftemperatursensor HK 4",
+   "source": "viessmann"
+  },
+  "F.549": {
+   "de": "Kurzschluss Vorlauftemperatursensor HK 4",
+   "source": "viessmann"
+  },
+  "F.578": {
+   "de": "Unterbrechung Raumtemperatursensor Funk-Fernbedienung",
+   "source": "viessmann"
+  },
+  "F.616": {
+   "de": "Inkompatible Softwareversion im Steuergeräteverbund erkannt",
+   "source": "viessmann"
+  },
+  "F.685": {
+   "de": "Kommunikationsfehler Elektronikmodul HPMU",
+   "source": "viessmann"
+  },
+  "F.686": {
+   "de": "Kommunikationsfehler Kältekreisregler",
+   "source": "viessmann"
+  },
+  "F.687": {
+   "de": "Kommunikationsfehler EHCU",
+   "source": "viessmann"
+  },
+  "F.744": {
+   "de": "Bedienteil ist nicht kompatibel",
+   "source": "viessmann"
+  },
+  "F.745": {
+   "de": "Inkompatible Systemkonfiguration",
+   "source": "viessmann"
+  },
+  "F.747": {
+   "de": "Interner Fehler der Bedieneinheit",
+   "source": "viessmann"
+  },
+  "F.748": {
+   "de": "Fehler Touchbedienfeld des Bedienteils",
+   "source": "viessmann"
+  },
+  "F.749": {
+   "de": "Firmwarestände der Steuergeräte zueinander inkompatibel",
+   "source": "viessmann"
+  },
+  "F.764": {
+   "de": "Weiterer CAN-BUS-Teilnehmer meldet eine Störung",
+   "source": "viessmann"
+  },
+  "F.765": {
+   "de": "Kommunikationsfehler zu weiterem CAN-BUS-Teilnehmer",
+   "source": "viessmann"
+  },
+  "F.770": {
+   "de": "Unterbrechung Vorlauftemperatursensor Sekundärkreis",
+   "source": "viessmann"
+  },
+  "F.771": {
+   "de": "Kurzschluss Vorlauftemperatursensor Sekundärkreis",
+   "source": "viessmann"
+  },
+  "F.772": {
+   "de": "Unterbrechung Verdichterölsumpftemperatursensor",
+   "source": "viessmann"
+  },
+  "F.773": {
+   "de": "Kurzschluss Verdichterölsumpftemperatursensor",
+   "source": "viessmann"
+  },
+  "F.788": {
+   "de": "Unterbrechung 4/3-Wege-Ventil",
+   "source": "viessmann"
+  },
+  "F.790": {
+   "de": "Mechanischer Defekt 4/3-Wege-Ventil",
+   "source": "viessmann"
+  },
+  "F.791": {
+   "de": "Ausfall Heizwasser-Durchlauferhitzer Phase 1",
+   "source": "viessmann"
+  },
+  "F.792": {
+   "de": "Ausfall Heizwasser-Durchlauferhitzer Phase 2",
+   "source": "viessmann"
+  },
+  "F.793": {
+   "de": "Ausfall Heizwasser-Durchlauferhitzer Phase 3",
+   "source": "viessmann"
+  },
+  "F.797": {
+   "de": "Mechanischer Defekt Umwälzpumpe Heizkreis 1",
+   "source": "viessmann"
+  },
+  "F.798": {
+   "de": "Mechanischer Defekt Umwälzpumpe Heizkreis 2",
+   "source": "viessmann"
+  },
+  "F.799": {
+   "de": "Elektrischer Fehler Umwälzpumpe Heizkreis 1",
+   "source": "viessmann"
+  },
+  "F.800": {
+   "de": "Elektrischer Fehler Umwälzpumpe Heizkreis 2",
+   "source": "viessmann"
+  },
+  "F.801": {
+   "de": "Fehlfunktion Ventil Kältekreisumkehr",
+   "source": "viessmann"
+  },
+  "F.808": {
+   "de": "Fehler unterer Ventilator",
+   "source": "viessmann"
+  },
+  "F.812": {
+   "de": "Fehler oberer Ventilator",
+   "source": "viessmann"
+  },
+  "F.819": {
+   "de": "Unterbrechung Expansionsventil 1",
+   "source": "viessmann"
+  },
+  "F.820": {
+   "de": "Unterbrechung Expansionsventil 2",
+   "source": "viessmann"
+  },
+  "F.823": {
+   "de": "Kurzschluss Expansionsventil 1",
+   "source": "viessmann"
+  },
+  "F.824": {
+   "de": "Kurzschluss Expansionsventil 2",
+   "source": "viessmann"
+  },
+  "F.830": {
+   "de": "Fehler Stromsensor Inverter",
+   "source": "viessmann"
+  },
+  "F.831": {
+   "de": "Fehler Stromsensor Leistungsfaktor-Korrekturfilter (PFC) Inverter",
+   "source": "viessmann"
+  },
+  "F.832": {
+   "de": "Invertertemperatursensor (IPM) defekt",
+   "source": "viessmann"
+  },
+  "F.833": {
+   "de": "Fehler Temperatursensor Leistungsfaktor-Korrekturfilter (PFC) Inverter",
+   "source": "viessmann"
+  },
+  "F.834": {
+   "de": "Inverter netzseitiger Phasenfehler",
+   "source": "viessmann"
+  },
+  "F.835": {
+   "de": "Inverter Parametrierung fehlerhaft",
+   "source": "viessmann"
+  },
+  "F.836": {
+   "de": "Laststrom Inverter zu hoch (Überstrom)",
+   "source": "viessmann"
+  },
+  "F.837": {
+   "de": "Inverter elektrischer Phasenanschluss an Verdichter fehlerhaft",
+   "source": "viessmann"
+  },
+  "F.838": {
+   "de": "Inverter Ansteuerung fehlerhaft",
+   "source": "viessmann"
+  },
+  "F.839": {
+   "de": "Verdichter blockiert",
+   "source": "viessmann"
+  },
+  "F.840": {
+   "de": "Inverter Phasenströme an Verdichter unsymmetrisch",
+   "source": "viessmann"
+  },
+  "F.841": {
+   "de": "Verdichterdrehmoment zu hoch",
+   "source": "viessmann"
+  },
+  "F.842": {
+   "de": "Kurzschluss Inverter internes Leistungsmodul",
+   "source": "viessmann"
+  },
+  "F.843": {
+   "de": "Inverter Überstromabschaltung Leistungsfaktor-Korrekturfilter (PFC)",
+   "source": "viessmann"
+  },
+  "F.844": {
+   "de": "Inverter Fehler interne Referenzspannung",
+   "source": "viessmann"
+  },
+  "F.845": {
+   "de": "Inverter Parametrierung fehlerhaft",
+   "source": "viessmann"
+  },
+  "F.846": {
+   "de": "Inverter Verdichterdrehfeld gegenläufig",
+   "source": "viessmann"
+  },
+  "F.847": {
+   "de": "Stromsensor Inverter erkennt gleichbleibenden Verdichterstrom",
+   "source": "viessmann"
+  },
+  "F.848": {
+   "de": "Stromsensor Inverter erkennt schwankenden Verdichterstrom",
+   "source": "viessmann"
+  },
+  "F.864": {
+   "de": "Abtauen nicht erfolgreich beendet",
+   "source": "viessmann"
+  },
+  "F.865": {
+   "de": "Kältekreis Hochdruckabschaltung",
+   "source": "viessmann"
+  },
+  "F.866": {
+   "de": "Kältekreis Niederdruckabschaltung",
+   "source": "viessmann"
+  },
+  "F.875": {
+   "de": "Kommunikationsfehler zu verbundenem Hauptgerät",
+   "source": "viessmann"
+  },
+  "F.876": {
+   "de": "Unterbrechung Kombisensor Volumenstrom/Temperatur",
+   "source": "viessmann"
+  },
+  "F.881": {
+   "de": "Sicherheitsabschaltung Kältekreis",
+   "source": "viessmann"
+  },
+  "F.909": {
+   "de": "Keine Informationen zum Viessmann Energiemanagement (HEMS)",
+   "source": "viessmann"
+  },
+  "F.910": {
+   "de": "Mehrere Hauptgeräte erkannt",
+   "source": "viessmann"
+  },
+  "F.912": {
+   "de": "Inverter Innenraumtemperatursensor fehlerhaft",
+   "source": "viessmann"
+  },
+  "F.923": {
+   "de": "Daten Energiezähler 1 nicht verfügbar",
+   "source": "viessmann"
+  },
+  "F.924": {
+   "de": "Daten Energiezähler 2 nicht verfügbar",
+   "source": "viessmann"
+  },
+  "F.925": {
+   "de": "Daten Energiezähler 3 nicht verfügbar",
+   "source": "viessmann"
+  },
+  "F.926": {
+   "de": "Daten Energiezähler 4 nicht verfügbar",
+   "source": "viessmann"
+  },
+  "F.927": {
+   "de": "Daten Energiezähler 5 nicht verfügbar",
+   "source": "viessmann"
+  },
+  "F.928": {
+   "de": "Daten Energiezähler 6 nicht verfügbar",
+   "source": "viessmann"
+  },
+  "F.929": {
+   "de": "Daten Energiezähler 7 nicht verfügbar",
+   "source": "viessmann"
+  },
+  "F.930": {
+   "de": "Daten Energiezähler 8 nicht verfügbar",
+   "source": "viessmann"
+  },
+  "F.931": {
+   "de": "Daten Energiezähler 9 nicht verfügbar",
+   "source": "viessmann"
+  },
+  "F.932": {
+   "de": "Daten Energiezähler 10 nicht verfügbar",
+   "source": "viessmann"
+  },
+  "F.933": {
+   "de": "Daten Energiezähler 11 nicht verfügbar",
+   "source": "viessmann"
+  },
+  "F.934": {
+   "de": "Daten Energiezähler 12 nicht verfügbar",
+   "source": "viessmann"
+  },
+  "F.935": {
+   "de": "Daten Energiezähler 13 nicht verfügbar",
+   "source": "viessmann"
+  },
+  "F.936": {
+   "de": "Daten Energiezähler 14 nicht verfügbar",
+   "source": "viessmann"
+  },
+  "F.937": {
+   "de": "Daten Energiezähler 15 nicht verfügbar",
+   "source": "viessmann"
+  },
+  "F.938": {
+   "de": "Daten Wechselrichter 1 nicht verfügbar",
+   "source": "viessmann"
+  },
+  "F.939": {
+   "de": "Daten Wechselrichter 2 nicht verfügbar",
+   "source": "viessmann"
+  },
+  "F.940": {
+   "de": "Daten Wechselrichter 3 nicht verfügbar",
+   "source": "viessmann"
+  },
+  "F.941": {
+   "de": "Daten Wechselrichter 4 nicht verfügbar",
+   "source": "viessmann"
+  },
+  "F.942": {
+   "de": "Daten Wechselrichter 5 nicht verfügbar",
+   "source": "viessmann"
+  },
+  "F.943": {
+   "de": "Daten Wechselrichter 6 nicht verfügbar",
+   "source": "viessmann"
+  },
+  "F.944": {
+   "de": "Daten Verbraucher 1 nicht verfügbar",
+   "source": "viessmann"
+  },
+  "F.945": {
+   "de": "Daten Verbraucher 2 nicht verfügbar",
+   "source": "viessmann"
+  },
+  "F.946": {
+   "de": "Daten Verbraucher 3 nicht verfügbar",
+   "source": "viessmann"
+  },
+  "F.947": {
+   "de": "Daten Verbraucher 4 nicht verfügbar",
+   "source": "viessmann"
+  },
+  "F.948": {
+   "de": "Daten Verbraucher 5 nicht verfügbar",
+   "source": "viessmann"
+  },
+  "F.949": {
+   "de": "Daten Verbraucher 6 nicht verfügbar",
+   "source": "viessmann"
+  },
+  "F.950": {
+   "de": "Daten Verbraucher 7 nicht verfügbar",
+   "source": "viessmann"
+  },
+  "F.951": {
+   "de": "Daten Verbraucher 8 nicht verfügbar",
+   "source": "viessmann"
+  },
+  "F.952": {
+   "de": "Daten Verbraucher 9 nicht verfügbar",
+   "source": "viessmann"
+  },
+  "F.953": {
+   "de": "Daten Verbraucher 10 nicht verfügbar",
+   "source": "viessmann"
+  },
+  "F.954": {
+   "de": "Daten Verbraucher 11 nicht verfügbar",
+   "source": "viessmann"
+  },
+  "F.955": {
+   "de": "Daten Verbraucher 12 nicht verfügbar",
+   "source": "viessmann"
+  },
+  "F.956": {
+   "de": "Daten Verbraucher 13 nicht verfügbar",
+   "source": "viessmann"
+  },
+  "F.957": {
+   "de": "Daten Verbraucher 14 nicht verfügbar",
+   "source": "viessmann"
+  },
+  "F.958": {
+   "de": "Daten Verbraucher 15 nicht verfügbar",
+   "source": "viessmann"
+  },
+  "F.959": {
+   "de": "Daten Erzeuger 1 nicht verfügbar",
+   "source": "viessmann"
+  },
+  "F.960": {
+   "de": "Daten Erzeuger 2 nicht verfügbar",
+   "source": "viessmann"
+  },
+  "F.961": {
+   "de": "Daten Erzeuger 3 nicht verfügbar",
+   "source": "viessmann"
+  },
+  "F.962": {
+   "de": "Daten Erzeuger 4 nicht verfügbar",
+   "source": "viessmann"
+  },
+  "F.963": {
+   "de": "Daten Erzeuger 5 nicht verfügbar",
+   "source": "viessmann"
+  },
+  "F.964": {
+   "de": "Daten Erzeuger 6 nicht verfügbar",
+   "source": "viessmann"
+  },
+  "F.965": {
+   "de": "Daten Batteriemodul 1 nicht verfügbar",
+   "source": "viessmann"
+  },
+  "F.966": {
+   "de": "Daten Batteriemodul 2 nicht verfügbar",
+   "source": "viessmann"
+  },
+  "F.967": {
+   "de": "Daten Batteriemodul 3 nicht verfügbar",
+   "source": "viessmann"
+  },
+  "F.968": {
+   "de": "Daten Batteriemodul 4 nicht verfügbar",
+   "source": "viessmann"
+  },
+  "F.969": {
+   "de": "Daten Batteriemodul 5 nicht verfügbar",
+   "source": "viessmann"
+  },
+  "F.970": {
+   "de": "Daten Batteriemodul 6 nicht verfügbar",
+   "source": "viessmann"
+  },
+  "F.983": {
+   "de": "Inverter EEPROM fehlerhaft",
+   "source": "viessmann"
+  },
+  "F.984": {
+   "de": "Mehrfacher elektrischer Fehler Ansteuerung elektronisches Expansionsventil 1",
+   "source": "viessmann"
+  },
+  "F.985": {
+   "de": "Mehrfacher elektrischer Fehler Ansteuerung elektronisches Expansionsventil 2",
+   "source": "viessmann"
+  },
+  "F.990": {
+   "de": "Kurzschluss Temperatursensor hydraulische Weiche",
+   "source": "viessmann"
+  },
+  "F.991": {
+   "de": "Unterbrechung Temperatursensor hydraulische Weiche",
+   "source": "viessmann"
+  },
+  "F.992": {
+   "de": "Kurzschluss Temperatursensor Heiz-/Kühlwasser-Pufferspeicher",
+   "source": "viessmann"
+  },
+  "F.993": {
+   "de": "Kurzschluss Temperatursensor Heizwasser-Pufferspeicher",
+   "source": "viessmann"
+  },
+  "F.994": {
+   "de": "Kurzschluss Temperatursensor Heizwasser-Pufferspeicher",
+   "source": "viessmann"
+  },
+  "F.995": {
+   "de": "Unterbrechung Temperatursensor Heizwasser-Pufferspeicher",
+   "source": "viessmann"
+  },
+  "F.996": {
+   "de": "Kurzschluss Temperatursensor Kühlwasser-Pufferspeicher",
+   "source": "viessmann"
+  },
+  "F.997": {
+   "de": "Unterbrechung Temperatursensor Kühlwasser-Pufferspeicher",
+   "source": "viessmann"
+  },
+  "F.998": {
+   "de": "Kommunikationsfehler Kältekreisregler zu EHCU/Volumenstromsignal",
+   "source": "viessmann"
+  },
+  "F.1006": {
+   "de": "Startzähler Wärmepumpe überschritten",
+   "source": "viessmann"
+  },
+  "F.1007": {
+   "de": "Wärmepumpe verriegelt",
+   "source": "viessmann"
+  },
+  "F.1008": {
+   "de": "Anzahl unterstützter Geräte an Hauptsteuergerät überschritten",
+   "source": "viessmann"
+  },
+  "F.1009": {
+   "de": "Fehler elektrische Verdichterheizung Wärmepumpe",
+   "source": "viessmann"
+  },
+  "F.1010": {
+   "de": "Störung Wasserdrucksensor",
+   "source": "viessmann"
+  },
+  "F.1011": {
+   "de": "Störung Hochdrucksensor Kältekreis",
+   "source": "viessmann"
+  },
+  "F.1012": {
+   "de": "Störung Niederdrucksensor Kältekreis",
+   "source": "viessmann"
+  },
+  "F.1034": {
+   "de": "Kommunikationsstörung externer CAN-BUS",
+   "source": "viessmann"
+  },
+  "F.1035": {
+   "de": "Kommunikationsstörung interner CAN-BUS",
+   "source": "viessmann"
+  },
+  "F.1045": {
+   "de": "Fehler externer Wärme-/Kälteerzeuger 1",
+   "source": "viessmann"
+  },
+  "F.1049": {
+   "de": "Fehlfunktion externes 3/2-Wege-Mischventil Bivalenzbetrieb",
+   "source": "viessmann"
+  },
+  "F.1050": {
+   "de": "Kurzschluss Temperatursensor externer Wärme-/Kälteerzeuger 1",
+   "source": "viessmann"
+  },
+  "F.1051": {
+   "de": "Unterbrechung Temperatursensor externer Wärme-/Kälteerzeuger 1",
+   "source": "viessmann"
+  },
+  "F.1054": {
+   "de": "Maximaltemperatur externer Wärme-/Kälteerzeuger 1 überschritten",
+   "source": "viessmann"
+  },
+  "F.1056": {
+   "de": "Defektes Relais Inverter Zwischenkreis",
+   "source": "viessmann"
+  },
+  "F.1057": {
+   "de": "Störung Hochdrucksensor Kältekreis",
+   "source": "viessmann"
+  },
+  "F.1074": {
+   "de": "Druckdifferenz zu gering für Kältekreisumkehr",
+   "source": "viessmann"
+  },
+  "F.1076": {
+   "de": "Verdichterstartzähler mit zu niedriger Öltemperatur überschritten",
+   "source": "viessmann"
+  },
+  "F.1077": {
+   "de": "Wiederholte Verdichter Mindestlaufzeit Verletzung",
+   "source": "viessmann"
+  },
+  "F.1078": {
+   "de": "Wiederholt zu geringer Volumenstrom bei Verdichteranlauf",
+   "source": "viessmann"
+  },
+  "F.1080": {
+   "de": "Verdampfertemperatur zu niedrig",
+   "source": "viessmann"
+  },
+  "F.1105": {
+   "de": "Funktion Kühlen auf Heiz-/Kühlkreis 1 wird durch Erweiterungsmodul nicht unterstützt",
+   "source": "viessmann"
+  },
+  "F.1106": {
+   "de": "Funktion Kühlen auf Heiz-/Kühlkreis 2 wird durch Erweiterungsmodul nicht unterstützt",
+   "source": "viessmann"
+  },
+  "F.1107": {
+   "de": "Funktion Kühlen auf Heiz-/Kühlkreis 3 wird durch Erweiterungsmodul nicht unterstützt",
+   "source": "viessmann"
+  },
+  "F.1108": {
+   "de": "Funktion Kühlen auf Heiz-/Kühlkreis 4 wird durch Erweiterungsmodul nicht unterstützt",
+   "source": "viessmann"
+  },
+  "F.1129": {
+   "de": "Störung am Wechselrichter",
+   "source": "viessmann"
+  },
+  "F.1130": {
+   "de": "Keine Verbindung zum Datenlogger",
+   "source": "viessmann"
+  },
+  "F.1131": {
+   "de": "Netzwerkstörung (LAN)",
+   "source": "viessmann"
+  },
+  "F.1132": {
+   "de": "Spitzenleistung des Wechselrichters zu gering",
+   "source": "viessmann"
+  },
+  "F.1140": {
+   "de": "Führungs-Wärmepumpe aus",
+   "source": "viessmann"
+  },
+  "F.1172": {
+   "de": "Inverter unsymmetrische Verdichterströme detektiert",
+   "source": "viessmann"
+  },
+  "F.1173": {
+   "de": "Maximale Anzahl der Inverter Sicherheitsabschaltungen Interlock Eingang 1 erreicht",
+   "source": "viessmann"
+  },
+  "F.1174": {
+   "de": "Erzwungene Sicherheitsabschaltung Verdichter - Interlock Eingang 2 aktiv",
+   "source": "viessmann"
+  },
+  "F.1175": {
+   "de": "Maximale Anzahl der Inverter Sicherheitsabschaltungen Interlock Eingang 2 erreicht",
+   "source": "viessmann"
+  },
+  "F.1179": {
+   "de": "Interne Sicherheitsabschaltung Inverter durch netzseitigen Phasenfehler",
+   "source": "viessmann"
+  },
+  "F.1180": {
+   "de": "Inverter sicherheitsrelevanter interner Erdungsfehler",
+   "source": "viessmann"
+  },
+  "F.1181": {
+   "de": "Sicherheitsabschaltung Verdichter durch überlagerten Gleichstrom",
+   "source": "viessmann"
+  },
+  "F.1182": {
+   "de": "Sicherheitsabschaltung thermischer Überlastschutz Verdichter",
+   "source": "viessmann"
+  },
+  "F.1183": {
+   "de": "Fehler Anlauf Verdichter",
+   "source": "viessmann"
+  },
+  "F.1184": {
+   "de": "Fehler Netzspannungsmessung Inverter",
+   "source": "viessmann"
+  },
+  "F.1186": {
+   "de": "Offsetfehler Stromsensor Inverter",
+   "source": "viessmann"
+  },
+  "F.1187": {
+   "de": "Fehler Stromsensor Inverter außerhalb des gültigen Bereichs",
+   "source": "viessmann"
+  },
+  "F.1191": {
+   "de": "Fehler Sensor Interlock Eingang 1",
+   "source": "viessmann"
+  },
+  "F.1192": {
+   "de": "Fehler Sensor Interlock Eingang 2",
+   "source": "viessmann"
+  },
+  "F.1194": {
+   "de": "Inverter Überstrom internes Leistungsmodul",
+   "source": "viessmann"
+  },
+  "F.1195": {
+   "de": "Fehler Überlast Inverter",
+   "source": "viessmann"
+  },
+  "F.1196": {
+   "de": "Fehler Analog/Digital Umsetzer Inverter",
+   "source": "viessmann"
+  },
+  "F.1216": {
+   "de": "Kommunikationsverlust zur Führungs-Wärmepumpe",
+   "source": "viessmann"
+  },
+  "F.1217": {
+   "de": "Kommunikationsverlust zur Folge-Wärmepumpe",
+   "source": "viessmann"
+  },
+  "F.1254": {
+   "de": "Sicherheitsabschaltung thermischer Überlastschutz Verdichter bei mehrfachem Anlaufen des Verdichters",
+   "source": "viessmann"
+  },
+  "F.1259": {
+   "de": "Modbus Kommunikationsstörung Kältekreisregler (VCMU) zu Inverter",
+   "source": "viessmann"
+  },
+  "I.9": {
+   "de": "Estrichtrocknung aktiv",
+   "source": "viessmann"
+  },
+  "I.10": {
+   "de": "Laufzeitbegrenzung Warmwasserbereitung",
+   "source": "viessmann"
+  },
+  "I.56": {
+   "de": "Extern Anfordern aktiv",
+   "source": "viessmann"
+  },
+  "I.57": {
+   "de": "Extern Sperren aktiv",
+   "source": "viessmann"
+  },
+  "I.63": {
+   "de": "Kühlkreis nicht bereit",
+   "source": "viessmann"
+  },
+  "I.70": {
+   "de": "Inverter: Laststrom im Zwischenkreis Inverter zu hoch (Überstrom)",
+   "source": "viessmann"
+  },
+  "I.71": {
+   "de": "Inverter: Netzspannung zu hoch; Verdichter temporär aus",
+   "source": "viessmann"
+  },
+  "I.72": {
+   "de": "Inverter: Netzspannung zu niedrig; Verdichter temporär aus",
+   "source": "viessmann"
+  },
+  "I.73": {
+   "de": "Inverter: Gleichspannung im Zwischenkreis Inverter zu hoch (Überspannung)",
+   "source": "viessmann"
+  },
+  "I.74": {
+   "de": "Inverter: Gleichspannung im Zwischenkreis Inverter zu niedrig (Unterspannung); Verdichter temporär aus",
+   "source": "viessmann"
+  },
+  "I.75": {
+   "de": "Inverter: Temperatur am internen Leistungsmodul zu hoch; Verdichter temporär aus",
+   "source": "viessmann"
+  },
+  "I.76": {
+   "de": "Inverter: Zu hohe Temperatur im Leistungsfaktor-Korrekturfilter (PFC); Verdichter temporär aus",
+   "source": "viessmann"
+  },
+  "I.77": {
+   "de": "Inverter: Zu hoher Strom im Leistungsfaktor-Korrekturfilter (PFC); Verdichter temporär aus",
+   "source": "viessmann"
+  },
+  "I.78": {
+   "de": "Inverter: Leistungsreduzierung durch Inverter bei zu hoher Leistungsanforderung (Derating)",
+   "source": "viessmann"
+  },
+  "I.79": {
+   "de": "Inverter: Leistungsreduzierung durch Inverter bei zu hoher Leistungsanforderung des Verdichters (Derating)",
+   "source": "viessmann"
+  },
+  "I.80": {
+   "de": "Inverter: Leistungsbegrenzung durch Inverter bei zu hoher Leistungsanforderung des Verdichters (Feldschwächebetrieb)",
+   "source": "viessmann"
+  },
+  "I.81": {
+   "de": "Inverter: Leistungsreduzierung durch Inverter bei zu hoher Temperatur am internen Leistungsmodul (Derating)",
+   "source": "viessmann"
+  },
+  "I.82": {
+   "de": "Inverter: Leistungsreduzierung durch Inverter bei zu hoher Temperatur am Leistungsfaktor-Korrekturfilter (Derating)",
+   "source": "viessmann"
+  },
+  "I.83": {
+   "de": "4/3-Wege-Ventil: Mindestvolumenstrom erreicht",
+   "source": "viessmann"
+  },
+  "I.84": {
+   "de": "4/3-Wege-Ventil: Min. Rücklauftemperatur erreicht",
+   "source": "viessmann"
+  },
+  "I.85": {
+   "de": "Kontrollierte Regelniederdruckabschaltung Kältekreis",
+   "source": "viessmann"
+  },
+  "I.86": {
+   "de": "Kontrollierte Regelhochdruckabschaltung Kältekreis",
+   "source": "viessmann"
+  },
+  "I.89": {
+   "de": "Uhrzeit vorgestellt (Sommerzeit)",
+   "source": "viessmann"
+  },
+  "I.90": {
+   "de": "Uhrzeit zurückgestellt (Winterzeit)",
+   "source": "viessmann"
+  },
+  "I.92": {
+   "de": "Energiebilanz zurückgesetzt",
+   "source": "viessmann"
+  },
+  "I.94": {
+   "de": "Wartung in 30 Tagen fällig",
+   "source": "vieventlog"
+  },
+  "I.95": {
+   "de": "Filterwechsel in 14 Tagen fällig",
+   "source": "vieventlog"
+  },
+  "I.96": {
+   "de": "Unbekannte Folge-Wärmepumpe (weiteres Viessmann Gerät)",
+   "source": "viessmann"
+  },
+  "I.98": {
+   "de": "Neue Folge-Wärmepumpe (weiteres Viessmann Gerät) wurde erkannt.",
+   "source": "viessmann"
+  },
+  "I.99": {
+   "de": "Zieltemperatur Hygienefunktion erreicht",
+   "source": "viessmann"
+  },
+  "I.100": {
+   "de": "Max. Verflüssigungsdruck erreicht",
+   "source": "viessmann"
+  },
+  "I.101": {
+   "de": "Min. Verdampfungsdruck für Heizbetrieb erreicht",
+   "source": "viessmann"
+  },
+  "I.102": {
+   "de": "Min. Verdampfungsdruck für Kühlbetrieb erreicht",
+   "source": "viessmann"
+  },
+  "I.103": {
+   "de": "Max. Verdampfungsdruck erreicht",
+   "source": "viessmann"
+  },
+  "I.104": {
+   "de": "Max. Heißgastemperatur erreicht",
+   "source": "viessmann"
+  },
+  "I.105": {
+   "de": "Max. Laufzeit untere Verdampfungstemperatur erreicht",
+   "source": "viessmann"
+  },
+  "I.106": {
+   "de": "Max. Druckdifferenz Verdichter erreicht",
+   "source": "viessmann"
+  },
+  "I.107": {
+   "de": "Max. Verflüssigungstemperatur erreicht",
+   "source": "viessmann"
+  },
+  "I.108": {
+   "de": "Max. Drehmoment Verdichter erreicht",
+   "source": "viessmann"
+  },
+  "I.109": {
+   "de": "Max. Verdampfungstemperatur Verdichter erreicht",
+   "source": "viessmann"
+  },
+  "I.110": {
+   "de": "Min. Druckverhältnis Verdichter erreicht",
+   "source": "viessmann"
+  },
+  "I.111": {
+   "de": "Min. Verdampfungstemperatur Verdichter erreicht",
+   "source": "viessmann"
+  },
+  "I.112": {
+   "de": "Min. Austrittstemperatur am Verflüssiger erreicht",
+   "source": "viessmann"
+  },
+  "I.113": {
+   "de": "Smart Grid: Erzwungene Abschaltung aktiv",
+   "source": "viessmann"
+  },
+  "I.114": {
+   "de": "Smart Grid: Normalbetrieb aktiv",
+   "source": "viessmann"
+  },
+  "I.115": {
+   "de": "Smart Grid: Empfohlene Einschaltung aktiv",
+   "source": "viessmann"
+  },
+  "I.116": {
+   "de": "Smart Grid: Erzwungene Einschaltung aktiv",
+   "source": "viessmann"
+  },
+  "I.117": {
+   "de": "Energie-Management-System aktiv",
+   "source": "viessmann"
+  },
+  "I.118": {
+   "de": "Fußbodentemperaturbegrenzer Heiz-/Kühlkreis 1 aktiv",
+   "source": "viessmann"
+  },
+  "I.119": {
+   "de": "Fußbodentemperaturbegrenzer Heiz-/Kühlkreis 2 aktiv",
+   "source": "viessmann"
+  },
+  "I.120": {
+   "de": "Geräuschreduzierter Betrieb Wärmepumpe aktiv",
+   "source": "viessmann"
+  },
+  "I.121": {
+   "de": "Feuchteanbauschalter Heiz-/Kühlkreis 1 aktiv",
+   "source": "viessmann"
+  },
+  "I.122": {
+   "de": "Feuchteanbauschalter Heiz-/Kühlkreis 2 aktiv",
+   "source": "viessmann"
+  },
+  "I.123": {
+   "de": "Max. Rücklauftemperatur Kältekreis erreicht",
+   "source": "viessmann"
+  },
+  "I.124": {
+   "de": "Min. Rücklauftemperatur Kältekreis erreicht",
+   "source": "viessmann"
+  },
+  "I.125": {
+   "de": "Max. Lufteintrittstemperatur Kältekreis erreicht",
+   "source": "viessmann"
+  },
+  "I.126": {
+   "de": "Min. Lufteintrittstemperatur Kältekreis erreicht",
+   "source": "viessmann"
+  },
+  "I.127": {
+   "de": "Max. Druckdifferenz für Verdichterstart erreicht",
+   "source": "viessmann"
+  },
+  "I.128": {
+   "de": "Min. Ölsumpftemperatur erreicht",
+   "source": "viessmann"
+  },
+  "I.129": {
+   "de": "Kältekreisumkehr: Druckunterschied zu gering",
+   "source": "viessmann"
+  },
+  "I.130": {
+   "de": "Startphase Wärmepumpe: Zeitüberschreitung",
+   "source": "viessmann"
+  },
+  "I.131": {
+   "de": "Min. Verdampfungstemperatur erreicht",
+   "source": "viessmann"
+  },
+  "I.132": {
+   "de": "Neustart Wärmepumpenregelung",
+   "source": "viessmann"
+  },
+  "I.133": {
+   "de": "Reset der Elektronikmodule durch Neustart",
+   "source": "viessmann"
+  },
+  "I.134": {
+   "de": "Abtauen aktiv im Betriebsprogramm Frostschutz",
+   "source": "viessmann"
+  },
+  "I.135": {
+   "de": "Abtauen aktiv im Regelbetrieb",
+   "source": "viessmann"
+  },
+  "I.142": {
+   "de": "Min. Laufzeit Verdichter unterschritten",
+   "source": "viessmann"
+  },
+  "I.143": {
+   "de": "EVU-Sperre aktiv",
+   "source": "viessmann"
+  },
+  "I.144": {
+   "de": "Frequenzabweichungen bei Spannungsversorgung des EVU",
+   "source": "viessmann"
+  },
+  "I.145": {
+   "de": "Leistungsüberschreitung Außeneinheit",
+   "source": "viessmann"
+  },
+  "I.146": {
+   "de": "Überhitzung Verdampfer Kühlbetrieb",
+   "source": "viessmann"
+  },
+  "I.147": {
+   "de": "Überhitzung Verflüssiger Heizbetrieb",
+   "source": "viessmann"
+  },
+  "I.148": {
+   "de": "Überhitzung Verdampfer Heizbetrieb",
+   "source": "viessmann"
+  },
+  "I.149": {
+   "de": "Wärmeanforderung während Abtaubetrieb",
+   "source": "viessmann"
+  },
+  "I.150": {
+   "de": "Anforderung Abtauen während Regelbetrieb",
+   "source": "viessmann"
+  },
+  "I.151": {
+   "de": "Betriebsgrenze Flüssiggastemperatur Verflüssiger erreicht",
+   "source": "viessmann"
+  },
+  "I.152": {
+   "de": "Betriebsgrenze Niederdruck erreicht",
+   "source": "viessmann"
+  },
+  "I.155": {
+   "de": "Estrichtrocknung durch Anwender abgebrochen",
+   "source": "viessmann"
+  },
+  "I.156": {
+   "de": "Warnschwelle Wasservolumenstrom Abtaubetrieb erreicht",
+   "source": "viessmann"
+  },
+  "I.157": {
+   "de": "Erforderliche Heißgastemperatur für Heizbetrieb überschritten",
+   "source": "viessmann"
+  },
+  "I.158": {
+   "de": "Erforderliche Heißgastemperatur für Kühlbetrieb überschritten",
+   "source": "viessmann"
+  },
+  "I.159": {
+   "de": "Erhöhte Innenraumtemperatur in Außeneinheit",
+   "source": "viessmann"
+  },
+  "I.163": {
+   "de": "Strombegrenzung der Wallbox aktiv: Leistung der Photovoltaikanlage zu gering",
+   "source": "viessmann"
+  },
+  "I.168": {
+   "de": "Wärmepumpe ist als Führungs-Wärmepumpe konfiguriert.",
+   "source": "viessmann"
+  },
+  "I.169": {
+   "de": "Wärmepumpe ist als Folge-Wärmepumpe konfiguriert.",
+   "source": "viessmann"
+  },
+  "I.170": {
+   "de": "Durch eine Störung übernimmt eine Folge-Wärmepumpe vorübergehend die Aufgabe der Führungs-Wärmepumpe.",
+   "source": "viessmann"
+  },
+  "I.171": {
+   "de": "Inverter: Software-Update läuft; Inverter aus",
+   "source": "viessmann"
+  },
+  "I.173": {
+   "de": "Inverter: Ausgangsstrom zu hoch; Reduzierte Verdichterdrehzahl",
+   "source": "viessmann"
+  },
+  "I.174": {
+   "de": "Inverter: Leistung für Verdichter wird vorübergehend reduziert; Reduzierte Verdichterdrehzahl",
+   "source": "viessmann"
+  },
+  "I.175": {
+   "de": "Verdichter startet nicht: Umgebungstemperatur ist niedriger als zulässige Betriebstemperatur für Verdichter; Verdichter temporär aus",
+   "source": "viessmann"
+  },
+  "I.176": {
+   "de": "Verdichter mit reduzierter Leistung: Umgebungstemperatur ist höher als zulässige Betriebstemperatur für Verdichter.",
+   "source": "viessmann"
+  },
+  "I.182": {
+   "de": "Verdichter überlastet: Normales Regelverhalten",
+   "source": "viessmann"
+  },
+  "P.1": {
+   "de": "Wartung nach Zeitintervall steht bevor.",
+   "source": "viessmann"
+  },
+  "P.4": {
+   "de": "Heizwasser nachfüllen.",
+   "source": "viessmann"
+  },
+  "P.8": {
+   "de": "Wartung nach Betriebsstunden steht bevor.",
+   "source": "viessmann"
+  },
+  "P.34": {
+   "de": "Wartung Heizwasserfilter: Filter im Kugelhahn reinigen. Bauseitigen Heizwasserfilter (Zubehör) reinigen.",
+   "source": "viessmann"
+  },
+  "P.35": {
+   "de": "Zeitintervall für Filterwechsel ist abgelaufen",
+   "source": "vieventlog"
+  },
+  "S.10": {
+   "de": "Standby - Bereitschaftsmodus",
+   "source": "vieventlog"
+  },
+  "S.11": {
+   "de": "Kompressor läuft - Heizbetrieb",
+   "source": "vieventlog"
+  },
+  "S.12": {
+   "de": "Kompressor läuft - Kühlbetrieb",
+   "source": "vieventlog"
+  },
+  "S.13": {
+   "de": "Abtauung aktiv",
+   "source": "vieventlog"
+  },
+  "S.14": {
+   "de": "Notbetrieb/Störung",
+   "source": "vieventlog"
+  },
+  "S.15": {
+   "de": "Verdichter-Anlaufverzögerung",
+   "source": "vieventlog"
+  },
+  "S.20": {
+   "de": "Vorlauftemperatur zu hoch",
+   "source": "vieventlog"
+  },
+  "S.21": {
+   "de": "Vorlauftemperatur zu niedrig",
+   "source": "vieventlog"
+  },
+  "S.22": {
+   "de": "Rücklauftemperatur zu hoch",
+   "source": "vieventlog"
+  },
+  "S.23": {
+   "de": "Rücklauftemperatur zu niedrig",
+   "source": "vieventlog"
+  },
+  "S.24": {
+   "de": "Außentemperatur zu niedrig",
+   "source": "vieventlog"
+  },
+  "S.25": {
+   "de": "Außentemperatur zu hoch",
+   "source": "vieventlog"
+  },
+  "S.30": {
+   "de": "Umwälzpumpe läuft",
+   "source": "vieventlog"
+  },
+  "S.31": {
+   "de": "Umwälzpumpe aus",
+   "source": "vieventlog"
+  },
+  "S.32": {
+   "de": "Pumpe Heizkreis 1 läuft",
+   "source": "vieventlog"
+  },
+  "S.33": {
+   "de": "Pumpe Heizkreis 2 läuft",
+   "source": "vieventlog"
+  },
+  "S.34": {
+   "de": "Ladepumpe läuft",
+   "source": "vieventlog"
+  },
+  "S.35": {
+   "de": "Zirkulationspumpe läuft",
+   "source": "vieventlog"
+  },
+  "S.40": {
+   "de": "Wärmepumpe läuft",
+   "source": "vieventlog"
+  },
+  "S.41": {
+   "de": "Zusatzheizung aktiv",
+   "source": "vieventlog"
+  },
+  "S.42": {
+   "de": "Elektrische Zusatzheizung aktiv",
+   "source": "vieventlog"
+  },
+  "S.43": {
+   "de": "Bivalente Heizung aktiv",
+   "source": "vieventlog"
+  },
+  "S.50": {
+   "de": "Warmwasserbereitung",
+   "source": "vieventlog"
+  },
+  "S.51": {
+   "de": "Warmwasser-Nachladung",
+   "source": "vieventlog"
+  },
+  "S.52": {
+   "de": "Legionellenschutz aktiv",
+   "source": "vieventlog"
+  },
+  "S.53": {
+   "de": "Warmwasser-Zirkulation",
+   "source": "vieventlog"
+  },
+  "S.60": {
+   "de": "Sommerbetrieb aktiv (Sparfunktion Außentemperatur)",
+   "source": "viessmann"
+  },
+  "S.61": {
+   "de": "Abtauung laeuft",
+   "source": "vieventlog"
+  },
+  "S.62": {
+   "de": "Abtauung beendet",
+   "source": "vieventlog"
+  },
+  "S.63": {
+   "de": "Verdampfer-Abtauung",
+   "source": "vieventlog"
+  },
+  "S.70": {
+   "de": "Testbetrieb",
+   "source": "vieventlog"
+  },
+  "S.71": {
+   "de": "Relaistest",
+   "source": "vieventlog"
+  },
+  "S.72": {
+   "de": "Sensortest",
+   "source": "vieventlog"
+  },
+  "S.74": {
+   "de": "Heizunterdrückung Heizen bei Warmwasserbereitung durch Sonnenkollektoren",
+   "source": "viessmann"
+  },
+  "S.75": {
+   "de": "Zirkulationspumpe aktiv",
+   "source": "viessmann"
+  },
+  "S.80": {
+   "de": "Kommunikation OK",
+   "source": "vieventlog"
+  },
+  "S.81": {
+   "de": "Kommunikation gestoert",
+   "source": "vieventlog"
+  },
+  "S.82": {
+   "de": "Bus-Kommunikation aktiv",
+   "source": "vieventlog"
+  },
+  "S.88": {
+   "de": "Solarkreispumpe aktiv",
+   "source": "viessmann"
+  },
+  "S.89": {
+   "de": "Sonnenkollektoren in Stagnation",
+   "source": "viessmann"
+  },
+  "S.90": {
+   "de": "EVU-Sperre aktiv",
+   "source": "vieventlog"
+  },
+  "S.91": {
+   "de": "Smart Grid aktiv",
+   "source": "vieventlog"
+  },
+  "S.92": {
+   "de": "PV-Ueberschuss-Nutzung",
+   "source": "vieventlog"
+  },
+  "S.100": {
+   "de": "Heizen - Normalbetrieb",
+   "source": "vieventlog"
+  },
+  "S.101": {
+   "de": "Heizen - Reduzierter Betrieb",
+   "source": "vieventlog"
+  },
+  "S.102": {
+   "de": "Heizen - Komfortbetrieb",
+   "source": "vieventlog"
+  },
+  "S.103": {
+   "de": "Heizen - Eco-Betrieb",
+   "source": "vieventlog"
+  },
+  "S.104": {
+   "de": "Heizen - Partybetrieb",
+   "source": "vieventlog"
+  },
+  "S.105": {
+   "de": "Heizen - Urlaubsbetrieb",
+   "source": "vieventlog"
+  },
+  "S.110": {
+   "de": "Kuehlen - Normalbetrieb",
+   "source": "vieventlog"
+  },
+  "S.111": {
+   "de": "Kuehlen - Reduzierter Betrieb",
+   "source": "vieventlog"
+  },
+  "S.112": {
+   "de": "Initialisierung 4/3-Wege-Ventil",
+   "source": "viessmann"
+  },
+  "S.113": {
+   "de": "4/3-Wege-Ventil schaltet in Richtung „Trinkwassererwärmung“.",
+   "source": "viessmann"
+  },
+  "S.114": {
+   "de": "4/3-Wege-Ventil schaltet in Richtung „Heiz-/Kühlkreis 1“.",
+   "source": "viessmann"
+  },
+  "S.115": {
+   "de": "4/3-Wege-Ventil in Position „Trinkwassererwärmung“",
+   "source": "viessmann"
+  },
+  "S.116": {
+   "de": "4/3-Wege-Ventil in Position „Heiz-/Kühlkreis 1“",
+   "source": "viessmann"
+  },
+  "S.117": {
+   "de": "4/3-Wege-Ventil in Position „Heiz-/Kühlkreis 2“",
+   "source": "viessmann"
+  },
+  "S.118": {
+   "de": "4/3-Wege-Ventil in Position „Integrierter Pufferspeicher“",
+   "source": "viessmann"
+  },
+  "S.119": {
+   "de": "Verdichter-Mindestlaufzeit",
+   "source": "vieventlog"
+  },
+  "S.120": {
+   "de": "Smart Grid: Normalbetrieb aktiv",
+   "source": "viessmann"
+  },
+  "S.121": {
+   "de": "Smart Grid: Empfohlener Betrieb aktiv",
+   "source": "viessmann"
+  },
+  "S.122": {
+   "de": "Smart Grid: Erzwungener Betrieb aktiv",
+   "source": "viessmann"
+  },
+  "S.123": {
+   "de": "Wärmepumpe aus",
+   "source": "viessmann"
+  },
+  "S.124": {
+   "de": "Wärmepumpe Vorlaufphase",
+   "source": "viessmann"
+  },
+  "S.125": {
+   "de": "Wärmepumpe im Heizbetrieb",
+   "source": "viessmann"
+  },
+  "S.126": {
+   "de": "Wärmepumpe im Kühlbetrieb",
+   "source": "viessmann"
+  },
+  "S.127": {
+   "de": "Wärmepumpe: Abtauen vorbereiten.",
+   "source": "viessmann"
+  },
+  "S.128": {
+   "de": "Wärmepumpe im Abtaubetrieb",
+   "source": "viessmann"
+  },
+  "S.129": {
+   "de": "Wärmepumpe Nachlaufphase",
+   "source": "viessmann"
+  },
+  "S.130": {
+   "de": "Heizwasser-Durchlauferhitzer ausgeschaltet",
+   "source": "viessmann"
+  },
+  "S.131": {
+   "de": "Heizwasser-Durchlauferhitzer: Stufe 1 aktiv",
+   "source": "viessmann"
+  },
+  "S.132": {
+   "de": "Heizwasser-Durchlauferhitzer: Stufe 2 aktiv",
+   "source": "viessmann"
+  },
+  "S.133": {
+   "de": "Heizwasser-Durchlauferhitzer: Stufe 3 aktiv",
+   "source": "viessmann"
+  },
+  "S.134": {
+   "de": "4/3-Wege-Ventil Leerlauf",
+   "source": "viessmann"
+  },
+  "S.135": {
+   "de": "4/3-Wege-Ventil Abtauen",
+   "source": "viessmann"
+  },
+  "S.136": {
+   "de": "4/3-Wege-Ventil Raumbeheizung/Raumkühlung",
+   "source": "viessmann"
+  },
+  "S.137": {
+   "de": "Heizbetrieb in Anlaufphase",
+   "source": "viessmann"
+  },
+  "S.138": {
+   "de": "Heizbetrieb aktiv",
+   "source": "viessmann"
+  },
+  "S.139": {
+   "de": "Heizbetrieb inaktiv",
+   "source": "viessmann"
+  },
+  "S.140": {
+   "de": "Trinkwassererwärmung angefordert",
+   "source": "viessmann"
+  },
+  "S.141": {
+   "de": "Trinkwassererwärmung aktiv",
+   "source": "viessmann"
+  },
+  "S.142": {
+   "de": "Trinkwassererwärmung inaktiv",
+   "source": "viessmann"
+  },
+  "S.143": {
+   "de": "Kühlbetrieb angefordert",
+   "source": "viessmann"
+  },
+  "S.144": {
+   "de": "Kühlbetrieb aktiv",
+   "source": "viessmann"
+  },
+  "S.145": {
+   "de": "Kühlbetrieb inaktiv",
+   "source": "viessmann"
+  },
+  "S.146": {
+   "de": "Abtauen angefordert",
+   "source": "viessmann"
+  },
+  "S.147": {
+   "de": "Wärmebereitstellung für Abtauen aktiv",
+   "source": "viessmann"
+  },
+  "S.148": {
+   "de": "Abtauen über Wärmepumpe aktiv",
+   "source": "viessmann"
+  },
+  "S.149": {
+   "de": "Abtauen über Wärmepumpe inaktiv",
+   "source": "viessmann"
+  },
+  "S.150": {
+   "de": "Abtauen über Heiz-/Kühlkreis 1 oder externen Heizwasser-Pufferspeicher (falls vorhanden) in Vorbereitung",
+   "source": "viessmann"
+  },
+  "S.151": {
+   "de": "Abtauen über Heiz-/Kühlkreis 1 oder externen Heizwasser-Pufferspeicher (falls vorhanden) aktiv",
+   "source": "viessmann"
+  },
+  "S.152": {
+   "de": "Abtauen über Heiz-/Kühlkreis 1 oder externen Heizwasser-Pufferspeicher (falls vorhanden) inaktiv",
+   "source": "viessmann"
+  },
+  "S.153": {
+   "de": "Regelung im Standby",
+   "source": "viessmann"
+  },
+  "S.160": {
+   "de": "Lueftung - Stufe 1",
+   "source": "vieventlog"
+  },
+  "S.161": {
+   "de": "Befüllung aktiv",
+   "source": "viessmann"
+  },
+  "S.162": {
+   "de": "Entlüftung aktiv",
+   "source": "viessmann"
+  },
+  "S.163": {
+   "de": "Wärmepumpe: Systemstatus inaktiv",
+   "source": "viessmann"
+  },
+  "S.164": {
+   "de": "Wärmepumpe: Systemstatus Wartung Standby",
+   "source": "viessmann"
+  },
+  "S.165": {
+   "de": "Wärmepumpe: Systemstatus Regelung",
+   "source": "viessmann"
+  },
+  "S.167": {
+   "de": "Aktorentest aktiv",
+   "source": "viessmann"
+  },
+  "S.168": {
+   "de": "Lueftungsbypass offen",
+   "source": "vieventlog"
+  },
+  "S.170": {
+   "de": "Systemcheck laeuft",
+   "source": "vieventlog"
+  },
+  "S.171": {
+   "de": "Initialisierung",
+   "source": "vieventlog"
+  },
+  "S.172": {
+   "de": "Software-Update",
+   "source": "vieventlog"
+  },
+  "S.176": {
+   "de": "Wärmepumpenregelung: Abtauen angefordert",
+   "source": "viessmann"
+  },
+  "S.180": {
+   "de": "Betriebsstundenzaehler",
+   "source": "vieventlog"
+  },
+  "S.181": {
+   "de": "Passiver Frostschutz Heiz-/Kühlkreis 1 eingeschaltet",
+   "source": "viessmann"
+  },
+  "S.182": {
+   "de": "Passiver Frostschutz Heiz-/Kühlkreis 2 eingeschaltet",
+   "source": "viessmann"
+  },
+  "S.183": {
+   "de": "Passiver Frostschutz Heiz-/Kühlkreis 3 eingeschaltet",
+   "source": "viessmann"
+  },
+  "S.184": {
+   "de": "Passiver Frostschutz Heiz-/Kühlkreis 4 eingeschaltet",
+   "source": "viessmann"
+  },
+  "S.185": {
+   "de": "Passiver Frostschutz Heizwasser-Durchlauferhitzer eingeschaltet",
+   "source": "viessmann"
+  },
+  "S.186": {
+   "de": "Passiver Frostschutz Speicher-Wassererwärmer eingeschaltet",
+   "source": "viessmann"
+  },
+  "S.187": {
+   "de": "Passiver Frostschutz Wärmepumpe eingeschaltet",
+   "source": "viessmann"
+  },
+  "S.188": {
+   "de": "Passiver Frostschutz externer Heiz-/Kühlwasser-Pufferspeicher eingeschaltet",
+   "source": "viessmann"
+  },
+  "S.189": {
+   "de": "Passiver Frostschutz externer Heizwasser-Pufferspeicher eingeschaltet",
+   "source": "viessmann"
+  },
+  "S.190": {
+   "de": "Passiver Frostschutz externer Kühlwasser-Pufferspeicher eingeschaltet",
+   "source": "viessmann"
+  },
+  "S.191": {
+   "de": "Filter reinigen",
+   "source": "vieventlog"
+  },
+  "S.192": {
+   "de": "Wartung faellig",
+   "source": "vieventlog"
+  },
+  "S.193": {
+   "de": "Anforderung externer Wärmeerzeuger über potenzialfreien Schaltkontakt",
+   "source": "viessmann"
+  },
+  "S.195": {
+   "de": "Smart Grid: EVU-Sperre aktiv",
+   "source": "viessmann"
+  },
+  "S.196": {
+   "de": "EVU-Sperre aktiv",
+   "source": "viessmann"
+  },
+  "S.197": {
+   "de": "Wärmeanforderung Heiz-/Kühlkreis 1",
+   "source": "viessmann"
+  },
+  "S.198": {
+   "de": "Kühlanforderung Heiz-/Kühlkreis 1",
+   "source": "viessmann"
+  },
+  "S.199": {
+   "de": "Wärmeanforderung Heiz-/Kühlkreis 2",
+   "source": "viessmann"
+  },
+  "S.200": {
+   "de": "Kühlanforderung Heiz-/Kühlkreis 2",
+   "source": "viessmann"
+  },
+  "S.201": {
+   "de": "Wärmeanforderung Heiz-/Kühlkreis 3",
+   "source": "viessmann"
+  },
+  "S.202": {
+   "de": "Kühlanforderung Heiz-/Kühlkreis 3",
+   "source": "viessmann"
+  },
+  "S.203": {
+   "de": "Wärmeanforderung Heiz-/Kühlkreis 4",
+   "source": "viessmann"
+  },
+  "S.204": {
+   "de": "Kühlanforderung Heiz-/Kühlkreis 4",
+   "source": "viessmann"
+  },
+  "S.205": {
+   "de": "Anforderung externer Heizwasser-Pufferspeicher",
+   "source": "viessmann"
+  },
+  "S.206": {
+   "de": "Anforderung externer Kühlwasser-Pufferspeicher",
+   "source": "viessmann"
+  },
+  "S.207": {
+   "de": "Anforderung Trinkwassererwärmung",
+   "source": "viessmann"
+  },
+  "S.208": {
+   "de": "Erwärmung integrierter Pufferspeicher aktiv",
+   "source": "viessmann"
+  },
+  "S.209": {
+   "de": "Abbruch Befüllfunktion",
+   "source": "viessmann"
+  },
+  "S.210": {
+   "de": "Abbruch Entlüftungsfunktion",
+   "source": "viessmann"
+  },
+  "S.211": {
+   "de": "Befüllvorgang abgeschlossen",
+   "source": "viessmann"
+  },
+  "S.212": {
+   "de": "Entlüftungsvorgang abgeschlossen",
+   "source": "viessmann"
+  },
+  "S.213": {
+   "de": "Inbetriebnahme-Assistent aktiv",
+   "source": "viessmann"
+  },
+  "S.214": {
+   "de": "Abbruch Inbetriebnahme",
+   "source": "viessmann"
+  },
+  "S.215": {
+   "de": "Inbetriebnahme abgeschlossen",
+   "source": "viessmann"
+  },
+  "S.216": {
+   "de": "Aktorentest aktiv",
+   "source": "viessmann"
+  },
+  "S.217": {
+   "de": "Heizwasser-Durchlauferhitzer: Stufe 1 inaktiv",
+   "source": "viessmann"
+  },
+  "S.218": {
+   "de": "Heizwasser-Durchlauferhitzer: Stufe 2 inaktiv",
+   "source": "viessmann"
+  },
+  "S.219": {
+   "de": "Heizwasser-Durchlauferhitzer: Stufe 3 inaktiv",
+   "source": "viessmann"
+  },
+  "S.220": {
+   "de": "Kältekreis ausgeschaltet",
+   "source": "viessmann"
+  },
+  "S.221": {
+   "de": "Kältekreis Startphase Heizbetrieb",
+   "source": "viessmann"
+  },
+  "S.222": {
+   "de": "Kältekreis Startphase Kühlbetrieb",
+   "source": "viessmann"
+  },
+  "S.223": {
+   "de": "Kältekreis Startphase Abtaubetrieb",
+   "source": "viessmann"
+  },
+  "S.224": {
+   "de": "Kältekreis im Heizbetrieb",
+   "source": "viessmann"
+  },
+  "S.225": {
+   "de": "Kältekreis im Kühlbetrieb",
+   "source": "viessmann"
+  },
+  "S.226": {
+   "de": "Kältekreis im Abtaubetrieb im Betriebsprogramm Frostschutz",
+   "source": "viessmann"
+  },
+  "S.227": {
+   "de": "Kältekreis im Abtaubetrieb bei Regelbetrieb",
+   "source": "viessmann"
+  },
+  "S.228": {
+   "de": "Kältekreis Abschaltsignal",
+   "source": "viessmann"
+  },
+  "S.229": {
+   "de": "Kältekreisregler im Übergang von Heizbetrieb zu Kühlbetrieb",
+   "source": "viessmann"
+  },
+  "S.230": {
+   "de": "Kältekreisregler im Übergang von Kühlbetrieb zu Heizbetrieb",
+   "source": "viessmann"
+  },
+  "S.231": {
+   "de": "Kältekreisregler im Übergang von Abtaubetrieb zu Heizbetrieb",
+   "source": "viessmann"
+  },
+  "S.240": {
+   "de": "Kältekreisregler im Standby",
+   "source": "viessmann"
+  },
+  "S.392": {
+   "de": "Kältekreisregler im Übergang von Heizbetrieb zu Abtaubetrieb",
+   "source": "viessmann"
+  },
+  "S.393": {
+   "de": "Aktiver Frostschutz Heiz-/Kühlkreis 1 eingeschaltet",
+   "source": "viessmann"
+  },
+  "S.394": {
+   "de": "Aktiver Frostschutz Heiz-/Kühlkreis 2 eingeschaltet",
+   "source": "viessmann"
+  },
+  "S.395": {
+   "de": "Aktiver Frostschutz Heiz-/Kühlkreis 3 eingeschaltet",
+   "source": "viessmann"
+  },
+  "S.396": {
+   "de": "Aktiver Frostschutz Heiz-/Kühlkreis 4 eingeschaltet",
+   "source": "viessmann"
+  },
+  "S.397": {
+   "de": "Aktiver Frostschutz Heizwasser-Durchlauferhitzer eingeschaltet",
+   "source": "viessmann"
+  },
+  "S.398": {
+   "de": "Aktiver Frostschutz Speicher-Wassererwärmer eingeschaltet",
+   "source": "viessmann"
+  },
+  "S.399": {
+   "de": "Aktiver Frostschutz Wärmepumpe eingeschaltet",
+   "source": "viessmann"
+  },
+  "S.400": {
+   "de": "Aktiver Frostschutz externer Heiz-/Kühlwasser-Pufferspeicher eingeschaltet",
+   "source": "viessmann"
+  },
+  "S.401": {
+   "de": "Aktiver Frostschutz externer Heizwasser-Pufferspeicher eingeschaltet",
+   "source": "viessmann"
+  },
+  "S.402": {
+   "de": "Aktiver Frostschutz externer Kühlwasser-Pufferspeicher eingeschaltet",
+   "source": "viessmann"
+  },
+  "S.427": {
+   "de": "Leistungsbegrenzung durch den Netzbetreiber nach § 14a EnWG",
+   "source": "vieventlog"
+  }
+ }
+}

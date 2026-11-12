@@ -8,7 +8,7 @@ import json
 import pytest
 
 import custom_components.vicare_extras as integration
-from custom_components.vicare_extras import config_flow, diagnostics
+from custom_components.vicare_extras import config_flow, diagnostics, messages
 from custom_components.vicare_extras.const import DOMAIN
 from custom_components.vicare_extras.coordinator import ViCareExtrasCoordinator
 from homeassistant.config_entries import ConfigEntry, ConfigEntryState
@@ -21,6 +21,8 @@ from . import fakes
 def test_async_setup_registers_actions() -> None:
     hass, _ = fakes.make_hass()
     assert asyncio.run(integration.async_setup(hass, {})) is True
+    # The message table (a file) is read through the executor, not in the loop.
+    assert hass.executor_jobs == [messages.load_table]
     assert (DOMAIN, "get_event_history") in hass.services.registered
     assert (DOMAIN, "get_features") in hass.services.registered
 
@@ -31,11 +33,11 @@ def test_setup_and_unload_entry() -> None:
 
     assert asyncio.run(integration.async_setup_entry(hass, entry)) is True
     assert isinstance(entry.runtime_data, ViCareExtrasCoordinator)
-    assert hass.config_entries.forwarded == [(entry, [Platform.SENSOR])]
+    assert hass.config_entries.forwarded == [(entry, [Platform.BINARY_SENSOR, Platform.SENSOR])]
     assert fakes.HEAT_PUMP_IDENTIFIER in entry.runtime_data.data
 
     assert asyncio.run(integration.async_unload_entry(hass, entry)) is True
-    assert hass.config_entries.unloaded == [(entry, [Platform.SENSOR])]
+    assert hass.config_entries.unloaded == [(entry, [Platform.BINARY_SENSOR, Platform.SENSOR])]
     assert service.api_calls == 0
 
 
@@ -83,7 +85,8 @@ def test_diagnostics_contain_no_identifying_numbers() -> None:
     heat_pump = next(d for d in result["devices"] if d["device_id"] == "0")
     assert heat_pump["cache"] == "present"
     assert heat_pump["set_up_by_vicare"] is True
-    assert len(heat_pump["watched_features_present"]) == 8
+    assert "heating.power.consumption.dhw" in heat_pump["features"]
+    assert result["coordinator"]["snapshots"][0]["feature_count"] == 9
     assert service.api_calls == 0
 
 

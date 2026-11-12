@@ -25,6 +25,7 @@ MAX_SNAPSHOT_AGE_SECONDS: Final = 900
 MESSAGE_LIST_LIMIT: Final = 25
 
 DEVICE_TYPE_HEATING: Final = "heating"
+DEVICE_TYPE_ROOM_CONTROL: Final = "roomControl"
 
 FEATURE_CONSUMPTION_DHW: Final = "heating.power.consumption.dhw"
 FEATURE_CONSUMPTION_HEATING: Final = "heating.power.consumption.heating"
@@ -35,26 +36,27 @@ FEATURE_MESSAGES_STATUS: Final = "device.messages.status.raw"
 FEATURE_MESSAGES_INFO: Final = "device.messages.info.raw"
 FEATURE_MESSAGES_SERVICE: Final = "device.messages.service.raw"
 
-WATCHED_FEATURES: Final = frozenset(
-    {
-        FEATURE_CONSUMPTION_DHW,
-        FEATURE_CONSUMPTION_HEATING,
-        FEATURE_CONSUMPTION_TOTAL,
-        FEATURE_PRODUCTION_DHW,
-        FEATURE_PRODUCTION_HEATING,
-        FEATURE_MESSAGES_STATUS,
-        FEATURE_MESSAGES_INFO,
-        FEATURE_MESSAGES_SERVICE,
-    }
+FEATURE_PRODUCTION_COOLING: Final = "heating.heat.production.summary.cooling"
+FEATURE_CONSUMPTION_SUMMARY_COOLING: Final = "heating.power.consumption.summary.cooling"
+FEATURE_HEATING_ROD_SUMMARY_DHW: Final = (
+    "heating.heatingRod.power.consumption.summary.dhw"
 )
+FEATURE_HEATING_ROD_SUMMARY_HEATING: Final = (
+    "heating.heatingRod.power.consumption.summary.heating"
+)
+FEATURE_DHW_SCHEDULE: Final = "heating.dhw.schedule"
+FEATURE_DHW_CIRCULATION_SCHEDULE: Final = "heating.dhw.pumps.circulation.schedule"
+FEATURE_CIRCUIT_SCHEDULE: Final = "heating.circuits.{n}.heating.schedule"
 
 # --- Event history -----------------------------------------------------------
 # Paths are relative to PyViCare's API_BASE_URL (https://.../iot/v2).
-# The first one is the documented endpoint, the second one (hyphenated) is an
-# older spelling that is only tried when the first one answers "not found".
+# The hyphenated path is the one that works in practice (confirmed live on
+# 2026-11-12 through oauth_manager.get()). The path from Viessmann's API
+# documentation answered "not found" there; it is kept as a fallback that is
+# only tried when the first path answers "not found".
 EVENT_HISTORY_PATHS: Final = (
-    "/eventhistory/installations/{installation_id}/events",
     "/events-history/installations/{installation_id}/events",
+    "/eventhistory/installations/{installation_id}/events",
 )
 
 DEFAULT_LAST_N_DAYS: Final = 30

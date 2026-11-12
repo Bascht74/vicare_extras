@@ -71,7 +71,8 @@ async def test_sensors_attach_to_the_vicare_device(hass: HomeAssistant, vicare) 
     assert entry.state is ConfigEntryState.LOADED
 
     entities = er.async_entries_for_config_entry(er.async_get(hass), entry.entry_id)
-    assert len(entities) == 6
+    # 6 sensors of version 0.1.0 plus last/active status messages and operating state.
+    assert len(entities) == 9
     assert {entity.device_id for entity in entities} == {vicare_device.id}
     # No device of its own was created.
     assert dr.async_entries_for_config_entry(dr.async_get(hass), entry.entry_id) == []
@@ -84,6 +85,34 @@ async def test_sensors_attach_to_the_vicare_device(hass: HomeAssistant, vicare) 
     assert "state_class" not in state.attributes
     assert state.attributes["day"][0] == 2.6
     assert hass.states.get(by_key["messages"].entity_id).state == "S.134"
+    assert hass.states.get(by_key["last_status_message"].entity_id).state == "4/3-Wege-Ventil Leerlauf"
+    assert hass.states.get(by_key["operating_state"].entity_id).state == "off"
+    assert service.api_calls == 0
+
+
+async def test_vitocal_entities_and_rooms(hass: HomeAssistant, vicare) -> None:
+    """Full feature list of a Vitocal 250-A plus one synthetic room."""
+    _, service, _, vicare_device = vicare
+    service._cache = fakes.gateway_payload(fakes.vitocal_features(), fakes.room_features(0))
+    entry = await _setup_extras(hass)
+
+    registry = er.async_get(hass)
+    entities = er.async_entries_for_config_entry(registry, entry.entry_id)
+    assert len(entities) == 46 + 18 + 11
+    on_heat_pump = [entity for entity in entities if entity.device_id == vicare_device.id]
+    assert len(on_heat_pump) == 46 + 18
+    room_devices = dr.async_entries_for_config_entry(dr.async_get(hass), entry.entry_id)
+    assert [device.name for device in room_devices] == ["Wohnzimmer"]
+
+    by_unique_id = {entity.unique_id: entity for entity in entities}
+    prefix = fakes.HEAT_PUMP_IDENTIFIER
+    assert hass.states.get(by_unique_id[f"{prefix}-operating_state"].entity_id).state == "dhw"
+    assert hass.states.get(by_unique_id[f"{prefix}-cop_current"].entity_id).state == "2.54"
+    valve = hass.states.get(by_unique_id[f"{prefix}-four_three_way_valve_position"].entity_id)
+    assert valve.state == "domestic_hot_water"
+    assert hass.states.get(by_unique_id[f"{prefix}-internal_pump"].entity_id).state == "on"
+    disabled = [entity for entity in entities if entity.disabled_by is not None]
+    assert len(disabled) == 13 + 1  # 13 on the heat pump, 1 perceived setpoint of the room
     assert service.api_calls == 0
 
 
@@ -121,7 +150,7 @@ async def test_get_event_history_action(hass: HomeAssistant, vicare) -> None:
         DOMAIN, "get_event_history", {"last_n_days": 7}, blocking=True, return_response=True
     )
     assert response["count"] == 1
-    assert response["endpoint"] == "/eventhistory/installations/2323232/events"
+    assert response["endpoint"] == "/events-history/installations/2323232/events"
     assert "lastNDays=7" in manager.urls[0]
 
     manager.answers.append(fakes.PyViCareRateLimitError())

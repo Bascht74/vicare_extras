@@ -11,7 +11,202 @@
     }
   },
   "entity": {
+    "binary_sensor": {
+      "condensate_pan_heater": {
+        "name": "Kondensatwannenheizung"
+      },
+      "crankcase_heater": {
+        "name": "Verdichter{suffix} Kurbelwannenheizung"
+      },
+      "defrosting": {
+        "name": "Abtauen"
+      },
+      "device_external_lock": {
+        "name": "Externe Sperre (Gerät)"
+      },
+      "dhw_hygiene": {
+        "name": "Warmwasser Hygienefunktion"
+      },
+      "dhw_scald_protection": {
+        "name": "Warmwasser Verbrühschutz"
+      },
+      "evaporator_base_heater": {
+        "name": "Verdampfer{suffix} Sockelheizung"
+      },
+      "external_lock": {
+        "name": "Externe Sperre"
+      },
+      "fan_ring_heater": {
+        "name": "Ventilatorringheizung"
+      },
+      "heating_rod": {
+        "name": "Heizstab aktiv"
+      },
+      "heating_rod_dhw_approved": {
+        "name": "Heizstab Freigabe Warmwasser"
+      },
+      "heating_rod_heating_approved": {
+        "name": "Heizstab Freigabe Heizung"
+      },
+      "holiday_at_home_program": {
+        "name": "Ferien zu Hause"
+      },
+      "holiday_program": {
+        "name": "Ferienprogramm"
+      },
+      "internal_pump": {
+        "name": "Interne Pumpe"
+      },
+      "malfunction_lock": {
+        "name": "Störungssperre"
+      },
+      "primary_four_three_way_valve": {
+        "name": "Primärkreis 4/3-Wege-Ventil aktiv"
+      },
+      "room_child_lock": {
+        "name": "Kindersicherung"
+      },
+      "room_condensation_risk": {
+        "name": "Kondensationsrisiko"
+      },
+      "room_window_open": {
+        "name": "Fenster"
+      },
+      "secondary_heat_generator": {
+        "name": "Externer Wärmeerzeuger"
+      }
+    },
     "sensor": {
+      "active_status_messages": {
+        "name": "Aktive Statusmeldungen"
+      },
+      "boiler_temperature": {
+        "name": "Kesseltemperatur"
+      },
+      "circuit_active_program": {
+        "name": "Heizkreis {number} aktives Programm",
+        "state": {
+          "comfort": "Komfort",
+          "comfort_heating": "Komfort Heizen",
+          "comfort_cooling": "Komfort Kühlen",
+          "comfort_energy_saving": "Komfort (Energiesparen)",
+          "comfort_cooling_energy_saving": "Komfort Kühlen (Energiesparen)",
+          "eco": "Eco",
+          "fixed": "Festwert",
+          "forced_last_from_schedule": "Zeitprogramm verlängert",
+          "frostprotection": "Frostschutz",
+          "normal": "Normal",
+          "normal_heating": "Normal Heizen",
+          "normal_cooling": "Normal Kühlen",
+          "normal_energy_saving": "Normal (Energiesparen)",
+          "normal_cooling_energy_saving": "Normal Kühlen (Energiesparen)",
+          "reduced": "Reduziert",
+          "reduced_heating": "Reduziert Heizen",
+          "reduced_cooling": "Reduziert Kühlen",
+          "reduced_energy_saving": "Reduziert (Energiesparen)",
+          "reduced_cooling_energy_saving": "Reduziert Kühlen (Energiesparen)",
+          "standby": "Standby",
+          "summer_eco": "Sommer-Eco"
+        }
+      },
+      "circuit_heating_schedule": {
+        "name": "Heizkreis {number} Zeitprogramm",
+        "state": {
+          "none": "Kein Zeitfenster",
+          "inactive": "Zeitprogramm aus",
+          "on": "Ein",
+          "off": "Aus",
+          "normal": "Normal",
+          "reduced": "Reduziert",
+          "comfort": "Komfort",
+          "5_25_cycles": "5/25 Takt",
+          "5_10_cycles": "5/10 Takt"
+        }
+      },
+      "circuit_summer_eco_threshold": {
+        "name": "Heizkreis {number} Sommer-Eco Schwelle"
+      },
+      "circuit_temperature_level_max": {
+        "name": "Heizkreis {number} Temperaturgrenze Maximum"
+      },
+      "circuit_temperature_level_min": {
+        "name": "Heizkreis {number} Temperaturgrenze Minimum"
+      },
+      "compressor_motor_chamber_temperature": {
+        "name": "Verdichter{suffix} Motorraumtemperatur"
+      },
+      "compressor_oil_temperature": {
+        "name": "Verdichter{suffix} Öltemperatur"
+      },
+      "compressor_speed": {
+        "name": "Verdichter{suffix} Drehzahl"
+      },
+      "compressor_speed_setpoint": {
+        "name": "Verdichter{suffix} Drehzahl Soll"
+      },
+      "cop_current": {
+        "name": "COP aktuell"
+      },
+      "dhw_circulation_schedule": {
+        "name": "Zirkulation Zeitprogramm",
+        "state": {
+          "none": "Kein Zeitfenster",
+          "inactive": "Zeitprogramm aus",
+          "on": "Ein",
+          "off": "Aus",
+          "normal": "Normal",
+          "reduced": "Reduziert",
+          "comfort": "Komfort",
+          "5_25_cycles": "5/25 Takt",
+          "5_10_cycles": "5/10 Takt"
+        }
+      },
+      "dhw_schedule": {
+        "name": "Warmwasser Zeitprogramm",
+        "state": {
+          "none": "Kein Zeitfenster",
+          "inactive": "Zeitprogramm aus",
+          "on": "Ein",
+          "off": "Aus",
+          "normal": "Normal",
+          "reduced": "Reduziert",
+          "comfort": "Komfort",
+          "5_25_cycles": "5/25 Takt",
+          "5_10_cycles": "5/10 Takt"
+        }
+      },
+      "economizer_liquid_temperature": {
+        "name": "Economizer{suffix} Flüssiggastemperatur"
+      },
+      "expansion_valve_target": {
+        "name": "Expansionsventil {number} Soll"
+      },
+      "four_three_way_valve_current": {
+        "name": "4/3-Wege-Ventil Stellung Ist"
+      },
+      "four_three_way_valve_position": {
+        "name": "4/3-Wege-Ventil Position",
+        "state": {
+          "domestic_hot_water": "Warmwasser",
+          "climate_circuit_one": "Heiz-/Kühlkreis 1",
+          "climat_circuit_two_defrost": "Integrierter Pufferspeicher",
+          "climate_circuit_two_defrost_domestic_hot_water": "Warmwasser",
+          "heating": "Heizen",
+          "cooling": "Kühlen",
+          "defrost": "Abtauen",
+          "standby": "Standby",
+          "off": "Aus"
+        }
+      },
+      "four_three_way_valve_target": {
+        "name": "4/3-Wege-Ventil Stellung Soll"
+      },
+      "heat_production_cooling_summary": {
+        "name": "Wärmeerzeugung Kühlen"
+      },
+      "heat_production_current": {
+        "name": "Wärmeleistung aktuell"
+      },
       "heat_production_dhw_summary": {
         "name": "Wärmeerzeugung Warmwasser",
         "state_attributes": {
@@ -58,6 +253,27 @@
           }
         }
       },
+      "heating_rod_max_outside_temperature": {
+        "name": "Heizstab maximale Außentemperatur"
+      },
+      "heating_rod_power_consumption_dhw_summary": {
+        "name": "Heizstab Stromverbrauch Warmwasser"
+      },
+      "heating_rod_power_consumption_heating_summary": {
+        "name": "Heizstab Stromverbrauch Heizung"
+      },
+      "heating_rod_stage": {
+        "name": "Heizstab aktive Stufen"
+      },
+      "internal_pump_speed": {
+        "name": "Interne Pumpe Drehzahl"
+      },
+      "internal_pump_target": {
+        "name": "Interne Pumpe Drehzahl Soll"
+      },
+      "last_status_message": {
+        "name": "Letzte Statusmeldung"
+      },
       "messages": {
         "name": "Meldungen",
         "state_attributes": {
@@ -81,8 +297,29 @@
           },
           "status_count": {
             "name": "Anzahl Statusmeldungen"
+          },
+          "newest_status_text": {
+            "name": "Text der neuesten Statusmeldung"
           }
         }
+      },
+      "operating_state": {
+        "name": "Betriebszustand",
+        "state": {
+          "off": "Aus",
+          "preflow": "Vorlauf",
+          "heating": "Heizen",
+          "dhw": "Warmwasser",
+          "cooling": "Kühlen",
+          "defrost": "Abtauen",
+          "afterflow": "Nachlauf"
+        }
+      },
+      "power_consumption_cooling_summary": {
+        "name": "Stromverbrauch Kühlen"
+      },
+      "power_consumption_current": {
+        "name": "Leistungsaufnahme aktuell"
       },
       "power_consumption_dhw_history": {
         "name": "Stromverbrauch Warmwasser Verlauf",
@@ -142,6 +379,9 @@
           }
         }
       },
+      "power_consumption_limit": {
+        "name": "Leistungsbegrenzung Limit Verbrauch"
+      },
       "power_consumption_total_history": {
         "name": "Stromverbrauch gesamt Verlauf",
         "state_attributes": {
@@ -170,6 +410,79 @@
             "name": "Jahreswerte gelesen am"
           }
         }
+      },
+      "power_limitation": {
+        "name": "Leistungsbegrenzung §14a",
+        "state": {
+          "14a_off": "§14a aus"
+        }
+      },
+      "power_status_consumption": {
+        "name": "Leistungsbegrenzung Status Verbrauch",
+        "state": {
+          "unlimited_autonomous": "Unbegrenzt (autonom)",
+          "init": "Initialisierung"
+        }
+      },
+      "power_status_production": {
+        "name": "Leistungsbegrenzung Status Erzeugung",
+        "state": {
+          "unlimited_autonomous": "Unbegrenzt (autonom)",
+          "init": "Initialisierung"
+        }
+      },
+      "primary_fan_speed": {
+        "name": "Ventilator {number}"
+      },
+      "room_co2": {
+        "name": "CO2"
+      },
+      "room_humidity": {
+        "name": "Luftfeuchtigkeit"
+      },
+      "room_operating_level": {
+        "name": "Betriebsstufe",
+        "state": {
+          "normal": "Normal",
+          "reduced": "Reduziert",
+          "comfort": "Komfort"
+        }
+      },
+      "room_setpoint_comfort_heating": {
+        "name": "Solltemperatur Komfort"
+      },
+      "room_setpoint_comfort_perceived": {
+        "name": "Solltemperatur Komfort (gefühlt)"
+      },
+      "room_setpoint_normal_cooling": {
+        "name": "Solltemperatur Kühlen Normal"
+      },
+      "room_setpoint_normal_heating": {
+        "name": "Solltemperatur Normal"
+      },
+      "room_setpoint_normal_perceived": {
+        "name": "Solltemperatur Normal (gefühlt)"
+      },
+      "room_setpoint_reduced_cooling": {
+        "name": "Solltemperatur Kühlen Reduziert"
+      },
+      "room_setpoint_reduced_heating": {
+        "name": "Solltemperatur Reduziert"
+      },
+      "room_temperature": {
+        "name": "Temperatur"
+      },
+      "secondary_circuit_state": {
+        "name": "Sekundärkreis Betriebszustand",
+        "state": {
+          "heating": "Heizen",
+          "cooling": "Kühlen",
+          "standby": "Standby",
+          "off": "Aus"
+        }
+      },
+      "secondary_return_minimum_temperature": {
+        "name": "Sekundärkreis Rücklauftemperatur Minimum"
       }
     }
   },
@@ -219,7 +532,7 @@
   },
   "services": {
     "get_event_history": {
-      "description": "Ruft die Ereignishistorie einer Anlage aus der Viessmann-Cloud ab. Jede abgerufene Seite ist ein API-Aufruf, der auf das Tageskontingent angerechnet wird.",
+      "description": "Ruft die Ereignishistorie einer Anlage aus der Viessmann-Cloud ab. Jede abgerufene Seite ist ein API-Aufruf, der auf das Tageskontingent angerechnet wird. Meldungen werden mit Klartext ergänzt (decoded, summary).",
       "fields": {
         "cursor": {
           "description": "Setzt einen früheren Aufruf mit dessen next_cursor fort.",

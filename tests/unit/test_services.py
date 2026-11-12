@@ -54,7 +54,7 @@ def test_event_history_defaults() -> None:
     assert result["installation_id"] == "2323232"
     assert result["endpoint"] == PRIMARY
     assert result["count"] == 1
-    assert result["events"] == [event(n=1)]
+    assert [{k: e[k] for k in event(n=1)} for e in result["events"]] == [event(n=1)]
     assert result["next_cursor"] is None
     assert result["api_calls"] == 1
     assert result["known_gateway_serials"] == [fakes.GATEWAY_SERIAL]
@@ -94,6 +94,45 @@ def test_event_history_all_fields() -> None:
     }
     assert result["truncated"] is True
     assert result["next_cursor"] == "c9"
+
+
+def test_event_history_decodes_messages_and_keeps_raw_events() -> None:
+    status = {
+        "eventType": "device-message-status",
+        "gatewaySerial": fakes.GATEWAY_SERIAL,
+        "body": {"errorCode": "S.123", "deviceId": "0", "active": True, "errorDescription": "S.123"},
+        "createdAt": "2026-11-12T10:23:57.890Z",
+        "eventTimestamp": "2026-11-12T10:23:27.000Z",
+        "editedBy": "system",
+        "origin": "system",
+    }
+    changed = {
+        "eventType": "feature-changed",
+        "body": {
+            "featureName": "heating.circuits.1.operating.modes.active",
+            "commandName": "setMode",
+            "commandBody": {"mode": "standby"},
+        },
+        "origin": "API",
+        "audiences": None,
+    }
+    other = {"eventType": "gateway-online", "body": {"online": True}}
+    hass, _ = setup(fakes.FakeOAuthManager(page([status, changed, other])))
+
+    events = call(hass, "get_event_history")["events"]
+
+    assert events[0]["summary"] == "S.123: Wärmepumpe aus"
+    assert events[0]["decoded"] == {
+        "code": "S.123",
+        "text": "Wärmepumpe aus",
+        "source": "viessmann",
+        "category": "status",
+        "active": True,
+    }
+    assert events[1]["summary"] == "heating.circuits.1.operating.modes.active: setMode(mode=standby)"
+    assert events[2] == other
+    for raw, returned in zip((status, changed, other), events, strict=True):
+        assert {key: returned[key] for key in raw} == raw
 
 
 def test_event_history_remembers_working_path() -> None:

@@ -9,7 +9,11 @@ imports, so both test suites (``tests/unit`` and ``tests/ha``) can use it.
 from __future__ import annotations
 
 from datetime import datetime
+import json
+from pathlib import Path
 from typing import Any
+
+FIXTURES = Path(__file__).parent / "fixtures"
 
 INSTALLATION_ID = 2323232
 GATEWAY_SERIAL = "7571381500000001"
@@ -134,14 +138,87 @@ def heat_pump_features() -> list[dict[str, Any]]:
     ]
 
 
-def gateway_payload(heat_pump: list[dict[str, Any]] | None = None) -> dict[str, Any]:
+def vitocal_features() -> list[dict[str, Any]]:
+    """Return the feature list of a Vitocal 250-A (structure from a real device)."""
+    data = json.loads((FIXTURES / "vitocal250a_features.json").read_text(encoding="utf-8"))
+    return data["data"]
+
+
+def room_features(room: int = 0, name: str | None = "Wohnzimmer") -> list[dict[str, Any]]:
+    """Return rooms.<n>.* features like a ViCare room control delivers them.
+
+    Synthetic: modelled on PyViCare's RoomControl fixtures and accessors, not
+    on a real installation.
+    """
+
+    def value(val: Any, unit: str | None = None, kind: str = "number") -> dict[str, Any]:
+        result = {"type": kind, "value": val}
+        if unit:
+            result["unit"] = unit
+        return result
+
+    def temperature(val: float) -> dict[str, Any]:
+        return {"temperature": value(val, "celsius")}
+
+    prefix = f"rooms.{room}"
+    connected = value("connected", kind="string")
+    base: dict[str, Any] = {"type": value("livingroom", kind="string"), "actors": value([], kind="array")}
+    if name is not None:
+        base["name"] = value(name, kind="string")
+    items = {
+        prefix: base,
+        f"{prefix}.sensors.temperature": {"status": connected, "value": value(21.4, "celsius")},
+        f"{prefix}.sensors.humidity": {"status": connected, "value": value(48, "percent")},
+        f"{prefix}.co2": {"concentration": value(650, "partsPerMillion")},
+        f"{prefix}.condensationRisk": {"value": value(False, kind="boolean")},
+        f"{prefix}.sensors.openWindow": {"value": value(True, kind="boolean")},
+        f"{prefix}.childLock": {"active": value(False, kind="boolean"), "status": value("inactive", kind="string")},
+        f"{prefix}.temperature.levels.normal.heating": temperature(21),
+        f"{prefix}.temperature.levels.reduced.heating": temperature(18),
+        f"{prefix}.temperature.levels.comfort.heating": temperature(23),
+        f"{prefix}.temperature.levels.normal.perceived": temperature(21),
+        f"{prefix}.temperature.levels.normal.cooling": {},
+        f"{prefix}.operating.state": {
+            "level": value("normal", kind="string"),
+            "demand": value("heating", kind="string"),
+            "reason": value("schedule", kind="string"),
+            "modifier": value("none", kind="string"),
+        },
+        f"{prefix}.configuration.openWindow": {"active": value(True, kind="boolean")},
+    }
+    return [feature(name_, props, "RoomControl-1") for name_, props in items.items()]
+
+
+def room_control_only_flags() -> list[dict[str, Any]]:
+    """Return what a room control without rooms delivers (seen on a real system)."""
+    names = ["rooms.features", "rooms.features.remotePresenceProbability"]
+    for channel in range(4):
+        names += [
+            f"rooms.features.supplyChannel{channel}FTDC",
+            f"rooms.features.supplyChannel{channel}FTDCUseValveInformation",
+            f"rooms.features.supplyChannel{channel}PumpControl",
+        ]
+    return [
+        feature(name_, {} if name_ == "rooms.features" else {"active": {"type": "boolean", "value": False}}, "RoomControl-1")
+        for name_ in names
+    ]
+
+
+def gateway_payload(
+    heat_pump: list[dict[str, Any]] | None = None,
+    rooms: list[dict[str, Any]] | None = None,
+) -> dict[str, Any]:
     """Build the payload of the gateway bulk request (all devices at once)."""
     return {
         "data": [
             feature("gateway.devices", {"devices": {"type": "DeviceList", "value": []}}, None),
             *(heat_pump_features() if heat_pump is None else heat_pump),
             feature("tcu.wifi", {"strength": {"type": "number", "value": -60}}, "TCU"),
-            feature("rooms", {"enabled": {"type": "array", "value": ["0"]}}, "RoomControl-1"),
+            *(
+                [feature("rooms", {"enabled": {"type": "array", "value": ["0"]}}, "RoomControl-1")]
+                if rooms is None
+                else rooms
+            ),
         ]
     }
 

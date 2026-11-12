@@ -7,8 +7,8 @@ API usage
 ---------
 ``get_features``       0 API calls. Reads the payload PyViCare has in memory.
 ``get_event_history``  1 API call per page fetched (at most ``max_pages``),
-                       plus 1 call when the documented path answers "not
-                       found" and the fallback path is tried.
+                       plus 1 call when the first path answers "not found"
+                       and the fallback path is tried.
 """
 
 from __future__ import annotations
@@ -65,6 +65,7 @@ from .const import (
 from .errors import ViCareExtrasError
 from .event_history import fetch_event_history, path_template
 from .features import slim_feature
+from .messages import decode_event
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -212,6 +213,9 @@ async def _async_get_event_history(call: ServiceCall) -> ServiceResponse:
 
     if (used := path_template(result["endpoint"], installation_id, paths)) is not None:
         store[DATA_EVENT_HISTORY_PATH] = used
+    # Add "decoded"/"summary" to the events; the raw fields stay untouched.
+    language = getattr(hass.config, "language", "de") or "de"
+    result["events"] = [decode_event(event, language) for event in result["events"]]
     result["known_gateway_serials"] = known_serials
     _LOGGER.debug(
         "Event history: %s events, %s page(s), %s API call(s)",

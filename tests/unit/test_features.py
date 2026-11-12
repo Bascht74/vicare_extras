@@ -56,18 +56,46 @@ def test_messages_newest_status_first() -> None:
     code, attributes = ft.messages_state(_by_name())
     assert code == "S.134"  # newest by timestamp, not first in the list
     assert attributes["newest_status_timestamp"] == "2026-11-12T07:30:00.000Z"
+    assert attributes["newest_status_text"] == "4/3-Wege-Ventil Leerlauf"
     assert [m["errorCode"] for m in attributes["status"]] == ["S.134", "S.123", "S.165"]
     assert attributes["status"][0] == {
         "errorCode": "S.134",
         "timestamp": "2026-11-12T07:30:00.000Z",
         "priority": "status",
+        "text": "4/3-Wege-Ventil Leerlauf",
+        "source": "viessmann",
     }
+    assert attributes["status"][1]["text"] == "Wärmepumpe aus"
     assert attributes["status_count"] == 3
     assert attributes["info"] == [
-        {"errorCode": "I.114", "timestamp": "2026-11-11T19:00:00.000Z", "priority": "info"}
+        {
+            "errorCode": "I.114",
+            "timestamp": "2026-11-11T19:00:00.000Z",
+            "priority": "info",
+            "text": "Smart Grid: Normalbetrieb aktiv",
+            "source": "viessmann",
+        }
     ]
     assert attributes["service"] == []
     assert attributes["service_count"] == 0
+
+
+def test_messages_unknown_code_keeps_raw_code() -> None:
+    features = {
+        "device.messages.status.raw": fakes.feature(
+            "device.messages.status.raw",
+            fakes.messages(("S.1", "2026-11-12T07:30:00.000Z", "status")),
+        )
+    }
+    code, attributes = ft.messages_state(features)
+    assert code == "S.1"
+    assert attributes["newest_status_text"] is None
+    assert attributes["status"][0] == {
+        "errorCode": "S.1",
+        "timestamp": "2026-11-12T07:30:00.000Z",
+        "priority": "status",
+        "text": None,
+    }
 
 
 def test_messages_without_status_feature() -> None:
@@ -77,6 +105,7 @@ def test_messages_without_status_feature() -> None:
     assert code is None
     assert "status" not in attributes
     assert attributes["newest_status_timestamp"] is None
+    assert attributes["newest_status_text"] is None
     assert attributes["info_count"] == 1
 
 

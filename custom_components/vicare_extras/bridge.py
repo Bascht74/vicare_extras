@@ -55,6 +55,11 @@ class DeviceRef:
         return (self.installation_id, self.gateway_serial, self.device_id)
 
     @property
+    def ref_id(self) -> str:
+        """Return a stable id: the vicare device identifier when there is one."""
+        return self.identifier or f"{self.gateway_serial}_{self.device_id}"
+
+    @property
     def label(self) -> str:
         """Return a short human readable label."""
         return f"{self.model or 'unknown'} (id {self.device_id})"

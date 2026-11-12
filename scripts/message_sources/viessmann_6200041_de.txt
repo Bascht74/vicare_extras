@@ -1,0 +1,484 @@
+# Message texts of Viessmann One Base heat pumps, German.
+# Source: Viessmann "Serviceanleitung für die Fachkraft: Viessmann One Base.
+#   Systemkonfiguration und Diagnose für Wärmepumpen mit Viessmann One Base",
+#   document 6200041, DE 6/2024 (Vitocal 150-A, 151-A, 250-A, 252-A), chapter
+#   "Meldungen": Störungsmeldungen (F), Warnungsmeldungen (A), Wartungsmeldungen
+#   (P), Statusmeldungen (S), Informationsmeldungen (I).
+# Extracted on 2026-11-12 from the PDF text by an automated reader, one
+#   CODE|TEXT line per message. F and A were extracted twice (table of contents
+#   and chapter headings) with identical results; S.89-S.395 were extracted
+#   twice from overlapping text windows with identical results. I, P, S.60-S.88
+#   and S.396-S.402 were extracted once. Not proofread against the printed PDF.
+# For F and A the text is the message title. For I messages that the manual
+#   prints as bullet lists, the bullets are joined with "; " and the "Maßnahmen"
+#   (remedies) are left out.
+F.1|Unterbrechung Vorlauftemperatursensor
+F.2|Kurzschluss Vorlauftemperatursensor
+F.3|Unterbrechung Rücklauftemperatursensor
+F.4|Kurzschluss Rücklauftemperatursensor
+F.7|Unterbrechung Speichertemperatursensor
+F.8|Kurzschluss Speichertemperatursensor
+F.13|Unterbrechung Außentemperatursensor
+F.14|Kurzschluss Außentemperatursensor
+F.33|Unterbrechung Primäreintrittstemperatursensor Wärmepumpe
+F.34|Kurzschluss Primäreintrittstemperatursensor Wärmepumpe
+F.74|Hydraulischer Anlagendruck zu niedrig
+F.75|Kein Volumenstrom im Hydraulikkreis
+F.78|Keine Kommunikation mit Bedienteil
+F.87|Überdruck Anlage
+F.91|Kommunikationsfehler DIO
+F.92|Kommunikationsfehler ADIO
+F.100|Spannungsfehler PlusBus
+F.101|Kurzschluss PlusBus
+F.111|Unterbrechung Flüssiggastemperatursensor Heizen
+F.112|Kurzschluss Flüssiggastemperatursensor Heizen
+F.117|Unterbrechung Sauggastemperatursensor Verdampfer
+F.118|Kurzschluss Sauggastemperatursensor Verdampfer
+F.121|Fehler Kommunikation Wechselrichter
+F.123|Unterbrechung Flüssiggastemperatursensor Verflüssiger
+F.124|Kurzschluss Flüssiggastemperatursensor Verflüssiger
+F.134|Kommunikationsfehler Inverter
+F.147|Unterbrechung Sauggastemperatursensor Verdichter
+F.148|Kurzschluss Sauggastemperatursensor Verdichter
+F.149|Unterbrechung Flüssiggastemperatursensor Kühlen
+F.150|Kurzschluss Flüssiggastemperatursensor Kühlen
+F.151|Unterbrechung Heißgastemperatursensor
+F.152|Kurzschluss Heißgastemperatursensor
+F.155|Fehler Elektronisches Expansionsventil 1
+F.156|Fehler Elektronisches Expansionsventil 2
+F.160|Kommunikationsstörung CAN-BUS
+F.425|Zeitsynchronisierung fehlgeschlagen
+F.430|Kommunikationsfehler Gateway
+F.431|Kommunikationsfehler KNX
+F.454|Falsche Softwareversion
+F.472|Kommunikation Energiezähler unterbrochen
+F.519|Kommunikationsfehler BACnet
+F.520|Kommunikationsfehler Modbus
+F.544|Unterbrechung Vorlauftemperatursensor HK 2
+F.545|Kurzschluss Vorlauftemperatursensor HK 2
+F.546|Unterbrechung Vorlauftemperatursensor HK 3
+F.547|Kurzschluss Vorlauftemperatursensor HK 3
+F.548|Unterbrechung Vorlauftemperatursensor HK 4
+F.549|Kurzschluss Vorlauftemperatursensor HK 4
+F.578|Unterbrechung Raumtemperatursensor Funk-Fernbedienung
+F.616|Inkompatible Softwareversion im Steuergeräteverbund erkannt
+F.685|Kommunikationsfehler Elektronikmodul HPMU
+F.686|Kommunikationsfehler Kältekreisregler
+F.687|Kommunikationsfehler EHCU
+F.744|Bedienteil ist nicht kompatibel
+F.745|Inkompatible Systemkonfiguration
+F.747|Interner Fehler der Bedieneinheit
+F.748|Fehler Touchbedienfeld des Bedienteils
+F.749|Firmwarestände der Steuergeräte zueinander inkompatibel
+F.764|Weiterer CAN-BUS-Teilnehmer meldet eine Störung
+F.765|Kommunikationsfehler zu weiterem CAN-BUS-Teilnehmer
+F.770|Unterbrechung Vorlauftemperatursensor Sekundärkreis
+F.771|Kurzschluss Vorlauftemperatursensor Sekundärkreis
+F.772|Unterbrechung Verdichterölsumpftemperatursensor
+F.773|Kurzschluss Verdichterölsumpftemperatursensor
+F.788|Unterbrechung 4/3-Wege-Ventil
+F.790|Mechanischer Defekt 4/3-Wege-Ventil
+F.791|Ausfall Heizwasser-Durchlauferhitzer Phase 1
+F.792|Ausfall Heizwasser-Durchlauferhitzer Phase 2
+F.793|Ausfall Heizwasser-Durchlauferhitzer Phase 3
+F.797|Mechanischer Defekt Umwälzpumpe Heizkreis 1
+F.798|Mechanischer Defekt Umwälzpumpe Heizkreis 2
+F.799|Elektrischer Fehler Umwälzpumpe Heizkreis 1
+F.800|Elektrischer Fehler Umwälzpumpe Heizkreis 2
+F.801|Fehlfunktion Ventil Kältekreisumkehr
+F.808|Fehler unterer Ventilator
+F.812|Fehler oberer Ventilator
+F.819|Unterbrechung Expansionsventil 1
+F.820|Unterbrechung Expansionsventil 2
+F.823|Kurzschluss Expansionsventil 1
+F.824|Kurzschluss Expansionsventil 2
+F.830|Fehler Stromsensor Inverter
+F.831|Fehler Stromsensor Leistungsfaktor-Korrekturfilter (PFC) Inverter
+F.832|Invertertemperatursensor (IPM) defekt
+F.833|Fehler Temperatursensor Leistungsfaktor-Korrekturfilter (PFC) Inverter
+F.834|Inverter netzseitiger Phasenfehler
+F.835|Inverter Parametrierung fehlerhaft
+F.836|Laststrom Inverter zu hoch (Überstrom)
+F.837|Inverter elektrischer Phasenanschluss an Verdichter fehlerhaft
+F.838|Inverter Ansteuerung fehlerhaft
+F.839|Verdichter blockiert
+F.840|Inverter Phasenströme an Verdichter unsymmetrisch
+F.841|Verdichterdrehmoment zu hoch
+F.842|Kurzschluss Inverter internes Leistungsmodul
+F.843|Inverter Überstromabschaltung Leistungsfaktor-Korrekturfilter (PFC)
+F.844|Inverter Fehler interne Referenzspannung
+F.845|Inverter Parametrierung fehlerhaft
+F.846|Inverter Verdichterdrehfeld gegenläufig
+F.847|Stromsensor Inverter erkennt gleichbleibenden Verdichterstrom
+F.848|Stromsensor Inverter erkennt schwankenden Verdichterstrom
+F.864|Abtauen nicht erfolgreich beendet
+F.865|Kältekreis Hochdruckabschaltung
+F.866|Kältekreis Niederdruckabschaltung
+F.875|Kommunikationsfehler zu verbundenem Hauptgerät
+F.876|Unterbrechung Kombisensor Volumenstrom/Temperatur
+F.881|Sicherheitsabschaltung Kältekreis
+F.909|Keine Informationen zum Viessmann Energiemanagement (HEMS)
+F.910|Mehrere Hauptgeräte erkannt
+F.912|Inverter Innenraumtemperatursensor fehlerhaft
+F.923|Daten Energiezähler 1 nicht verfügbar
+F.924|Daten Energiezähler 2 nicht verfügbar
+F.925|Daten Energiezähler 3 nicht verfügbar
+F.926|Daten Energiezähler 4 nicht verfügbar
+F.927|Daten Energiezähler 5 nicht verfügbar
+F.928|Daten Energiezähler 6 nicht verfügbar
+F.929|Daten Energiezähler 7 nicht verfügbar
+F.930|Daten Energiezähler 8 nicht verfügbar
+F.931|Daten Energiezähler 9 nicht verfügbar
+F.932|Daten Energiezähler 10 nicht verfügbar
+F.933|Daten Energiezähler 11 nicht verfügbar
+F.934|Daten Energiezähler 12 nicht verfügbar
+F.935|Daten Energiezähler 13 nicht verfügbar
+F.936|Daten Energiezähler 14 nicht verfügbar
+F.937|Daten Energiezähler 15 nicht verfügbar
+F.938|Daten Wechselrichter 1 nicht verfügbar
+F.939|Daten Wechselrichter 2 nicht verfügbar
+F.940|Daten Wechselrichter 3 nicht verfügbar
+F.941|Daten Wechselrichter 4 nicht verfügbar
+F.942|Daten Wechselrichter 5 nicht verfügbar
+F.943|Daten Wechselrichter 6 nicht verfügbar
+F.944|Daten Verbraucher 1 nicht verfügbar
+F.945|Daten Verbraucher 2 nicht verfügbar
+F.946|Daten Verbraucher 3 nicht verfügbar
+F.947|Daten Verbraucher 4 nicht verfügbar
+F.948|Daten Verbraucher 5 nicht verfügbar
+F.949|Daten Verbraucher 6 nicht verfügbar
+F.950|Daten Verbraucher 7 nicht verfügbar
+F.951|Daten Verbraucher 8 nicht verfügbar
+F.952|Daten Verbraucher 9 nicht verfügbar
+F.953|Daten Verbraucher 10 nicht verfügbar
+F.954|Daten Verbraucher 11 nicht verfügbar
+F.955|Daten Verbraucher 12 nicht verfügbar
+F.956|Daten Verbraucher 13 nicht verfügbar
+F.957|Daten Verbraucher 14 nicht verfügbar
+F.958|Daten Verbraucher 15 nicht verfügbar
+F.959|Daten Erzeuger 1 nicht verfügbar
+F.960|Daten Erzeuger 2 nicht verfügbar
+F.961|Daten Erzeuger 3 nicht verfügbar
+F.962|Daten Erzeuger 4 nicht verfügbar
+F.963|Daten Erzeuger 5 nicht verfügbar
+F.964|Daten Erzeuger 6 nicht verfügbar
+F.965|Daten Batteriemodul 1 nicht verfügbar
+F.966|Daten Batteriemodul 2 nicht verfügbar
+F.967|Daten Batteriemodul 3 nicht verfügbar
+F.968|Daten Batteriemodul 4 nicht verfügbar
+F.969|Daten Batteriemodul 5 nicht verfügbar
+F.970|Daten Batteriemodul 6 nicht verfügbar
+F.983|Inverter EEPROM fehlerhaft
+F.984|Mehrfacher elektrischer Fehler Ansteuerung elektronisches Expansionsventil 1
+F.985|Mehrfacher elektrischer Fehler Ansteuerung elektronisches Expansionsventil 2
+F.990|Kurzschluss Temperatursensor hydraulische Weiche
+F.991|Unterbrechung Temperatursensor hydraulische Weiche
+F.992|Kurzschluss Temperatursensor Heiz-/Kühlwasser-Pufferspeicher
+F.993|Kurzschluss Temperatursensor Heizwasser-Pufferspeicher
+F.994|Kurzschluss Temperatursensor Heizwasser-Pufferspeicher
+F.995|Unterbrechung Temperatursensor Heizwasser-Pufferspeicher
+F.996|Kurzschluss Temperatursensor Kühlwasser-Pufferspeicher
+F.997|Unterbrechung Temperatursensor Kühlwasser-Pufferspeicher
+F.998|Kommunikationsfehler Kältekreisregler zu EHCU/Volumenstromsignal
+F.1006|Startzähler Wärmepumpe überschritten
+F.1007|Wärmepumpe verriegelt
+F.1008|Anzahl unterstützter Geräte an Hauptsteuergerät überschritten
+F.1009|Fehler elektrische Verdichterheizung Wärmepumpe
+F.1010|Störung Wasserdrucksensor
+F.1011|Störung Hochdrucksensor Kältekreis
+F.1012|Störung Niederdrucksensor Kältekreis
+F.1034|Kommunikationsstörung externer CAN-BUS
+F.1035|Kommunikationsstörung interner CAN-BUS
+F.1045|Fehler externer Wärme-/Kälteerzeuger 1
+F.1049|Fehlfunktion externes 3/2-Wege-Mischventil Bivalenzbetrieb
+F.1050|Kurzschluss Temperatursensor externer Wärme-/Kälteerzeuger 1
+F.1051|Unterbrechung Temperatursensor externer Wärme-/Kälteerzeuger 1
+F.1054|Maximaltemperatur externer Wärme-/Kälteerzeuger 1 überschritten
+F.1056|Defektes Relais Inverter Zwischenkreis
+F.1057|Störung Hochdrucksensor Kältekreis
+F.1074|Druckdifferenz zu gering für Kältekreisumkehr
+F.1076|Verdichterstartzähler mit zu niedriger Öltemperatur überschritten
+F.1077|Wiederholte Verdichter Mindestlaufzeit Verletzung
+F.1078|Wiederholt zu geringer Volumenstrom bei Verdichteranlauf
+F.1080|Verdampfertemperatur zu niedrig
+F.1105|Funktion Kühlen auf Heiz-/Kühlkreis 1 wird durch Erweiterungsmodul nicht unterstützt
+F.1106|Funktion Kühlen auf Heiz-/Kühlkreis 2 wird durch Erweiterungsmodul nicht unterstützt
+F.1107|Funktion Kühlen auf Heiz-/Kühlkreis 3 wird durch Erweiterungsmodul nicht unterstützt
+F.1108|Funktion Kühlen auf Heiz-/Kühlkreis 4 wird durch Erweiterungsmodul nicht unterstützt
+F.1129|Störung am Wechselrichter
+F.1130|Keine Verbindung zum Datenlogger
+F.1131|Netzwerkstörung (LAN)
+F.1132|Spitzenleistung des Wechselrichters zu gering
+F.1140|Führungs-Wärmepumpe aus
+F.1172|Inverter unsymmetrische Verdichterströme detektiert
+F.1173|Maximale Anzahl der Inverter Sicherheitsabschaltungen Interlock Eingang 1 erreicht
+F.1174|Erzwungene Sicherheitsabschaltung Verdichter - Interlock Eingang 2 aktiv
+F.1175|Maximale Anzahl der Inverter Sicherheitsabschaltungen Interlock Eingang 2 erreicht
+F.1179|Interne Sicherheitsabschaltung Inverter durch netzseitigen Phasenfehler
+F.1180|Inverter sicherheitsrelevanter interner Erdungsfehler
+F.1181|Sicherheitsabschaltung Verdichter durch überlagerten Gleichstrom
+F.1182|Sicherheitsabschaltung thermischer Überlastschutz Verdichter
+F.1183|Fehler Anlauf Verdichter
+F.1184|Fehler Netzspannungsmessung Inverter
+F.1186|Offsetfehler Stromsensor Inverter
+F.1187|Fehler Stromsensor Inverter außerhalb des gültigen Bereichs
+F.1191|Fehler Sensor Interlock Eingang 1
+F.1192|Fehler Sensor Interlock Eingang 2
+F.1194|Inverter Überstrom internes Leistungsmodul
+F.1195|Fehler Überlast Inverter
+F.1196|Fehler Analog/Digital Umsetzer Inverter
+F.1216|Kommunikationsverlust zur Führungs-Wärmepumpe
+F.1217|Kommunikationsverlust zur Folge-Wärmepumpe
+F.1254|Sicherheitsabschaltung thermischer Überlastschutz Verdichter bei mehrfachem Anlaufen des Verdichters
+F.1259|Modbus Kommunikationsstörung Kältekreisregler (VCMU) zu Inverter
+A.2|Frostschutzgrenze unterschritten
+A.11|Anlagendruck zu niedrig
+A.12|Batterie im Elektronikmodul HPMU
+A.16|Mindestvolumenstrom unterschritten
+A.17|Erhöhte Trinkwasserhygiene
+A.19|Temperaturwächter hat ausgelöst
+A.21|Hydraulischer Anlagendruck
+A.62|PWM-Signal Heizkreispumpe Heiz-/Kühlkreis 1
+A.63|PWM-Signal Heizkreispumpe Heiz-/Kühlkreis 2
+A.65|Heizkreispumpe Heiz-/Kühlkreis 2 läuft trocken
+A.66|Heizkreispumpe Heiz-/Kühlkreis 1 läuft nicht
+A.68|Heizkreispumpe Heiz-/Kühlkreis 2 läuft nicht
+A.70|Filter im Kugelhahn Außeneinheit
+A.71|Überstrom am Verdichter
+A.72|Strom Leistungsfaktor-Korrekturfilter
+A.73|Frequenzabweichung Verdichterdrehzahl
+A.74|Druckverlust im Sekundärkreis
+A.75|Druckspitzen im Sekundärkreis
+A.80|Ventilator blockiert
+A.81|Unzureichende Wärmeübertragung Verdampfer
+A.82|Fehler Drucksensor CAN-BUS-Teilnehmer
+A.83|Signal Speichertemperatursensor fehlerhaft
+A.84|Signal Rücklauftemperatursensor Sekundärkreis
+A.85|Signal Vorlauftemperatursensor Sekundärkreis
+A.86|Signal Vorlauftemperatursensor Heiz-/Kühlkreis 1
+A.87|Signal Vorlauftemperatursensor Heiz-/Kühlkreis 2
+A.91|Kältekreis vorübergehend aus
+A.93|Heißgasdruck nicht plausibel
+A.94|Sauggasdruck nicht plausibel
+A.96|Luft im Sekundärkreis
+A.99|Vorlauftemperatur Sekundärkreis zu niedrig
+A.100|Einstellungen gelöscht
+A.101|Heißgastemperatur nicht plausibel
+A.102|Sauggastemperatur nicht plausibel
+A.109|Kesseltemperatur-Istwert zu niedrig
+A.110|Temperatur externer Wärmeerzeuger 1
+A.111|Temperatur externer Wärmeerzeuger 2
+A.152|Überlastschutz Wallbox nicht aktiv
+A.153|Kein PV-optmiertes Laden
+A.159|Werkseitige Einstellung Inverter
+A.162|Inverter Überspannung Zwischenkreis
+A.163|Überspannung im Zwischenkreis Inverter
+A.164|Gleichspannung im Zwischenkreis Inverter
+A.174|Innenraumtemperatur zu hoch
+P.1|Wartung nach Zeitintervall steht bevor.
+P.4|Heizwasser nachfüllen.
+P.8|Wartung nach Betriebsstunden steht bevor.
+P.34|Wartung Heizwasserfilter: Filter im Kugelhahn reinigen. Bauseitigen Heizwasserfilter (Zubehör) reinigen.
+S.60|Sommerbetrieb aktiv (Sparfunktion Außentemperatur)
+S.74|Heizunterdrückung Heizen bei Warmwasserbereitung durch Sonnenkollektoren
+S.75|Zirkulationspumpe aktiv
+S.88|Solarkreispumpe aktiv
+S.89|Sonnenkollektoren in Stagnation
+S.112|Initialisierung 4/3-Wege-Ventil
+S.113|4/3-Wege-Ventil schaltet in Richtung „Trinkwassererwärmung“.
+S.114|4/3-Wege-Ventil schaltet in Richtung „Heiz-/Kühlkreis 1“.
+S.115|4/3-Wege-Ventil in Position „Trinkwassererwärmung“
+S.116|4/3-Wege-Ventil in Position „Heiz-/Kühlkreis 1“
+S.117|4/3-Wege-Ventil in Position „Heiz-/Kühlkreis 2“
+S.118|4/3-Wege-Ventil in Position „Integrierter Pufferspeicher“
+S.120|Smart Grid: Normalbetrieb aktiv
+S.121|Smart Grid: Empfohlener Betrieb aktiv
+S.122|Smart Grid: Erzwungener Betrieb aktiv
+S.123|Wärmepumpe aus
+S.124|Wärmepumpe Vorlaufphase
+S.125|Wärmepumpe im Heizbetrieb
+S.126|Wärmepumpe im Kühlbetrieb
+S.127|Wärmepumpe: Abtauen vorbereiten.
+S.128|Wärmepumpe im Abtaubetrieb
+S.129|Wärmepumpe Nachlaufphase
+S.130|Heizwasser-Durchlauferhitzer ausgeschaltet
+S.131|Heizwasser-Durchlauferhitzer: Stufe 1 aktiv
+S.132|Heizwasser-Durchlauferhitzer: Stufe 2 aktiv
+S.133|Heizwasser-Durchlauferhitzer: Stufe 3 aktiv
+S.134|4/3-Wege-Ventil Leerlauf
+S.135|4/3-Wege-Ventil Abtauen
+S.136|4/3-Wege-Ventil Raumbeheizung/Raumkühlung
+S.137|Heizbetrieb in Anlaufphase
+S.138|Heizbetrieb aktiv
+S.139|Heizbetrieb inaktiv
+S.140|Trinkwassererwärmung angefordert
+S.141|Trinkwassererwärmung aktiv
+S.142|Trinkwassererwärmung inaktiv
+S.143|Kühlbetrieb angefordert
+S.144|Kühlbetrieb aktiv
+S.145|Kühlbetrieb inaktiv
+S.146|Abtauen angefordert
+S.147|Wärmebereitstellung für Abtauen aktiv
+S.148|Abtauen über Wärmepumpe aktiv
+S.149|Abtauen über Wärmepumpe inaktiv
+S.150|Abtauen über Heiz-/Kühlkreis 1 oder externen Heizwasser-Pufferspeicher (falls vorhanden) in Vorbereitung
+S.151|Abtauen über Heiz-/Kühlkreis 1 oder externen Heizwasser-Pufferspeicher (falls vorhanden) aktiv
+S.152|Abtauen über Heiz-/Kühlkreis 1 oder externen Heizwasser-Pufferspeicher (falls vorhanden) inaktiv
+S.153|Regelung im Standby
+S.161|Befüllung aktiv
+S.162|Entlüftung aktiv
+S.163|Wärmepumpe: Systemstatus inaktiv
+S.164|Wärmepumpe: Systemstatus Wartung Standby
+S.165|Wärmepumpe: Systemstatus Regelung
+S.167|Aktorentest aktiv
+S.176|Wärmepumpenregelung: Abtauen angefordert
+S.181|Passiver Frostschutz Heiz-/Kühlkreis 1 eingeschaltet
+S.182|Passiver Frostschutz Heiz-/Kühlkreis 2 eingeschaltet
+S.183|Passiver Frostschutz Heiz-/Kühlkreis 3 eingeschaltet
+S.184|Passiver Frostschutz Heiz-/Kühlkreis 4 eingeschaltet
+S.185|Passiver Frostschutz Heizwasser-Durchlauferhitzer eingeschaltet
+S.186|Passiver Frostschutz Speicher-Wassererwärmer eingeschaltet
+S.187|Passiver Frostschutz Wärmepumpe eingeschaltet
+S.188|Passiver Frostschutz externer Heiz-/Kühlwasser-Pufferspeicher eingeschaltet
+S.189|Passiver Frostschutz externer Heizwasser-Pufferspeicher eingeschaltet
+S.190|Passiver Frostschutz externer Kühlwasser-Pufferspeicher eingeschaltet
+S.193|Anforderung externer Wärmeerzeuger über potenzialfreien Schaltkontakt
+S.195|Smart Grid: EVU-Sperre aktiv
+S.196|EVU-Sperre aktiv
+S.197|Wärmeanforderung Heiz-/Kühlkreis 1
+S.198|Kühlanforderung Heiz-/Kühlkreis 1
+S.199|Wärmeanforderung Heiz-/Kühlkreis 2
+S.200|Kühlanforderung Heiz-/Kühlkreis 2
+S.201|Wärmeanforderung Heiz-/Kühlkreis 3
+S.202|Kühlanforderung Heiz-/Kühlkreis 3
+S.203|Wärmeanforderung Heiz-/Kühlkreis 4
+S.204|Kühlanforderung Heiz-/Kühlkreis 4
+S.205|Anforderung externer Heizwasser-Pufferspeicher
+S.206|Anforderung externer Kühlwasser-Pufferspeicher
+S.207|Anforderung Trinkwassererwärmung
+S.208|Erwärmung integrierter Pufferspeicher aktiv
+S.209|Abbruch Befüllfunktion
+S.210|Abbruch Entlüftungsfunktion
+S.211|Befüllvorgang abgeschlossen
+S.212|Entlüftungsvorgang abgeschlossen
+S.213|Inbetriebnahme-Assistent aktiv
+S.214|Abbruch Inbetriebnahme
+S.215|Inbetriebnahme abgeschlossen
+S.216|Aktorentest aktiv
+S.217|Heizwasser-Durchlauferhitzer: Stufe 1 inaktiv
+S.218|Heizwasser-Durchlauferhitzer: Stufe 2 inaktiv
+S.219|Heizwasser-Durchlauferhitzer: Stufe 3 inaktiv
+S.220|Kältekreis ausgeschaltet
+S.221|Kältekreis Startphase Heizbetrieb
+S.222|Kältekreis Startphase Kühlbetrieb
+S.223|Kältekreis Startphase Abtaubetrieb
+S.224|Kältekreis im Heizbetrieb
+S.225|Kältekreis im Kühlbetrieb
+S.226|Kältekreis im Abtaubetrieb im Betriebsprogramm Frostschutz
+S.227|Kältekreis im Abtaubetrieb bei Regelbetrieb
+S.228|Kältekreis Abschaltsignal
+S.229|Kältekreisregler im Übergang von Heizbetrieb zu Kühlbetrieb
+S.230|Kältekreisregler im Übergang von Kühlbetrieb zu Heizbetrieb
+S.231|Kältekreisregler im Übergang von Abtaubetrieb zu Heizbetrieb
+S.240|Kältekreisregler im Standby
+S.392|Kältekreisregler im Übergang von Heizbetrieb zu Abtaubetrieb
+S.393|Aktiver Frostschutz Heiz-/Kühlkreis 1 eingeschaltet
+S.394|Aktiver Frostschutz Heiz-/Kühlkreis 2 eingeschaltet
+S.395|Aktiver Frostschutz Heiz-/Kühlkreis 3 eingeschaltet
+S.396|Aktiver Frostschutz Heiz-/Kühlkreis 4 eingeschaltet
+S.397|Aktiver Frostschutz Heizwasser-Durchlauferhitzer eingeschaltet
+S.398|Aktiver Frostschutz Speicher-Wassererwärmer eingeschaltet
+S.399|Aktiver Frostschutz Wärmepumpe eingeschaltet
+S.400|Aktiver Frostschutz externer Heiz-/Kühlwasser-Pufferspeicher eingeschaltet
+S.401|Aktiver Frostschutz externer Heizwasser-Pufferspeicher eingeschaltet
+S.402|Aktiver Frostschutz externer Kühlwasser-Pufferspeicher eingeschaltet
+I.9|Estrichtrocknung aktiv
+I.10|Laufzeitbegrenzung Warmwasserbereitung
+I.56|Extern Anfordern aktiv
+I.57|Extern Sperren aktiv
+I.63|Kühlkreis nicht bereit
+I.70|Inverter: Laststrom im Zwischenkreis Inverter zu hoch (Überstrom)
+I.71|Inverter: Netzspannung zu hoch; Verdichter temporär aus
+I.72|Inverter: Netzspannung zu niedrig; Verdichter temporär aus
+I.73|Inverter: Gleichspannung im Zwischenkreis Inverter zu hoch (Überspannung)
+I.74|Inverter: Gleichspannung im Zwischenkreis Inverter zu niedrig (Unterspannung); Verdichter temporär aus
+I.75|Inverter: Temperatur am internen Leistungsmodul zu hoch; Verdichter temporär aus
+I.76|Inverter: Zu hohe Temperatur im Leistungsfaktor-Korrekturfilter (PFC); Verdichter temporär aus
+I.77|Inverter: Zu hoher Strom im Leistungsfaktor-Korrekturfilter (PFC); Verdichter temporär aus
+I.78|Inverter: Leistungsreduzierung durch Inverter bei zu hoher Leistungsanforderung (Derating)
+I.79|Inverter: Leistungsreduzierung durch Inverter bei zu hoher Leistungsanforderung des Verdichters (Derating)
+I.80|Inverter: Leistungsbegrenzung durch Inverter bei zu hoher Leistungsanforderung des Verdichters (Feldschwächebetrieb)
+I.81|Inverter: Leistungsreduzierung durch Inverter bei zu hoher Temperatur am internen Leistungsmodul (Derating)
+I.82|Inverter: Leistungsreduzierung durch Inverter bei zu hoher Temperatur am Leistungsfaktor-Korrekturfilter (Derating)
+I.83|4/3-Wege-Ventil: Mindestvolumenstrom erreicht
+I.84|4/3-Wege-Ventil: Min. Rücklauftemperatur erreicht
+I.85|Kontrollierte Regelniederdruckabschaltung Kältekreis
+I.86|Kontrollierte Regelhochdruckabschaltung Kältekreis
+I.89|Uhrzeit vorgestellt (Sommerzeit)
+I.90|Uhrzeit zurückgestellt (Winterzeit)
+I.92|Energiebilanz zurückgesetzt
+I.96|Unbekannte Folge-Wärmepumpe (weiteres Viessmann Gerät)
+I.98|Neue Folge-Wärmepumpe (weiteres Viessmann Gerät) wurde erkannt.
+I.99|Zieltemperatur Hygienefunktion erreicht
+I.100|Max. Verflüssigungsdruck erreicht
+I.101|Min. Verdampfungsdruck für Heizbetrieb erreicht
+I.102|Min. Verdampfungsdruck für Kühlbetrieb erreicht
+I.103|Max. Verdampfungsdruck erreicht
+I.104|Max. Heißgastemperatur erreicht
+I.105|Max. Laufzeit untere Verdampfungstemperatur erreicht
+I.106|Max. Druckdifferenz Verdichter erreicht
+I.107|Max. Verflüssigungstemperatur erreicht
+I.108|Max. Drehmoment Verdichter erreicht
+I.109|Max. Verdampfungstemperatur Verdichter erreicht
+I.110|Min. Druckverhältnis Verdichter erreicht
+I.111|Min. Verdampfungstemperatur Verdichter erreicht
+I.112|Min. Austrittstemperatur am Verflüssiger erreicht
+I.113|Smart Grid: Erzwungene Abschaltung aktiv
+I.114|Smart Grid: Normalbetrieb aktiv
+I.115|Smart Grid: Empfohlene Einschaltung aktiv
+I.116|Smart Grid: Erzwungene Einschaltung aktiv
+I.117|Energie-Management-System aktiv
+I.118|Fußbodentemperaturbegrenzer Heiz-/Kühlkreis 1 aktiv
+I.119|Fußbodentemperaturbegrenzer Heiz-/Kühlkreis 2 aktiv
+I.120|Geräuschreduzierter Betrieb Wärmepumpe aktiv
+I.121|Feuchteanbauschalter Heiz-/Kühlkreis 1 aktiv
+I.122|Feuchteanbauschalter Heiz-/Kühlkreis 2 aktiv
+I.123|Max. Rücklauftemperatur Kältekreis erreicht
+I.124|Min. Rücklauftemperatur Kältekreis erreicht
+I.125|Max. Lufteintrittstemperatur Kältekreis erreicht
+I.126|Min. Lufteintrittstemperatur Kältekreis erreicht
+I.127|Max. Druckdifferenz für Verdichterstart erreicht
+I.128|Min. Ölsumpftemperatur erreicht
+I.129|Kältekreisumkehr: Druckunterschied zu gering
+I.130|Startphase Wärmepumpe: Zeitüberschreitung
+I.131|Min. Verdampfungstemperatur erreicht
+I.132|Neustart Wärmepumpenregelung
+I.133|Reset der Elektronikmodule durch Neustart
+I.134|Abtauen aktiv im Betriebsprogramm Frostschutz
+I.135|Abtauen aktiv im Regelbetrieb
+I.142|Min. Laufzeit Verdichter unterschritten
+I.143|EVU-Sperre aktiv
+I.144|Frequenzabweichungen bei Spannungsversorgung des EVU
+I.145|Leistungsüberschreitung Außeneinheit
+I.146|Überhitzung Verdampfer Kühlbetrieb
+I.147|Überhitzung Verflüssiger Heizbetrieb
+I.148|Überhitzung Verdampfer Heizbetrieb
+I.149|Wärmeanforderung während Abtaubetrieb
+I.150|Anforderung Abtauen während Regelbetrieb
+I.151|Betriebsgrenze Flüssiggastemperatur Verflüssiger erreicht
+I.152|Betriebsgrenze Niederdruck erreicht
+I.155|Estrichtrocknung durch Anwender abgebrochen
+I.156|Warnschwelle Wasservolumenstrom Abtaubetrieb erreicht
+I.157|Erforderliche Heißgastemperatur für Heizbetrieb überschritten
+I.158|Erforderliche Heißgastemperatur für Kühlbetrieb überschritten
+I.159|Erhöhte Innenraumtemperatur in Außeneinheit
+I.163|Strombegrenzung der Wallbox aktiv: Leistung der Photovoltaikanlage zu gering
+I.168|Wärmepumpe ist als Führungs-Wärmepumpe konfiguriert.
+I.169|Wärmepumpe ist als Folge-Wärmepumpe konfiguriert.
+I.170|Durch eine Störung übernimmt eine Folge-Wärmepumpe vorübergehend die Aufgabe der Führungs-Wärmepumpe.
+I.171|Inverter: Software-Update läuft; Inverter aus
+I.173|Inverter: Ausgangsstrom zu hoch; Reduzierte Verdichterdrehzahl
+I.174|Inverter: Leistung für Verdichter wird vorübergehend reduziert; Reduzierte Verdichterdrehzahl
+I.175|Verdichter startet nicht: Umgebungstemperatur ist niedriger als zulässige Betriebstemperatur für Verdichter; Verdichter temporär aus
+I.176|Verdichter mit reduzierter Leistung: Umgebungstemperatur ist höher als zulässige Betriebstemperatur für Verdichter.
+I.182|Verdichter überlastet: Normales Regelverhalten

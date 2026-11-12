@@ -3,64 +3,60 @@
 All values come from ``ViCareExtrasCoordinator``, which only mirrors what the
 built-in vicare integration has already fetched. No sensor causes an API call.
 
-State class
------------
-The energy sensors show a value that restarts at 0 every day. They deliberately
-have **no** ``state_class``:
+Which sensor reads which feature is listed in ``specs.py``: ``ValueSpec``
+entries become ``ViCareExtrasValueSensor`` (one property of one feature),
+``SpecialSpec`` entries become one of the classes below.
+
+State class of the energy sensors
+---------------------------------
+The history and summary sensors show a value that restarts at 0 every day.
+They deliberately have **no** ``state_class``:
 
 * ``measurement`` is not allowed for device class ``energy``.
 * ``total_increasing`` would make the recorder treat every dip as a meter
-  reset. The Viessmann backend corrects and shifts these arrays on its own
+  reset. The Viessmann backend corrects and shifts these values on its own
   schedule, so dips happen outside midnight too.
 * ``total`` needs a ``last_reset`` that matches the real reset moment, which
   the API does not tell (``dayValueReadAt`` is a read time, not a reset time).
-  A wrong ``last_reset`` produces negative consumption in the statistics.
 
 Without a state class no long-term statistics are compiled, which is the
 honest choice for a "history snapshot" sensor. The built-in integration
 already offers statistics-capable sensors for today's consumption.
+
+Instantaneous values (temperatures, power, speeds, percentages) have state
+class ``measurement``.
 """
 
 from __future__ import annotations
 
-from dataclasses import dataclass
-import logging
+from functools import partial
 from typing import Any
 
 from homeassistant.components.sensor import (
     SensorDeviceClass,
     SensorEntity,
-    SensorEntityDescription,
+    SensorStateClass,
 )
-from homeassistant.const import UnitOfEnergy
-from homeassistant.core import HomeAssistant, callback
-from homeassistant.helpers import device_registry as dr
+from homeassistant.const import EntityCategory, UnitOfEnergy
+from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
-from homeassistant.helpers.update_coordinator import CoordinatorEntity
+from homeassistant.util import dt as dt_util
 
-from . import features as ft
-from .bridge import DeviceRef
-from .const import (
-    FEATURE_CONSUMPTION_DHW,
-    FEATURE_CONSUMPTION_HEATING,
-    FEATURE_CONSUMPTION_TOTAL,
-    FEATURE_MESSAGES_INFO,
-    FEATURE_MESSAGES_SERVICE,
-    FEATURE_MESSAGES_STATUS,
-    FEATURE_PRODUCTION_DHW,
-    FEATURE_PRODUCTION_HEATING,
-    VICARE_DOMAIN,
-)
+from . import derived, features as ft, messages, specs
 from .coordinator import ViCareExtrasConfigEntry, ViCareExtrasCoordinator
-
-_LOGGER = logging.getLogger(__name__)
+from .entity import (
+    Target,
+    ViCareExtrasEntity,
+    ViCareExtrasValueEntity,
+    async_setup_discovery,
+    create_value_entities,
+)
 
 # Entities only read coordinator data, nothing to throttle.
 PARALLEL_UPDATES = 0
 
-KIND_HISTORY = "history"
-KIND_SUMMARY = "summary"
-KIND_MESSAGES = "messages"
+# Home Assistant stores at most 255 characters as a state.
+MAX_STATE_LENGTH = 255
 
 VICARE_UNIT_TO_HA_UNIT = {
     "kilowattHour": UnitOfEnergy.KILO_WATT_HOUR,
@@ -68,76 +64,8 @@ VICARE_UNIT_TO_HA_UNIT = {
 }
 
 
-@dataclass(frozen=True, kw_only=True)
-class ViCareExtrasSensorDescription(SensorEntityDescription):
-    """Describes a ViCare Extras sensor."""
-
-    kind: str
-    # The sensor is created when at least one of these features exists.
-    feature_names: tuple[str, ...]
-
-
-SENSORS: tuple[ViCareExtrasSensorDescription, ...] = (
-    ViCareExtrasSensorDescription(
-        key="power_consumption_dhw_history",
-        translation_key="power_consumption_dhw_history",
-        kind=KIND_HISTORY,
-        feature_names=(FEATURE_CONSUMPTION_DHW,),
-    ),
-    ViCareExtrasSensorDescription(
-        key="power_consumption_heating_history",
-        translation_key="power_consumption_heating_history",
-        kind=KIND_HISTORY,
-        feature_names=(FEATURE_CONSUMPTION_HEATING,),
-    ),
-    ViCareExtrasSensorDescription(
-        key="power_consumption_total_history",
-        translation_key="power_consumption_total_history",
-        kind=KIND_HISTORY,
-        feature_names=(FEATURE_CONSUMPTION_TOTAL,),
-    ),
-    ViCareExtrasSensorDescription(
-        key="heat_production_dhw_summary",
-        translation_key="heat_production_dhw_summary",
-        kind=KIND_SUMMARY,
-        feature_names=(FEATURE_PRODUCTION_DHW,),
-    ),
-    ViCareExtrasSensorDescription(
-        key="heat_production_heating_summary",
-        translation_key="heat_production_heating_summary",
-        kind=KIND_SUMMARY,
-        feature_names=(FEATURE_PRODUCTION_HEATING,),
-    ),
-    ViCareExtrasSensorDescription(
-        key="messages",
-        translation_key="messages",
-        kind=KIND_MESSAGES,
-        feature_names=(
-            FEATURE_MESSAGES_STATUS,
-            FEATURE_MESSAGES_INFO,
-            FEATURE_MESSAGES_SERVICE,
-        ),
-    ),
-)
-
-
-def _find_vicare_device(hass: HomeAssistant, device: DeviceRef) -> Any | None:
-    """Return the device registry entry of the built-in integration, if any.
-
-    Since Home Assistant 2026 a device belongs to exactly one config entry, so
-    the sensors are not linked through ``device_info`` (that would create a
-    second device). Instead the existing device entry is attached to the
-    entity. If it cannot be found the sensor is created without a device.
-    """
-    if device.identifier is None or device.entry_id is None:
-        return None
-    try:
-        return dr.async_get(hass).async_get_device_by_identifier(
-            (VICARE_DOMAIN, device.identifier), device.entry_id
-        )
-    except Exception:  # noqa: BLE001 - never fail sensor setup over the link
-        _LOGGER.debug("Could not look up the ViCare device", exc_info=True)
-        return None
+def _truncate(text: str) -> str:
+    return text if len(text) <= MAX_STATE_LENGTH else f"{text[: MAX_STATE_LENGTH - 1]}…"
 
 
 async def async_setup_entry(
@@ -147,76 +75,139 @@ async def async_setup_entry(
 ) -> None:
     """Create sensors for every feature that exists, now or later."""
     coordinator = entry.runtime_data
-    known: set[tuple[str, str]] = set()
+    create_values = partial(
+        create_value_entities,
+        specs.PLATFORM_SENSOR,
+        ViCareExtrasValueSensor,
+        coordinator,
+    )
 
-    @callback
-    def _async_discover() -> None:
-        new_entities: list[ViCareExtrasSensor] = []
-        for identifier, snapshot in (coordinator.data or {}).items():
-            for description in SENSORS:
-                if (identifier, description.key) in known:
+    def create(
+        scope: str,
+        target: Target,
+        features: dict[str, dict[str, Any]],
+        known: set[str],
+    ) -> list[SensorEntity]:
+        entities: list[SensorEntity] = create_values(scope, target, features, known)
+        if scope != specs.SCOPE_HEATING:
+            return entities
+        for spec in specs.SPECIAL_SPECS:
+            for index in specs.special_indexes(spec, features):
+                suffix = spec.key if index is None else f"{spec.key}-{index}"
+                unique_id = f"{target.unique_prefix}-{suffix}"
+                if unique_id in known:
                     continue
-                if not any(
-                    name in snapshot.features for name in description.feature_names
-                ):
-                    continue
-                known.add((identifier, description.key))
-                new_entities.append(
-                    SENSOR_CLASSES[description.kind](
-                        coordinator,
-                        description,
-                        snapshot.device,
-                        _find_vicare_device(hass, snapshot.device),
-                    )
+                known.add(unique_id)
+                entities.append(
+                    SPECIAL_CLASSES[spec.kind](coordinator, target, spec, index)
                 )
-        if new_entities:
-            async_add_entities(new_entities)
+        return entities
 
-    _async_discover()
-    entry.async_on_unload(coordinator.async_add_listener(_async_discover))
+    entry.async_on_unload(async_setup_discovery(coordinator, create, async_add_entities))
 
 
-class ViCareExtrasSensor(CoordinatorEntity[ViCareExtrasCoordinator], SensorEntity):
-    """Base class for the ViCare Extras sensors."""
+class _DynamicEnumMixin:
+    """Enum sensor whose options grow with the values the API sends.
 
-    entity_description: ViCareExtrasSensorDescription
-    _attr_has_entity_name = True
+    Home Assistant rejects an enum state that is not one of the options. The
+    API can send values this integration has never seen; they are added to
+    the options (and shown untranslated) instead of breaking the entity.
+    """
+
+    _attr_options: list[str]
+
+    def _init_enum(self, known: tuple[str, ...]) -> None:
+        self._attr_device_class = SensorDeviceClass.ENUM
+        self._attr_options = list(known)
+        self._ensure_current_option()
+
+    def _ensure_current_option(self) -> None:
+        value = self.native_value  # type: ignore[attr-defined]
+        if isinstance(value, str) and value not in self._attr_options:
+            self._attr_options = [*self._attr_options, value]
+
+    def _handle_coordinator_update(self) -> None:
+        """Handle updated data from the coordinator."""
+        if getattr(self, "_attr_device_class", None) is SensorDeviceClass.ENUM:
+            self._ensure_current_option()
+        super()._handle_coordinator_update()  # type: ignore[misc]
+
+
+class ViCareExtrasValueSensor(_DynamicEnumMixin, ViCareExtrasValueEntity, SensorEntity):
+    """One property of one ViCare feature."""
 
     def __init__(
         self,
         coordinator: ViCareExtrasCoordinator,
-        description: ViCareExtrasSensorDescription,
-        device: DeviceRef,
-        device_entry: Any | None,
+        target: Target,
+        spec: specs.ValueSpec,
+        index: int | None,
     ) -> None:
         """Initialize the sensor."""
-        super().__init__(coordinator)
-        self.entity_description = description
-        self._identifier = str(device.identifier)
-        self._attr_unique_id = f"{self._identifier}-{description.key}"
-        # Attach to the device of the built-in integration (no device_info).
-        self.device_entry = device_entry
+        super().__init__(coordinator, target, spec, index)
+        if spec.diagnostic:
+            self._attr_entity_category = EntityCategory.DIAGNOSTIC
+        if spec.kind == specs.KIND_ENUM:
+            self._init_enum(specs.ENUM_STATES.get(spec.key, ()))
+            return
+        if spec.device_class is not None:
+            self._attr_device_class = SensorDeviceClass(spec.device_class)
+        self._attr_native_unit_of_measurement = specs.read_unit(
+            spec, self._features, self._index
+        )
+        if spec.measurement:
+            self._attr_state_class = SensorStateClass.MEASUREMENT
+        if spec.precision is not None:
+            self._attr_suggested_display_precision = spec.precision
 
     @property
-    def _features(self) -> dict[str, dict[str, Any]]:
-        """Return the mirrored features of this sensor's device."""
-        snapshot = (self.coordinator.data or {}).get(self._identifier)
-        return snapshot.features if snapshot is not None else {}
+    def native_value(self) -> float | int | str | None:
+        """Return the value of the property."""
+        return specs.read_value(self._spec, self._features, self._index)
+
+
+class ViCareExtrasSpecialSensor(ViCareExtrasEntity, SensorEntity):
+    """Base class of the sensors with their own logic."""
+
+    def __init__(
+        self,
+        coordinator: ViCareExtrasCoordinator,
+        target: Target,
+        spec: specs.SpecialSpec,
+        index: int | None,
+    ) -> None:
+        """Initialize the sensor."""
+        self._special = spec
+        self._index = index
+        self._feature_names = tuple(
+            name if index is None else name.replace("{n}", str(index))
+            for name in spec.features
+        )
+        super().__init__(
+            coordinator,
+            target,
+            spec.key,
+            spec.key if index is None else f"{spec.key}-{index}",
+            specs.special_placeholders(spec, index),
+        )
+        self._attr_entity_registry_enabled_default = spec.enabled
+
+    @property
+    def _language(self) -> str:
+        """Return the language for decoded message texts."""
+        return getattr(self.coordinator.hass.config, "language", "de") or "de"
 
     @property
     def _feature(self) -> dict[str, Any] | None:
         """Return the (first) feature this sensor is based on."""
-        return self._features.get(self.entity_description.feature_names[0])
+        return self._features.get(self._feature_names[0])
 
-    @property
-    def available(self) -> bool:
-        """Return True while the mirrored data contains this sensor's feature."""
-        return super().available and any(
-            name in self._features for name in self.entity_description.feature_names
-        )
+    def _has_data(self) -> bool:
+        present = [name in self._features for name in self._feature_names]
+        return all(present) if self._special.require == "all" else any(present)
 
 
-class _EnergySensor(ViCareExtrasSensor):
+class _EnergySensor(ViCareExtrasSpecialSensor):
     """Common unit handling of the energy sensors."""
 
     _attr_suggested_display_precision = 1
@@ -224,12 +215,12 @@ class _EnergySensor(ViCareExtrasSensor):
     def __init__(
         self,
         coordinator: ViCareExtrasCoordinator,
-        description: ViCareExtrasSensorDescription,
-        device: DeviceRef,
-        device_entry: Any | None,
+        target: Target,
+        spec: specs.SpecialSpec,
+        index: int | None,
     ) -> None:
         """Initialize the sensor and take the unit from the feature."""
-        super().__init__(coordinator, description, device, device_entry)
+        super().__init__(coordinator, target, spec, index)
         raw = self._raw_unit()
         if raw is None or raw in VICARE_UNIT_TO_HA_UNIT:
             # kWh when the API reports no unit at all.
@@ -293,24 +284,155 @@ class ViCareExtrasSummarySensor(_EnergySensor):
         return ft.summary_attributes(self._feature)
 
 
-class ViCareExtrasMessagesSensor(ViCareExtrasSensor):
-    """Code of the newest status message, message lists as attributes."""
+class ViCareExtrasMessagesSensor(ViCareExtrasSpecialSensor):
+    """Code of the newest status message, decoded lists as attributes."""
 
     _unrecorded_attributes = frozenset({"status", "info", "service"})
 
     @property
     def native_value(self) -> str | None:
         """Return the code of the newest status message."""
-        return ft.messages_state(self._features)[0]
+        return ft.messages_state(self._features, self._language)[0]
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
-        """Return the status, info and service message lists."""
-        return ft.messages_state(self._features)[1]
+        """Return the status, info and service message lists with texts."""
+        return ft.messages_state(self._features, self._language)[1]
 
 
-SENSOR_CLASSES: dict[str, type[ViCareExtrasSensor]] = {
-    KIND_HISTORY: ViCareExtrasHistorySensor,
-    KIND_SUMMARY: ViCareExtrasSummarySensor,
-    KIND_MESSAGES: ViCareExtrasMessagesSensor,
+class ViCareExtrasLastStatusSensor(ViCareExtrasSpecialSensor):
+    """Decoded text of the newest status message (raw code when unknown)."""
+
+    def _newest(self) -> dict[str, Any] | None:
+        entries = derived.active_status_messages(self._features)
+        return entries[0] if entries else None
+
+    @property
+    def native_value(self) -> str | None:
+        """Return the text of the newest status message."""
+        if (newest := self._newest()) is None:
+            return None
+        text = messages.label(newest.get("errorCode"), self._language)
+        return _truncate(text) if text else None
+
+    @property
+    def extra_state_attributes(self) -> dict[str, Any]:
+        """Return code, time and text source of the newest status message."""
+        if (newest := self._newest()) is None:
+            return {}
+        info = messages.describe(newest.get("errorCode"), self._language)
+        return {
+            "code": info["code"],
+            "timestamp": newest.get("timestamp"),
+            "source": info["source"],
+        }
+
+
+class ViCareExtrasActiveStatusSensor(ViCareExtrasSpecialSensor):
+    """All status messages that are active right now."""
+
+    _unrecorded_attributes = frozenset({"messages"})
+
+    @property
+    def native_value(self) -> str | None:
+        """Return the active status codes, sorted, separated by commas."""
+        codes = derived.active_status_codes(self._features)
+        if codes is None:
+            return None
+        return _truncate(", ".join(codes))
+
+    @property
+    def extra_state_attributes(self) -> dict[str, Any]:
+        """Return the active messages with decoded texts."""
+        entries = derived.active_status_messages(self._features) or []
+        return {
+            "count": len(entries),
+            "codes": derived.active_status_codes(self._features) or [],
+            "messages": messages.decode_entries(entries, self._language),
+        }
+
+
+class ViCareExtrasOperatingStateSensor(ViCareExtrasSpecialSensor):
+    """Operating state of the heat pump for a history timeline."""
+
+    _attr_device_class = SensorDeviceClass.ENUM
+    _attr_options = list(derived.OPERATING_STATES)
+
+    @property
+    def native_value(self) -> str | None:
+        """Return the derived operating state (see ``derived.py``)."""
+        return derived.operating_state(self._features)[0]
+
+    @property
+    def extra_state_attributes(self) -> dict[str, Any]:
+        """Return what the state was derived from."""
+        return derived.operating_state(self._features)[1]
+
+
+class ViCareExtrasHeatingRodStageSensor(ViCareExtrasSpecialSensor):
+    """Number of active stages of the instantaneous heating water heater."""
+
+    _attr_state_class = SensorStateClass.MEASUREMENT
+
+    @property
+    def native_value(self) -> int | None:
+        """Return the number of active stages (0-3)."""
+        return derived.heating_rod_stage(self._features)
+
+
+class ViCareExtrasCopSensor(ViCareExtrasSpecialSensor):
+    """Current heat production divided by current power consumption."""
+
+    _attr_state_class = SensorStateClass.MEASUREMENT
+    _attr_suggested_display_precision = 2
+
+    @property
+    def native_value(self) -> float | None:
+        """Return the COP, unknown while the heat pump is not running."""
+        return derived.current_cop(self._features)
+
+
+class ViCareExtrasScheduleSensor(_DynamicEnumMixin, ViCareExtrasSpecialSensor):
+    """Mode a schedule asks for right now, the schedule as attributes."""
+
+    _unrecorded_attributes = frozenset({"entries", "today"})
+
+    def __init__(
+        self,
+        coordinator: ViCareExtrasCoordinator,
+        target: Target,
+        spec: specs.SpecialSpec,
+        index: int | None,
+    ) -> None:
+        """Initialize the sensor."""
+        super().__init__(coordinator, target, spec, index)
+        self._init_enum(specs.SCHEDULE_STATES)
+
+    @property
+    def native_value(self) -> str | None:
+        """Return the scheduled mode at the current local time."""
+        return derived.schedule_mode(self._feature, dt_util.now())
+
+    @property
+    def extra_state_attributes(self) -> dict[str, Any]:
+        """Return the schedule."""
+        entries = ft.prop_value(self._feature, "entries")
+        return {
+            "active": ft.prop_value(self._feature, "active"),
+            "today": derived.schedule_today(self._feature, dt_util.now()),
+            "entries": entries if isinstance(entries, dict) else None,
+        }
+
+
+SPECIAL_CLASSES: dict[str, type[ViCareExtrasSpecialSensor]] = {
+    specs.SPECIAL_HISTORY: ViCareExtrasHistorySensor,
+    specs.SPECIAL_SUMMARY: ViCareExtrasSummarySensor,
+    specs.SPECIAL_MESSAGES: ViCareExtrasMessagesSensor,
+    specs.SPECIAL_LAST_STATUS: ViCareExtrasLastStatusSensor,
+    specs.SPECIAL_ACTIVE_STATUS: ViCareExtrasActiveStatusSensor,
+    specs.SPECIAL_OPERATING_STATE: ViCareExtrasOperatingStateSensor,
+    specs.SPECIAL_HEATING_ROD_STAGE: ViCareExtrasHeatingRodStageSensor,
+    specs.SPECIAL_COP: ViCareExtrasCopSensor,
+    specs.SPECIAL_SCHEDULE: ViCareExtrasScheduleSensor,
 }
+
