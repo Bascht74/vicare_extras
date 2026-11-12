@@ -188,8 +188,8 @@
         "name": "4/3-Wege-Ventil Position",
         "state": {
           "domestic_hot_water": "Warmwasser",
-          "climate_circuit_one": "Heiz-/Kühlkreis 1",
-          "climat_circuit_two_defrost": "Integrierter Pufferspeicher",
+          "climate_circuit_one": "Heizen (Pufferspeicher)",
+          "climat_circuit_two_defrost": "Leerlauf / Abtauen",
           "climate_circuit_two_defrost_domestic_hot_water": "Warmwasser",
           "heating": "Heizen",
           "cooling": "Kühlen",

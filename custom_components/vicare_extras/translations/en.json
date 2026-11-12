@@ -188,8 +188,8 @@
         "name": "4/3-way valve position",
         "state": {
           "domestic_hot_water": "Domestic hot water",
-          "climate_circuit_one": "Heating/cooling circuit 1",
-          "climat_circuit_two_defrost": "Integrated buffer cylinder",
+          "climate_circuit_one": "Heating (buffer cylinder)",
+          "climat_circuit_two_defrost": "Idle / defrost",
           "climate_circuit_two_defrost_domestic_hot_water": "Domestic hot water",
           "heating": "Heating",
           "cooling": "Cooling",
