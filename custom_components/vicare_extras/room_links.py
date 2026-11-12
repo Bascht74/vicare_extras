@@ -197,11 +197,15 @@ class RoomLinkManager:
         """Return the rooms a thermostat can still belong to."""
         if (room := self.room_of(trv)) is not None:
             return [room]
-        return [
-            self._rooms[rid]
-            for rid in self.learner.candidates(trv.ref_id)
-            if rid in self._rooms
-        ]
+        # By room number (the learner sorts its ids as text: 10 before 2).
+        return sorted(
+            (
+                self._rooms[rid]
+                for rid in self.learner.candidates(trv.ref_id)
+                if rid in self._rooms
+            ),
+            key=lambda room: room.index,
+        )
 
     def learned_name(self, rid: str) -> str | None:
         """Return the name this integration found for a room, if any."""

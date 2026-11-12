@@ -249,6 +249,13 @@ def test_actors_from_the_api_win() -> None:
     assert site.manager.room_of(trv_ref("b")).source == "learned"
 
 
+def test_candidates_are_sorted_by_room_number() -> None:
+    site = Site()
+    site.rooms = {2: (26.0, 23.5), 10: (26.0, 23.5), 11: (25.0, 23.0)}
+    site.look()
+    assert [room.index for room in site.manager.candidates_of(trv_ref("a"))] == [2, 10, 11]
+
+
 def test_kept_snapshots_teach_nothing() -> None:
     site = Site()
     site.look()
