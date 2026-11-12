@@ -55,24 +55,25 @@ def test_summary() -> None:
 def test_messages_newest_status_first() -> None:
     code, attributes = ft.messages_state(_by_name())
     assert code == "S.134"  # newest by timestamp, not first in the list
-    assert attributes["newest_status_timestamp"] == "2026-11-12T07:30:00.000Z"
-    assert attributes["newest_status_text"] == "4/3-Wege-Ventil Leerlauf"
+    assert attributes["newest_status_device_time"] == "2026-11-12T07:30:00.000Z"
+    assert "newest_status_timestamp" not in attributes
+    assert attributes["newest_status_text"] == "4/3-Wege-Ventil in Leerlaufstellung"
     assert [m["errorCode"] for m in attributes["status"]] == ["S.134", "S.123", "S.165"]
     assert attributes["status"][0] == {
         "errorCode": "S.134",
         "timestamp": "2026-11-12T07:30:00.000Z",
         "priority": "status",
-        "text": "4/3-Wege-Ventil Leerlauf",
+        "text": "4/3-Wege-Ventil in Leerlaufstellung",
         "source": "viessmann",
     }
-    assert attributes["status"][1]["text"] == "Wärmepumpe aus"
+    assert attributes["status"][1]["text"] == "Wärmepumpe ist aus"
     assert attributes["status_count"] == 3
     assert attributes["info"] == [
         {
             "errorCode": "I.114",
             "timestamp": "2026-11-11T19:00:00.000Z",
             "priority": "info",
-            "text": "Smart Grid: Normalbetrieb aktiv",
+            "text": "Smart Grid im Normalbetrieb",
             "source": "viessmann",
         }
     ]
@@ -84,17 +85,37 @@ def test_messages_unknown_code_keeps_raw_code() -> None:
     features = {
         "device.messages.status.raw": fakes.feature(
             "device.messages.status.raw",
+            fakes.messages(("S.999", "2026-11-12T07:30:00.000Z", "status")),
+        )
+    }
+    code, attributes = ft.messages_state(features)
+    assert code == "S.999"
+    assert attributes["newest_status_text"] is None
+    assert attributes["status"][0] == {
+        "errorCode": "S.999",
+        "timestamp": "2026-11-12T07:30:00.000Z",
+        "priority": "status",
+        "text": None,
+    }
+
+
+def test_messages_unverified_text_is_marked() -> None:
+    features = {
+        "device.messages.status.raw": fakes.feature(
+            "device.messages.status.raw",
             fakes.messages(("S.1", "2026-11-12T07:30:00.000Z", "status")),
         )
     }
     code, attributes = ft.messages_state(features)
     assert code == "S.1"
-    assert attributes["newest_status_text"] is None
+    assert attributes["newest_status_text"] == "S.1 (ungeprüft: Netzspannung eingeschaltet)"
     assert attributes["status"][0] == {
         "errorCode": "S.1",
         "timestamp": "2026-11-12T07:30:00.000Z",
         "priority": "status",
-        "text": None,
+        "text": "Netzspannung eingeschaltet",
+        "source": "fhem",
+        "verified": False,
     }
 
 
@@ -104,7 +125,7 @@ def test_messages_without_status_feature() -> None:
     code, attributes = ft.messages_state(features)
     assert code is None
     assert "status" not in attributes
-    assert attributes["newest_status_timestamp"] is None
+    assert attributes["newest_status_device_time"] is None
     assert attributes["newest_status_text"] is None
     assert attributes["info_count"] == 1
 

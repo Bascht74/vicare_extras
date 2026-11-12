@@ -3,12 +3,13 @@
 
 Run from the repository root:  python scripts/list_entities.py [--report]
 
-The table is generated from ``specs.py`` and the translations, so it cannot
-drift from the code. ``--report`` adds the English name and the key column.
+The tables are generated from ``specs.py``, ``thermostats.py`` and the
+translations, so they cannot drift from the code. ``--report`` adds the English name and the key column.
 """
 
 from __future__ import annotations
 
+import ast
 import importlib.util
 import json
 from pathlib import Path
@@ -21,6 +22,20 @@ _spec = importlib.util.spec_from_file_location("vicare_extras_specs", COMPONENT 
 specs = importlib.util.module_from_spec(_spec)
 sys.modules["vicare_extras_specs"] = specs
 _spec.loader.exec_module(specs)
+
+def _constants(path: Path) -> dict[str, object]:
+    """Return the module level literal constants of a file without importing it."""
+    values: dict[str, object] = {}
+    for node in ast.parse(path.read_text(encoding="utf-8")).body:
+        if isinstance(node, ast.Assign) and isinstance(node.targets[0], ast.Name):
+            try:
+                values[node.targets[0].id] = ast.literal_eval(node.value)
+            except ValueError:
+                continue
+    return values
+
+
+THERMOSTATS = _constants(COMPONENT / "thermostats.py")
 
 SPECIAL_UNITS = {
     specs.SPECIAL_HISTORY: "kWh",
@@ -85,7 +100,31 @@ def main() -> int:
                 print(f"| {row['platform']} | `{row['key']}` | {row['de']} | {row['en']} | {row['unit']} | {row['enabled']} | {row['source']} |")
             else:
                 print(f"| {row['platform']} | {row['de']} | {row['unit']} | {row['enabled']} | {row['source']} |")
+    print_climate()
     return 0
+
+
+def print_climate() -> None:
+    """Print the climate entities (built from the constants of thermostats.py)."""
+    room_setpoints = " / ".join(
+        f"`{feature}` → `{THERMOSTATS['ROOM_SETPOINT_PROPERTY']}`"
+        for feature in THERMOSTATS["ROOM_SETPOINT_FEATURES"]
+    )
+    room_commands = ", ".join(f"`{name}`" for name in THERMOSTATS["ROOM_SETPOINT_COMMANDS"])
+    trv_commands = ", ".join(f"`{name}`" for name in THERMOSTATS["TRV_SETPOINT_COMMANDS"])
+    print("\n**Klima (Räume und Heizkörperthermostate)**\n")
+    print("| Plattform | Gerät | Ist-Temperatur | Soll-Temperatur | Befehl | Aktion |")
+    print("| --- | --- | --- | --- | --- | --- |")
+    print(
+        "| climate | Raum (eigenes Gerät) | `rooms.{n}.sensors.temperature` → `value` "
+        f"| {room_setpoints} | {room_commands} | `rooms.{{n}}.operating.state` → `demand` |"
+    )
+    print(
+        "| climate | Heizkörperthermostat (Gerät der eingebauten Integration) "
+        f"| `{THERMOSTATS['TRV_TEMPERATURE_FEATURE']}` → `value` (nur bei `status: connected`) "
+        f"| `{THERMOSTATS['TRV_SETPOINT_FEATURE']}` → `{THERMOSTATS['TRV_SETPOINT_PROPERTY']}` "
+        f"| {trv_commands} | `{THERMOSTATS['TRV_VALVE_FEATURE']}` → `position` > 0 |"
+    )
 
 
 if __name__ == "__main__":

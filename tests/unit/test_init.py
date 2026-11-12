@@ -33,11 +33,11 @@ def test_setup_and_unload_entry() -> None:
 
     assert asyncio.run(integration.async_setup_entry(hass, entry)) is True
     assert isinstance(entry.runtime_data, ViCareExtrasCoordinator)
-    assert hass.config_entries.forwarded == [(entry, [Platform.BINARY_SENSOR, Platform.SENSOR])]
+    assert hass.config_entries.forwarded == [(entry, [Platform.BINARY_SENSOR, Platform.CLIMATE, Platform.SENSOR])]
     assert fakes.HEAT_PUMP_IDENTIFIER in entry.runtime_data.data
 
     assert asyncio.run(integration.async_unload_entry(hass, entry)) is True
-    assert hass.config_entries.unloaded == [(entry, [Platform.BINARY_SENSOR, Platform.SENSOR])]
+    assert hass.config_entries.unloaded == [(entry, [Platform.BINARY_SENSOR, Platform.CLIMATE, Platform.SENSOR])]
     assert service.api_calls == 0
 
 
@@ -99,3 +99,34 @@ def test_diagnostics_when_vicare_is_not_loaded() -> None:
     result = asyncio.run(diagnostics.async_get_config_entry_diagnostics(hass, entry))
     assert result["error"] == "vicare_not_loaded"
     assert result["devices"] == []
+
+
+def test_diagnostics_show_poll_intervals_and_hide_zigbee_addresses() -> None:
+    hass, service = fakes.make_hass(with_trv=True)
+    entry = ConfigEntry(domain=DOMAIN, entry_id="extras")
+    entry.options = {"vicare_poll_interval": 90}
+    asyncio.run(integration.async_setup_entry(hass, entry))
+
+    result = asyncio.run(diagnostics.async_get_config_entry_diagnostics(hass, entry))
+
+    assert result["poll_interval"] == {
+        "option_seconds": 90,
+        "vicare_seconds": 90.0,
+        "mirror_seconds": 85.0,
+    }
+    dumped = json.dumps(result)
+    assert fakes.TRV_DEVICE_ID not in dumped
+    assert "zigbee-...cdef" in dumped
+    assert service.api_calls == 0
+
+
+def test_diagnostics_without_poll_interval_option() -> None:
+    hass, _ = fakes.make_hass()
+    entry = ConfigEntry(domain=DOMAIN, entry_id="extras")
+    asyncio.run(integration.async_setup_entry(hass, entry))
+    result = asyncio.run(diagnostics.async_get_config_entry_diagnostics(hass, entry))
+    assert result["poll_interval"] == {
+        "option_seconds": None,
+        "vicare_seconds": 60.0,
+        "mirror_seconds": 55.0,
+    }

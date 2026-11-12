@@ -283,8 +283,8 @@
           "info_count": {
             "name": "Anzahl Infomeldungen"
           },
-          "newest_status_timestamp": {
-            "name": "Neueste Statusmeldung am"
+          "newest_status_device_time": {
+            "name": "Neueste Statusmeldung seit (Gerätezeit)"
           },
           "service": {
             "name": "Servicemeldungen"
@@ -493,6 +493,12 @@
     "cache_unsupported": {
       "message": "Der PyViCare-Client der Integration Viessmann ViCare hat keinen lesbaren Feature-Cache. Diese Version von ViCare Extras passt nicht zur installierten Home-Assistant-Version."
     },
+    "command_failed": {
+      "message": "Die Viessmann-API hat den Befehl abgelehnt: {reason}"
+    },
+    "command_not_available": {
+      "message": "Die Viessmann-API bietet keinen Befehl an, um diesen Wert zu ändern."
+    },
     "device_not_found": {
       "message": "Kein ViCare-Gerät passt zur Auswahl."
     },
@@ -523,11 +529,28 @@
     "unexpected_error": {
       "message": "Unerwarteter Fehler beim Aufruf der Viessmann-API: {error}"
     },
+    "value_out_of_range": {
+      "message": "Der Wert {value} liegt außerhalb des Bereichs, den die Viessmann-API annimmt ({min} bis {max})."
+    },
     "vicare_incompatible": {
       "message": "Die Daten der Integration Viessmann ViCare haben einen unerwarteten Aufbau ({detail}). Diese Version von ViCare Extras passt nicht zur installierten Home-Assistant-Version."
     },
     "vicare_not_loaded": {
       "message": "Die Integration Viessmann ViCare ist nicht eingerichtet oder nicht geladen."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Optionen von ViCare Extras",
+        "description": "Die Sensoren von ViCare Extras lösen nie API-Aufrufe aus. Aufrufe lassen sich nur sparen, indem die eingebaute Integration Viessmann ViCare seltener abfragt.",
+        "data": {
+          "vicare_poll_interval": "Abfrageintervall der ViCare-Integration"
+        },
+        "data_description": {
+          "vicare_poll_interval": "Sekunden zwischen zwei Abfragen der eingebauten Integration (60 bis 900). Leer lassen, um deren eigenes Intervall (60 s je Gateway) beizubehalten. Wirkt ohne Neustart; die eingebaute Integration nutzt den neuen Wert nach ihrer nächsten Abfrage."
+        }
+      }
     }
   },
   "services": {

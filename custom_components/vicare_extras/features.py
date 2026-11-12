@@ -28,7 +28,7 @@ from .const import (
     FEATURE_MESSAGES_STATUS,
     MESSAGE_LIST_LIMIT,
 )
-from .messages import decode_entries
+from .messages import decode_entries, label
 
 HISTORY_PERIODS = ("day", "week", "month", "year")
 MESSAGE_KEYS = ("errorCode", "timestamp", "priority")
@@ -121,7 +121,9 @@ def message_entries(feature: dict[str, Any] | None) -> list[dict[str, Any]]:
     """Return the message entries of a ``device.messages.*.raw`` feature.
 
     Entries are reduced to errorCode, timestamp and priority and sorted newest
-    first. ISO 8601 UTC timestamps sort correctly as strings.
+    first. The timestamps are passed on as they are: observed on a Vitocal
+    250-A they are the device's local clock labelled as UTC ("Z"), so they
+    are not converted. ISO 8601 strings of one clock sort correctly as text.
     """
     raw = prop_value(feature, "entries")
     if not isinstance(raw, list):
@@ -141,7 +143,8 @@ def messages_state(
     """Return the newest status code and the message attributes.
 
     Every entry gets a ``text`` with the decoded message (None for codes the
-    table does not know) and, when known, the ``source`` of that text.
+    table does not know), when known the ``source`` of that text, and
+    ``verified: False`` when no Viessmann document confirms it.
     """
     attributes: dict[str, Any] = {}
     newest_status: dict[str, Any] | None = None
@@ -154,11 +157,14 @@ def messages_state(
         if name == "status" and entries:
             newest_status = entries[0]
     code = newest_status.get("errorCode") if newest_status else None
-    attributes["newest_status_timestamp"] = (
+    # Device time, not UTC (see message_entries): hence the attribute name.
+    attributes["newest_status_device_time"] = (
         newest_status.get("timestamp") if newest_status else None
     )
     attributes["newest_status_text"] = (
-        newest_status.get("text") if newest_status else None
+        label(newest_status.get("errorCode"), language)
+        if newest_status and newest_status.get("text")
+        else None
     )
     return (str(code) if code is not None else None), attributes
 

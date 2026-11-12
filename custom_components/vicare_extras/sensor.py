@@ -323,8 +323,10 @@ class ViCareExtrasLastStatusSensor(ViCareExtrasSpecialSensor):
         info = messages.describe(newest.get("errorCode"), self._language)
         return {
             "code": info["code"],
-            "timestamp": newest.get("timestamp"),
+            # The device's local clock labelled as UTC ("Z"); not converted.
+            "device_time": newest.get("timestamp"),
             "source": info["source"],
+            "verified": info["verified"],
         }
 
 

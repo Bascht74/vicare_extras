@@ -8,7 +8,7 @@ imports, so both test suites (``tests/unit`` and ``tests/ha``) can use it.
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timedelta
 import json
 from pathlib import Path
 from typing import Any
@@ -20,6 +20,8 @@ GATEWAY_SERIAL = "7571381500000001"
 HEAT_PUMP_SERIAL = "7733738100000002"
 VICARE_ENTRY_ID = "vicare-entry-1"
 HEAT_PUMP_IDENTIFIER = f"{GATEWAY_SERIAL}_{HEAT_PUMP_SERIAL}"
+TRV_DEVICE_ID = "zigbee-1234567890abcdef"
+TRV_IDENTIFIER = f"{GATEWAY_SERIAL}_zigbee_1234567890abcdef"
 BASE = "https://api.viessmann-climatesolutions.com/iot/v2/features"
 
 
@@ -47,7 +49,10 @@ def non_json_error() -> PyViCareInternalServerError:
 
 
 def feature(
-    name: str, properties: dict[str, Any], device_id: str | None = "0"
+    name: str,
+    properties: dict[str, Any],
+    device_id: str | None = "0",
+    commands: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Build a feature object like the Viessmann API delivers it."""
     path = f"/installations/{INSTALLATION_ID}/gateways/{GATEWAY_SERIAL}"
@@ -55,7 +60,7 @@ def feature(
         path += f"/devices/{device_id}"
     result: dict[str, Any] = {
         "apiVersion": 1,
-        "commands": {},
+        "commands": commands or {},
         "feature": name,
         "gatewayId": GATEWAY_SERIAL,
         "isEnabled": True,
@@ -138,17 +143,83 @@ def heat_pump_features() -> list[dict[str, Any]]:
     ]
 
 
+def number_command(
+    name: str,
+    param: str,
+    *,
+    executable: bool = True,
+    minimum: float = 8,
+    maximum: float = 30,
+    step: float = 0.5,
+) -> dict[str, Any]:
+    """Build a command object like the Viessmann API puts into a feature."""
+    return {
+        name: {
+            "uri": f"{BASE}/…/commands/{name}",
+            "name": name,
+            "isExecutable": executable,
+            "params": {
+                param: {
+                    "type": "number",
+                    "required": True,
+                    "constraints": {"min": minimum, "max": maximum, "stepping": step},
+                }
+            },
+        }
+    }
+
+
+def trv_features(
+    device_id: str = TRV_DEVICE_ID,
+    *,
+    temperature_status: str | None = "connected",
+    executable: bool = True,
+    valve: float = 17,
+) -> list[dict[str, Any]]:
+    """Return the features of a radiator thermostat.
+
+    Synthetic, modelled on PyViCare's test response zigbee_zk03840_trv.json.
+    """
+    temperature: dict[str, Any] = {}
+    if temperature_status is not None:
+        temperature["status"] = {"type": "string", "value": temperature_status}
+        if temperature_status == "connected":
+            temperature["value"] = {"type": "number", "unit": "celsius", "value": 20.8}
+    items = [
+        ("device.sensors.temperature", temperature, None),
+        ("device.power.battery", {"level": {"type": "number", "unit": "percent", "value": 92}}, None),
+        ("device.name", {"name": {"type": "string", "value": "Thermostat Wohnzimmer"}}, None),
+        ("trv.childLock", {"status": {"type": "string", "value": "inactive"}}, None),
+        (
+            "trv.temperature",
+            {"value": {"type": "number", "unit": "celsius", "value": 20}},
+            number_command("setTargetTemperature", "temperature", executable=executable),
+        ),
+        ("trv.valve.position", {"position": {"type": "number", "unit": "percent", "value": valve}}, None),
+    ]
+    return [feature(name, props, device_id, commands) for name, props, commands in items]
+
+
 def vitocal_features() -> list[dict[str, Any]]:
     """Return the feature list of a Vitocal 250-A (structure from a real device)."""
     data = json.loads((FIXTURES / "vitocal250a_features.json").read_text(encoding="utf-8"))
     return data["data"]
 
 
-def room_features(room: int = 0, name: str | None = "Wohnzimmer") -> list[dict[str, Any]]:
+def room_features(
+    room: int = 0,
+    name: str | None = "Wohnzimmer",
+    *,
+    writable: str | None = None,
+    executable: bool = True,
+    actors: tuple[str, ...] = (),
+) -> list[dict[str, Any]]:
     """Return rooms.<n>.* features like a ViCare room control delivers them.
 
     Synthetic: modelled on PyViCare's RoomControl fixtures and accessors, not
-    on a real installation.
+    on a real installation. ``writable`` names the setpoint feature (suffix
+    after ``rooms.<n>.``) that carries a ``setTemperature`` command, as
+    ViEventLog uses it for ``temperature.levels.normal.perceived``.
     """
 
     def value(val: Any, unit: str | None = None, kind: str = "number") -> dict[str, Any]:
@@ -162,7 +233,12 @@ def room_features(room: int = 0, name: str | None = "Wohnzimmer") -> list[dict[s
 
     prefix = f"rooms.{room}"
     connected = value("connected", kind="string")
-    base: dict[str, Any] = {"type": value("livingroom", kind="string"), "actors": value([], kind="array")}
+    base: dict[str, Any] = {
+        "type": value("livingroom", kind="string"),
+        "actors": value(
+            [{"deviceId": actor, "heatingCircuit": 0} for actor in actors], kind="array"
+        ),
+    }
     if name is not None:
         base["name"] = value(name, kind="string")
     items = {
@@ -186,7 +262,17 @@ def room_features(room: int = 0, name: str | None = "Wohnzimmer") -> list[dict[s
         },
         f"{prefix}.configuration.openWindow": {"active": value(True, kind="boolean")},
     }
-    return [feature(name_, props, "RoomControl-1") for name_, props in items.items()]
+    return [
+        feature(
+            name_,
+            props,
+            "RoomControl-1",
+            number_command("setTemperature", "targetTemperature", executable=executable)
+            if writable is not None and name_ == f"{prefix}.{writable}"
+            else None,
+        )
+        for name_, props in items.items()
+    ]
 
 
 def room_control_only_flags() -> list[dict[str, Any]]:
@@ -207,6 +293,7 @@ def room_control_only_flags() -> list[dict[str, Any]]:
 def gateway_payload(
     heat_pump: list[dict[str, Any]] | None = None,
     rooms: list[dict[str, Any]] | None = None,
+    extra: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     """Build the payload of the gateway bulk request (all devices at once)."""
     return {
@@ -219,6 +306,7 @@ def gateway_payload(
                 if rooms is None
                 else rooms
             ),
+            *(extra or []),
         ]
     }
 
@@ -229,6 +317,7 @@ class FakeCachedService:
     def __init__(self, payload: dict[str, Any] | None) -> None:
         self._cache = payload
         self._cacheTime = datetime.now()
+        self._cacheDuration = 60
         self.api_calls = 0
 
     def _fail(self) -> None:
@@ -243,6 +332,71 @@ class FakeCachedService:
 
     def setProperty(self, *args: Any) -> Any:  # noqa: N802
         self._fail()
+
+
+class ViCareService:
+    """Same class name as PyViCare's plain service: posts a command.
+
+    Records the call and answers with ``answer`` (or raises it).
+    """
+
+    answer: Any
+    commands: list[tuple[str, str, str, Any]]
+
+    def setProperty(self, accessor: Any, property_name: str, action: str, data: Any) -> Any:  # noqa: N802
+        self.commands.append((accessor.device_id, property_name, action, data))
+        if isinstance(self.answer, Exception):
+            raise self.answer
+        return self.answer
+
+
+class FakeCommandService(FakeCachedService, ViCareService):
+    """A service that accepts commands, like PyViCare's cached service.
+
+    Reads still fail the test. As in PyViCare, ``setProperty`` of the cached
+    service posts through ``ViCareService.setProperty`` and then empties the
+    cache; ``cache_clears`` counts how often that happened.
+    """
+
+    def __init__(self, payload: dict[str, Any] | None, answer: Any = None) -> None:
+        super().__init__(payload)
+        self.answer = {"data": {"success": True, "reason": "COMMAND_EXECUTION_SUCCESS"}} if answer is None else answer
+        self.commands = []
+        self.cache_clears = 0
+
+    def setProperty(self, accessor: Any, property_name: str, action: str, data: Any) -> Any:  # noqa: N802
+        response = ViCareService.setProperty(self, accessor, property_name, action, data)
+        self._cache = None
+        self.cache_clears += 1
+        return response
+
+
+class FakeOtherCommandService(FakeCachedService):
+    """A command service whose class hierarchy has no ``ViCareService``."""
+
+    def __init__(self, payload: dict[str, Any] | None) -> None:
+        super().__init__(payload)
+        self.commands: list[tuple[str, str, str, Any]] = []
+
+    def setProperty(self, accessor: Any, property_name: str, action: str, data: Any) -> Any:  # noqa: N802
+        self.commands.append((accessor.device_id, property_name, action, data))
+        self._cache = None
+        return {"data": {"success": True}}
+
+
+class PyViCareCommandError(Exception):
+    """Same class name as PyViCare's error."""
+
+    def __init__(self, reason: str = "COMMAND_EXECUTION_ERROR") -> None:
+        super().__init__(f"Command failed. Reason given was: {reason}")
+        self.message = f"Command failed with status code 502. Reason given was: {reason}"
+
+
+class FakeViCareCoordinator:
+    """Mimics the built-in ViCareCoordinator (a DataUpdateCoordinator)."""
+
+    def __init__(self, seconds: int = 60) -> None:
+        self.update_interval = timedelta(seconds=seconds)
 
 
 class FakeAccessor:
@@ -283,7 +437,7 @@ class FakeViCareDevice:
         self.config = config
         self.api = FakeApiDevice(config.accessor, config.service)
         self.serial = serial
-        self.coordinator = None
+        self.coordinator: Any = None
 
 
 class FakeOAuthManager:
@@ -328,9 +482,16 @@ def make_runtime_data(
     oauth_manager: Any = None,
     *,
     empty_cache: bool = False,
+    with_trv: bool = False,
+    service: FakeCachedService | None = None,
 ) -> tuple[FakeViCareData, FakeCachedService]:
-    """Build runtime data: heat pump set up, gateway and room control not."""
-    service = FakeCachedService(None if empty_cache else (payload or gateway_payload()))
+    """Build runtime data: heat pump set up, gateway and room control not.
+
+    ``with_trv`` adds a radiator thermostat the built-in integration has set
+    up. All devices share one service and one coordinator (one gateway).
+    """
+    if service is None:
+        service = FakeCachedService(None if empty_cache else (payload or gateway_payload()))
     heat_pump = FakeDeviceConfig(
         FakeAccessor(INSTALLATION_ID, GATEWAY_SERIAL, "0"), service, "E3_Vitocal_16", "heating"
     )
@@ -343,5 +504,19 @@ def make_runtime_data(
         "E3_RoomControl_One_522",
         "roomControl",
     )
-    client = FakeClient(oauth_manager or FakeOAuthManager(), [tcu, heat_pump, room])
-    return FakeViCareData(client, [FakeViCareDevice(heat_pump, HEAT_PUMP_SERIAL)]), service
+    configs = [tcu, heat_pump, room]
+    devices = [FakeViCareDevice(heat_pump, HEAT_PUMP_SERIAL)]
+    if with_trv:
+        trv = FakeDeviceConfig(
+            FakeAccessor(INSTALLATION_ID, GATEWAY_SERIAL, TRV_DEVICE_ID),
+            service,
+            "Smart_zigbee_trv",
+            "zigbee",
+        )
+        configs.append(trv)
+        devices.append(FakeViCareDevice(trv, TRV_DEVICE_ID))
+    coordinator = FakeViCareCoordinator()
+    for device in devices:
+        device.coordinator = coordinator
+    client = FakeClient(oauth_manager or FakeOAuthManager(), configs)
+    return FakeViCareData(client, devices), service

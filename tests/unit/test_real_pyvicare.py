@@ -7,13 +7,16 @@ authlib is missing, a minimal stand-in from ``stubs_authlib`` is used.
 These tests pin down the PyViCare behaviour this integration relies on:
 * looking at ``_cache`` never performs a request, a public read may;
 * how ``oauth_manager.get`` reports "not found", rate limiting and non-JSON
-  answers.
+  answers;
+* how ``service.setProperty`` sends a command and reports a rejected one;
+* the room and thermostat model, against PyViCare's test responses.
 """
 
 from __future__ import annotations
 
 from datetime import datetime, timedelta
 import importlib.util
+import json
 import os
 from pathlib import Path
 import sys
@@ -37,7 +40,11 @@ from PyViCare.PyViCareCachedServiceViaGateway import (  # noqa: E402
 from PyViCare.PyViCareService import ViCareDeviceAccessor  # noqa: E402
 import requests  # noqa: E402
 
-from custom_components.vicare_extras import bridge  # noqa: E402
+from custom_components.vicare_extras import (  # noqa: E402
+    bridge,
+    commands,
+    thermostats,
+)
 from custom_components.vicare_extras.errors import ViCareExtrasError  # noqa: E402
 from custom_components.vicare_extras.event_history import (  # noqa: E402
     fetch_event_history,
@@ -143,9 +150,14 @@ class FakeSession:
     def __init__(self, *responses: FakeResponse) -> None:
         self.responses = list(responses)
         self.urls: list[str] = []
+        self.posts: list[tuple[str, str]] = []
 
     def get(self, url: str, **kwargs):
         self.urls.append(url)
+        return self.responses.pop(0)
+
+    def post(self, url: str, data=None, **kwargs):
+        self.posts.append((url, data))
         return self.responses.pop(0)
 
 
@@ -222,3 +234,187 @@ def test_expired_token_is_renewed_by_pyvicare_not_by_us() -> None:
     assert manager.renewals == 1
     assert result["count"] == 1
     assert result["api_calls"] == 1  # the retry is PyViCare's, not counted by us
+
+
+# ------------------------------------------------------------------ commands
+
+ROOM_COMMAND = commands.NumberCommand(
+    feature="rooms.0.operating.programs.normalHeating",
+    name="setTemperature",
+    param="targetTemperature",
+    minimum=8.0,
+    maximum=30.0,
+    step=0.5,
+)
+ROOM_ACCESSOR = ViCareDeviceAccessor(fakes.INSTALLATION_ID, fakes.GATEWAY_SERIAL, "RoomControl-1")
+
+
+def test_command_goes_through_real_set_property_as_one_post() -> None:
+    session = FakeSession(FakeResponse(200, {"data": {"success": True, "reason": "COMMAND_EXECUTION_SUCCESS"}}))
+    service = ViCareCachedServiceViaGateway(Manager(session), 60)
+    payload = fakes.gateway_payload()  # what the built-in integration fetched
+    service._cache = payload
+    service._cacheTime = datetime.now()
+
+    assert commands.execute(service, ROOM_ACCESSOR, ROOM_COMMAND, 21.5) == 21.5
+
+    assert session.urls == []  # no read
+    assert session.posts == [
+        (
+            f"{API_BASE_URL}/features/installations/{fakes.INSTALLATION_ID}/gateways/"
+            f"{fakes.GATEWAY_SERIAL}/devices/RoomControl-1/features/"
+            "rooms.0.operating.programs.normalHeating/commands/setTemperature",
+            '{"targetTemperature": 21.5}',
+        )
+    ]
+    # The command went out through ViCareService.setProperty, which only
+    # posts. The cache keeps its content, so the built-in integration does
+    # not fetch again before its next regular poll.
+    assert bridge.peek_payload(service) is payload
+    assert not service.is_cache_invalid()
+    assert session.urls == []
+
+
+def test_pyvicare_cached_set_property_would_empty_the_cache() -> None:
+    """Why the command is not sent through the cached service's method."""
+    session = FakeSession(FakeResponse(200, {"data": {"success": True}}))
+    service = ViCareCachedServiceViaGateway(Manager(session), 60)
+    service._cache = fakes.gateway_payload()
+    service._cacheTime = datetime.now()
+
+    service.setProperty(ROOM_ACCESSOR, ROOM_COMMAND.feature, ROOM_COMMAND.name, {"targetTemperature": 21})
+
+    assert bridge.peek_payload(service) is None
+    assert service.is_cache_invalid()  # the next read of anyone fetches again
+
+
+def test_whole_numbers_are_sent_as_integers() -> None:
+    session = FakeSession(FakeResponse(200, {"data": {"success": True}}))
+    service = ViCareCachedServiceViaGateway(Manager(session), 60)
+    commands.execute(service, ROOM_ACCESSOR, ROOM_COMMAND, 21.0)
+    assert session.posts[0][1] == '{"targetTemperature": 21}'
+
+
+def test_real_rejected_command_is_mapped() -> None:
+    body = {
+        "viErrorId": "x",
+        "statusCode": 400,
+        "errorType": "COMMAND_EXECUTION_ERROR",
+        "message": "Command execution error.",
+        "extendedPayload": {"reason": "COMMAND_NOT_EXECUTABLE"},
+    }
+    session = FakeSession(FakeResponse(400, body))
+    service = ViCareCachedServiceViaGateway(Manager(session), 60)
+    with pytest.raises(ViCareExtrasError) as err:
+        commands.execute(service, ROOM_ACCESSOR, ROOM_COMMAND, 21.5)
+    assert err.value.translation_key == "command_failed"
+    assert "COMMAND_NOT_EXECUTABLE" in err.value.placeholders["reason"]
+    assert len(session.posts) == 1  # no retry
+
+
+def test_real_rate_limit_on_a_command_is_mapped() -> None:
+    body = {
+        "viErrorId": "x",
+        "statusCode": 429,
+        "errorType": "RATE_LIMIT_EXCEEDED",
+        "message": "API calls rate limit has been exceeded.",
+        "extendedPayload": {"name": "ViCare day limit", "requestCountLimit": 1450, "limitReset": 1794441600000},
+    }
+    service = ViCareCachedServiceViaGateway(Manager(FakeSession(FakeResponse(429, body))), 60)
+    with pytest.raises(ViCareExtrasError) as err:
+        commands.execute(service, ROOM_ACCESSOR, ROOM_COMMAND, 21.5)
+    assert err.value.translation_key == "rate_limited"
+
+
+def test_out_of_range_value_never_reaches_pyvicare() -> None:
+    session = FakeSession()
+    service = ViCareCachedServiceViaGateway(Manager(session), 60)
+    with pytest.raises(ViCareExtrasError) as err:
+        commands.execute(service, ROOM_ACCESSOR, ROOM_COMMAND, 35)
+    assert err.value.translation_key == "value_out_of_range"
+    assert session.posts == []
+
+
+# ----------------------------------------------- PyViCare's test responses
+
+
+def _response(name: str) -> list[dict]:
+    source = os.environ.get("PYVICARE_SRC")
+    path = Path(source or "") / "tests" / "response" / name
+    if not source or not path.is_file():
+        pytest.skip(f"PyViCare test response {name} is not available")
+    return json.loads(path.read_text(encoding="utf-8"))["data"]
+
+
+def _features(data: list[dict], device_id: str) -> dict[str, dict]:
+    return {
+        feature["feature"]: feature
+        for feature in bridge.device_features({"data": data}, device_id)
+    }
+
+
+def test_room_and_thermostat_model_against_gateway_response() -> None:
+    """Vitodens with one room and one radiator thermostat assigned to it."""
+    data = _response("gatewayWithDevices/heatbox2/Vitodens-300-W-WB3D-with-TRV.json")
+    rooms = _features(data, "RoomControl-1")
+    trv_id = "zigbee-1234567890abcdef"
+    trv = _features(data, trv_id)
+
+    # The room names its thermostats, the thermostat does not name its room.
+    assert thermostats.room_actors(rooms, 0) == [trv_id]
+    assert thermostats.room_of_device(rooms, trv_id) == (0, "Arbeitszimmer")
+    assert not any(name.startswith("rooms.") for name in trv)
+
+    # normal.perceived and normal.heating are readable but offer no command
+    # here; the executable setTemperature sits on operating.programs.normalHeating.
+    setpoint = thermostats.room_setpoint(rooms, 0)
+    assert setpoint.feature == "rooms.0.operating.programs.normalHeating"
+    assert setpoint.value == 20.0
+    assert setpoint.command == commands.NumberCommand(
+        feature="rooms.0.operating.programs.normalHeating",
+        name="setTemperature",
+        param="targetTemperature",
+        minimum=8.0,
+        maximum=30.0,
+        step=0.5,
+    )
+    assert thermostats.room_action(rooms, 0) == "heating"
+
+    assert thermostats.is_trv(trv)
+    trv_setpoint = thermostats.trv_setpoint(trv)
+    assert trv_setpoint.feature == "trv.temperature"
+    assert trv_setpoint.command.name == "setTargetTemperature"
+    assert trv_setpoint.command.param == "temperature"
+    assert (trv_setpoint.command.minimum, trv_setpoint.command.maximum, trv_setpoint.command.step) == (8.0, 30.0, 0.5)
+
+
+def test_room_control_response_without_commands_is_read_only() -> None:
+    """RoomControl.json carries no commands: setpoint readable, not writable."""
+    rooms = _features(_response("RoomControl.json"), "RoomControl-1") or {
+        feature["feature"]: feature for feature in _response("RoomControl.json")
+    }
+    setpoint = thermostats.room_setpoint(rooms, 0)
+    assert setpoint.feature == "rooms.0.temperature.levels.normal.perceived"
+    assert setpoint.command is None
+    assert thermostats.room_actors(rooms, 0) == []  # no rooms.0 feature in this file
+    assert thermostats.sensor_value(rooms["rooms.0.sensors.temperature"]) is not None
+
+
+@pytest.mark.parametrize(
+    ("name", "is_trv"),
+    [
+        ("zigbee_zk03840_trv.json", True),
+        ("zigbee_zk03839_cs.json", False),  # climate sensor
+        ("zigbee_zk03838_fht_main.json", False),  # floor heating thermostat
+        ("zigbee_zk03838_fht_channel.json", False),
+        ("zigbee_zk05390_repeater.json", False),
+    ],
+)
+def test_only_radiator_thermostats_count_as_trv(name, is_trv) -> None:
+    features = {feature["feature"]: feature for feature in _response(name)}
+    assert thermostats.is_trv(features) is is_trv
+    assert (thermostats.trv_setpoint(features) is not None) is is_trv
+    if is_trv:
+        assert thermostats.trv_setpoint(features).command.name == "setTargetTemperature"
+        assert thermostats.sensor_value(features["device.sensors.temperature"]) == 21.5
+        assert thermostats.trv_action(features) == "heating"  # valve at 2 %

@@ -7,17 +7,24 @@ from typing import Final
 DOMAIN: Final = "vicare_extras"
 VICARE_DOMAIN: Final = "vicare"
 
-# --- Sensors -----------------------------------------------------------------
+# --- Mirror coordinator -------------------------------------------------------
 # How often the cached payload of the built-in integration is looked at.
-# Looking at the cache is a plain attribute read and never causes an API call.
+# Looking at the cache is a plain attribute read and never causes an API call,
+# so this interval has no influence on the API quota.
 #
-# Deliberately not 60 seconds: the built-in integration refreshes every 60
-# seconds per gateway and its cache is empty while the request is running. Two
-# timers with the same period keep their phase, so a look that falls into that
-# gap once would fall into it every time. With 55 seconds the phase moves on
-# and (while a request takes under 5 seconds) at most one look in twelve can
-# meet the gap. A missed look only means the previous snapshot is kept.
+# The mirror runs slightly faster than the built-in integration polls
+# (built-in interval minus MIRROR_LEAD_SECONDS, at least UPDATE_INTERVAL_SECONDS
+# and at most MAX_MIRROR_INTERVAL_SECONDS: a look is free, and a long period
+# would only make the entities lag behind the built-in integration and delay
+# re-applying the poll interval option after the vicare entry reloads).
+# Deliberately never the same period: the cache of the built-in integration is
+# empty while its request is running, and two timers with the same period keep
+# their phase, so a look that falls into that gap once would fall into it
+# every time. With a slightly shorter period the phase moves on. A missed look
+# only means the previous snapshot is kept.
 UPDATE_INTERVAL_SECONDS: Final = 55
+MIRROR_LEAD_SECONDS: Final = 5
+MAX_MIRROR_INTERVAL_SECONDS: Final = 120
 # A snapshot is reused for this long while the built-in integration has no
 # cached payload (it empties its cache for the duration of each refresh).
 MAX_SNAPSHOT_AGE_SECONDS: Final = 900
@@ -26,6 +33,16 @@ MESSAGE_LIST_LIMIT: Final = 25
 
 DEVICE_TYPE_HEATING: Final = "heating"
 DEVICE_TYPE_ROOM_CONTROL: Final = "roomControl"
+DEVICE_TYPE_ZIGBEE: Final = "zigbee"
+
+# --- Option: poll interval of the built-in integration -------------------------
+CONF_VICARE_POLL_INTERVAL: Final = "vicare_poll_interval"
+MIN_VICARE_POLL_INTERVAL: Final = 60
+MAX_VICARE_POLL_INTERVAL: Final = 900
+# PyViCare's cache must outlive the poll interval, otherwise any read between
+# two polls would fetch again. The built-in coordinator empties the cache
+# itself before each poll, so a generous margin costs nothing.
+CACHE_MARGIN_SECONDS: Final = 60
 
 FEATURE_CONSUMPTION_DHW: Final = "heating.power.consumption.dhw"
 FEATURE_CONSUMPTION_HEATING: Final = "heating.power.consumption.heating"

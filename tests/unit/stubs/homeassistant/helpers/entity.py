@@ -2,6 +2,8 @@
 
 
 class Entity:
+    hass = None
+    state_writes = 0
     entity_description = None
     device_entry = None
     _attr_device_class = None
@@ -40,3 +42,6 @@ class Entity:
     @property
     def unique_id(self):
         return self._attr_unique_id
+
+    def async_write_ha_state(self):
+        self.state_writes += 1

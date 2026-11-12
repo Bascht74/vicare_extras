@@ -1,0 +1,524 @@
+# Message texts of ViCare Extras, German. One line per code: CODE|SOURCE|TEXT
+#
+# The wording is our own. It is not a copy of any manual: every text is a
+# short reformulation of what the code means. SOURCE names where the MEANING
+# comes from:
+#
+#   viessmann          Viessmann service manual "Viessmann One Base.
+#                      Systemkonfiguration und Diagnose für Wärmepumpen mit
+#                      Viessmann One Base", 6200041 (editions DE 6/2024 and
+#                      DE 7/2024 list the same codes); Vitocal 150-A, 151-A,
+#                      250-A, 252-A.
+#   viessmann_6221420  Viessmann service manual "Einzelraumregelung mit ViCare
+#                      Smart Climate", 6221420, DE 2/2025 (thermostats, climate
+#                      sensors, floor heating thermostats).
+#   viessmann_6179923  Viessmann service manual for heat pumps with Viessmann
+#                      One Base, 6179923, DE 3/2022 (Vitocal 200-S/222-S,
+#                      250-A/252-A, 250-AH); only codes missing in 6200041.
+#   vieventlog         ViEventLog (github.com/mschneider82/vieventlog, MIT),
+#                      text taken as it is. NOT confirmed by any Viessmann
+#                      document: shown as "ungeprüft".
+#   fhem               FHEM module 98_vitoconnect.pm (github.com/fhem/fhem-mirror),
+#                      text taken as it is. NOT confirmed: shown as "ungeprüft".
+#
+# Edit this file, then run: python scripts/build_message_codes.py
+S.1|fhem|Netzspannung eingeschaltet
+S.60|viessmann|Sommerbetrieb läuft (Sparfunktion nach Außentemperatur)
+S.74|viessmann|Heizen unterdrückt: Sonnenkollektoren bereiten Warmwasser
+S.75|viessmann|Zirkulationspumpe läuft
+S.88|viessmann|Solarkreispumpe läuft
+S.89|viessmann|Sonnenkollektoren stagnieren
+S.112|viessmann|4/3-Wege-Ventil wird initialisiert
+S.113|viessmann|4/3-Wege-Ventil fährt auf Trinkwassererwärmung
+S.114|viessmann|4/3-Wege-Ventil fährt auf Heiz-/Kühlkreis 1
+S.115|viessmann|4/3-Wege-Ventil steht auf Trinkwassererwärmung
+S.116|viessmann|4/3-Wege-Ventil steht auf Heiz-/Kühlkreis 1
+S.117|viessmann|4/3-Wege-Ventil steht auf Heiz-/Kühlkreis 2
+S.118|viessmann|4/3-Wege-Ventil steht auf integriertem Pufferspeicher
+S.119|vieventlog|Verdichter-Mindestlaufzeit
+S.120|viessmann|Smart Grid im Normalbetrieb
+S.121|viessmann|Smart Grid empfiehlt den Betrieb
+S.122|viessmann|Smart Grid erzwingt den Betrieb
+S.123|viessmann|Wärmepumpe ist aus
+S.124|viessmann|Wärmepumpe in der Vorlaufphase
+S.125|viessmann|Wärmepumpe heizt
+S.126|viessmann|Wärmepumpe kühlt
+S.127|viessmann|Wärmepumpe bereitet das Abtauen vor
+S.128|viessmann|Wärmepumpe taut ab
+S.129|viessmann|Wärmepumpe in der Nachlaufphase
+S.130|viessmann|Heizwasser-Durchlauferhitzer ist aus
+S.131|viessmann|Heizwasser-Durchlauferhitzer: Stufe 1 ein
+S.132|viessmann|Heizwasser-Durchlauferhitzer: Stufe 2 ein
+S.133|viessmann|Heizwasser-Durchlauferhitzer: Stufe 3 ein
+S.134|viessmann|4/3-Wege-Ventil in Leerlaufstellung
+S.135|viessmann|4/3-Wege-Ventil in Abtaustellung
+S.136|viessmann|4/3-Wege-Ventil steht auf Raumbeheizung/-kühlung
+S.137|viessmann|Heizbetrieb läuft an
+S.138|viessmann|Heizbetrieb läuft
+S.139|viessmann|Kein Heizbetrieb
+S.140|viessmann|Anforderung für Trinkwassererwärmung liegt vor
+S.141|viessmann|Trinkwassererwärmung läuft
+S.142|viessmann|Keine Trinkwassererwärmung
+S.143|viessmann|Anforderung für Kühlbetrieb liegt vor
+S.144|viessmann|Kühlbetrieb läuft
+S.145|viessmann|Kein Kühlbetrieb
+S.146|viessmann|Anforderung zum Abtauen liegt vor
+S.147|viessmann|Wärme für das Abtauen wird bereitgestellt
+S.148|viessmann|Abtauen über die Wärmepumpe läuft
+S.149|viessmann|Kein Abtauen über die Wärmepumpe
+S.150|viessmann|Abtauen über Heiz-/Kühlkreis 1 bzw. externen Heizwasser-Pufferspeicher wird vorbereitet
+S.151|viessmann|Abtauen über Heiz-/Kühlkreis 1 bzw. externen Heizwasser-Pufferspeicher läuft
+S.152|viessmann|Kein Abtauen über Heiz-/Kühlkreis 1 bzw. externen Heizwasser-Pufferspeicher
+S.153|viessmann|Regelung steht auf Standby
+S.161|viessmann|Befüllen läuft
+S.162|viessmann|Entlüften läuft
+S.163|viessmann|Systemstatus der Wärmepumpe: inaktiv
+S.164|viessmann|Systemstatus der Wärmepumpe: Wartungs-Standby
+S.165|viessmann|Systemstatus der Wärmepumpe: Regelung
+S.167|viessmann|Aktorentest läuft
+S.176|viessmann|Wärmepumpenregelung fordert Abtauen an
+S.181|viessmann|Passiver Frostschutz für Heiz-/Kühlkreis 1 ein
+S.182|viessmann|Passiver Frostschutz für Heiz-/Kühlkreis 2 ein
+S.183|viessmann|Passiver Frostschutz für Heiz-/Kühlkreis 3 ein
+S.184|viessmann|Passiver Frostschutz für Heiz-/Kühlkreis 4 ein
+S.185|viessmann|Passiver Frostschutz für Heizwasser-Durchlauferhitzer ein
+S.186|viessmann|Passiver Frostschutz für Speicher-Wassererwärmer ein
+S.187|viessmann|Passiver Frostschutz für Wärmepumpe ein
+S.188|viessmann|Passiver Frostschutz für externen Heiz-/Kühlwasser-Pufferspeicher ein
+S.189|viessmann|Passiver Frostschutz für externen Heizwasser-Pufferspeicher ein
+S.190|viessmann|Passiver Frostschutz für externen Kühlwasser-Pufferspeicher ein
+S.193|viessmann|Externer Wärmeerzeuger per potenzialfreiem Schaltkontakt angefordert
+S.195|viessmann|Smart Grid: EVU-Sperre liegt an
+S.196|viessmann|EVU-Sperre liegt an
+S.197|viessmann|Heiz-/Kühlkreis 1 fordert Wärme an
+S.198|viessmann|Heiz-/Kühlkreis 1 fordert Kühlung an
+S.199|viessmann|Heiz-/Kühlkreis 2 fordert Wärme an
+S.200|viessmann|Heiz-/Kühlkreis 2 fordert Kühlung an
+S.201|viessmann|Heiz-/Kühlkreis 3 fordert Wärme an
+S.202|viessmann|Heiz-/Kühlkreis 3 fordert Kühlung an
+S.203|viessmann|Heiz-/Kühlkreis 4 fordert Wärme an
+S.204|viessmann|Heiz-/Kühlkreis 4 fordert Kühlung an
+S.205|viessmann|Anforderung vom externen Heizwasser-Pufferspeicher
+S.206|viessmann|Anforderung vom externen Kühlwasser-Pufferspeicher
+S.207|viessmann|Trinkwassererwärmung: Anforderung liegt an
+S.208|viessmann|Integrierter Pufferspeicher wird erwärmt
+S.209|viessmann|Befüllfunktion abgebrochen
+S.210|viessmann|Entlüftungsfunktion abgebrochen
+S.211|viessmann|Befüllen beendet
+S.212|viessmann|Entlüften beendet
+S.213|viessmann|Inbetriebnahme-Assistent läuft
+S.214|viessmann|Inbetriebnahme abgebrochen
+S.215|viessmann|Inbetriebnahme beendet
+S.216|viessmann|Aktorentest wird ausgeführt
+S.217|viessmann|Heizwasser-Durchlauferhitzer: Stufe 1 aus
+S.218|viessmann|Heizwasser-Durchlauferhitzer: Stufe 2 aus
+S.219|viessmann|Heizwasser-Durchlauferhitzer: Stufe 3 aus
+S.220|viessmann|Kältekreis ist aus
+S.221|viessmann|Kältekreis startet im Heizbetrieb
+S.222|viessmann|Kältekreis startet im Kühlbetrieb
+S.223|viessmann|Kältekreis startet im Abtaubetrieb
+S.224|viessmann|Kältekreis heizt
+S.225|viessmann|Kältekreis kühlt
+S.226|viessmann|Kältekreis taut ab (Betriebsprogramm Frostschutz)
+S.227|viessmann|Kältekreis taut ab (Regelbetrieb)
+S.228|viessmann|Kältekreis: Abschaltsignal liegt an
+S.229|viessmann|Kältekreisregler wechselt von Heiz- auf Kühlbetrieb
+S.230|viessmann|Kältekreisregler wechselt von Kühl- auf Heizbetrieb
+S.231|viessmann|Kältekreisregler wechselt von Abtau- auf Heizbetrieb
+S.240|viessmann|Kältekreisregler steht auf Standby
+S.392|viessmann|Kältekreisregler wechselt von Heiz- auf Abtaubetrieb
+S.393|viessmann|Aktiver Frostschutz für Heiz-/Kühlkreis 1 ein
+S.394|viessmann|Aktiver Frostschutz für Heiz-/Kühlkreis 2 ein
+S.395|viessmann|Aktiver Frostschutz für Heiz-/Kühlkreis 3 ein
+S.396|viessmann|Aktiver Frostschutz für Heiz-/Kühlkreis 4 ein
+S.397|viessmann|Aktiver Frostschutz für Heizwasser-Durchlauferhitzer ein
+S.398|viessmann|Aktiver Frostschutz für Speicher-Wassererwärmer ein
+S.399|viessmann|Aktiver Frostschutz für Wärmepumpe ein
+S.400|viessmann|Aktiver Frostschutz für externen Heiz-/Kühlwasser-Pufferspeicher ein
+S.401|viessmann|Aktiver Frostschutz für externen Heizwasser-Pufferspeicher ein
+S.402|viessmann|Aktiver Frostschutz für externen Kühlwasser-Pufferspeicher ein
+S.427|vieventlog|Leistungsbegrenzung durch den Netzbetreiber nach § 14a EnWG
+I.9|viessmann|Estrichtrocknung läuft
+I.10|viessmann|Warmwasserbereitung: Laufzeit begrenzt
+I.56|viessmann|Externe Anforderung liegt an
+I.57|viessmann|Externe Sperre liegt an
+I.63|viessmann|Kühlkreis nicht betriebsbereit
+I.70|viessmann|Inverter: Überstrom im Zwischenkreis
+I.71|viessmann|Inverter: Netzspannung zu hoch, Verdichter pausiert
+I.72|viessmann|Inverter: Netzspannung zu niedrig, Verdichter pausiert
+I.73|viessmann|Inverter: Überspannung im Zwischenkreis
+I.74|viessmann|Inverter: Unterspannung im Zwischenkreis, Verdichter pausiert
+I.75|viessmann|Inverter: internes Leistungsmodul zu heiß, Verdichter pausiert
+I.76|viessmann|Inverter: Leistungsfaktor-Korrekturfilter (PFC) zu heiß, Verdichter pausiert
+I.77|viessmann|Inverter: Strom im Leistungsfaktor-Korrekturfilter (PFC) zu hoch, Verdichter pausiert
+I.78|viessmann|Inverter drosselt die Leistung: Anforderung zu hoch (Derating)
+I.79|viessmann|Inverter drosselt die Leistung: Anforderung des Verdichters zu hoch (Derating)
+I.80|viessmann|Inverter begrenzt die Leistung: Anforderung des Verdichters zu hoch (Feldschwächebetrieb)
+I.81|viessmann|Inverter drosselt die Leistung: internes Leistungsmodul zu heiß (Derating)
+I.82|viessmann|Inverter drosselt die Leistung: Leistungsfaktor-Korrekturfilter zu heiß (Derating)
+I.83|viessmann|4/3-Wege-Ventil: Volumenstrom am Mindestwert
+I.84|viessmann|4/3-Wege-Ventil: Rücklauftemperatur am Mindestwert
+I.85|viessmann|Kältekreis: geregelte Abschaltung wegen Niederdruck
+I.86|viessmann|Kältekreis: geregelte Abschaltung wegen Hochdruck
+I.89|viessmann|Uhr auf Sommerzeit vorgestellt
+I.90|viessmann|Uhr auf Winterzeit zurückgestellt
+I.92|viessmann|Rücksetzung der Energiebilanz
+I.94|vieventlog|Wartung in 30 Tagen fällig
+I.95|vieventlog|Filterwechsel in 14 Tagen fällig
+I.96|viessmann|Folge-Wärmepumpe (weiteres Viessmann Gerät) ist unbekannt
+I.98|viessmann|Neue Folge-Wärmepumpe gefunden (weiteres Viessmann Gerät)
+I.99|viessmann|Hygienefunktion hat die Zieltemperatur erreicht
+I.100|viessmann|Verflüssigungsdruck am Maximum
+I.101|viessmann|Verdampfungsdruck für Heizbetrieb am Minimum
+I.102|viessmann|Verdampfungsdruck für Kühlbetrieb am Minimum
+I.103|viessmann|Verdampfungsdruck am Maximum
+I.104|viessmann|Heißgastemperatur am Maximum
+I.105|viessmann|Höchstlaufzeit bei unterer Verdampfungstemperatur erreicht
+I.106|viessmann|Druckdifferenz am Verdichter am Maximum
+I.107|viessmann|Verflüssigungstemperatur am Maximum
+I.108|viessmann|Drehmoment des Verdichters am Maximum
+I.109|viessmann|Verdampfungstemperatur am Verdichter am Maximum
+I.110|viessmann|Druckverhältnis am Verdichter am Minimum
+I.111|viessmann|Verdampfungstemperatur am Verdichter am Minimum
+I.112|viessmann|Austrittstemperatur am Verflüssiger am Minimum
+I.113|viessmann|Smart Grid erzwingt die Abschaltung
+I.114|viessmann|Smart Grid im Normalbetrieb
+I.115|viessmann|Smart Grid empfiehlt die Einschaltung
+I.116|viessmann|Smart Grid erzwingt die Einschaltung
+I.117|viessmann|Energie-Management-System arbeitet
+I.118|viessmann|Heiz-/Kühlkreis 1: Fußbodentemperaturbegrenzer spricht an
+I.119|viessmann|Heiz-/Kühlkreis 2: Fußbodentemperaturbegrenzer spricht an
+I.120|viessmann|Wärmepumpe läuft geräuschreduziert
+I.121|viessmann|Heiz-/Kühlkreis 1: Feuchteanbauschalter spricht an
+I.122|viessmann|Heiz-/Kühlkreis 2: Feuchteanbauschalter spricht an
+I.123|viessmann|Rücklauftemperatur des Kältekreises am Maximum
+I.124|viessmann|Rücklauftemperatur des Kältekreises am Minimum
+I.125|viessmann|Lufteintrittstemperatur des Kältekreises am Maximum
+I.126|viessmann|Lufteintrittstemperatur des Kältekreises am Minimum
+I.127|viessmann|Druckdifferenz für den Verdichterstart am Maximum
+I.128|viessmann|Ölsumpftemperatur am Minimum
+I.129|viessmann|Kältekreisumkehr: Druckunterschied zu klein
+I.130|viessmann|Startphase der Wärmepumpe dauert zu lange (Zeitüberschreitung)
+I.131|viessmann|Verdampfungstemperatur am Minimum
+I.132|viessmann|Wärmepumpenregelung neu gestartet
+I.133|viessmann|Elektronikmodule durch Neustart zurückgesetzt
+I.134|viessmann|Abtauen läuft (Betriebsprogramm Frostschutz)
+I.135|viessmann|Abtauen läuft (Regelbetrieb)
+I.142|viessmann|Mindestlaufzeit des Verdichters unterschritten
+I.143|viessmann|EVU-Sperre liegt an
+I.144|viessmann|Netzfrequenz der EVU-Versorgung weicht ab
+I.145|viessmann|Außeneinheit überschreitet die Leistung
+I.146|viessmann|Verdampfer-Überhitzung im Kühlbetrieb
+I.147|viessmann|Verflüssiger-Überhitzung im Heizbetrieb
+I.148|viessmann|Verdampfer-Überhitzung im Heizbetrieb
+I.149|viessmann|Wärme wird während des Abtauens angefordert
+I.150|viessmann|Abtauen wird während des Regelbetriebs angefordert
+I.151|viessmann|Flüssiggastemperatur am Verflüssiger an der Betriebsgrenze
+I.152|viessmann|Niederdruck an der Betriebsgrenze
+I.155|viessmann|Estrichtrocknung vom Anwender abgebrochen
+I.156|viessmann|Wasservolumenstrom im Abtaubetrieb an der Warnschwelle
+I.157|viessmann|Heißgastemperatur über dem für Heizbetrieb nötigen Wert
+I.158|viessmann|Heißgastemperatur über dem für Kühlbetrieb nötigen Wert
+I.159|viessmann|Innenraum der Außeneinheit wärmer als üblich
+I.163|viessmann|Wallbox begrenzt den Strom: zu wenig PV-Leistung
+I.168|viessmann|Wärmepumpe arbeitet als Führungs-Wärmepumpe
+I.169|viessmann|Wärmepumpe arbeitet als Folge-Wärmepumpe
+I.170|viessmann|Wegen einer Störung führt vorübergehend eine Folge-Wärmepumpe
+I.171|viessmann|Inverter wird aktualisiert (Software-Update) und ist aus
+I.173|viessmann|Inverter senkt die Verdichterdrehzahl: Ausgangsstrom zu hoch
+I.174|viessmann|Inverter: Verdichterleistung vorübergehend reduziert, Drehzahl gesenkt
+I.175|viessmann|Verdichter startet nicht: Umgebung kälter als für den Betrieb zulässig
+I.176|viessmann|Verdichterleistung reduziert: Umgebung wärmer als für den Betrieb zulässig
+I.182|viessmann|Verdichter in Überlast, Regelung arbeitet normal
+A.2|viessmann|Temperatur unter der Frostschutzgrenze
+A.11|viessmann|Anlagendruck zu gering
+A.12|viessmann|Warnung: Batterie des Elektronikmoduls HPMU
+A.16|viessmann|Volumenstrom unter dem Mindestwert
+A.17|viessmann|Warnung zur erhöhten Trinkwasserhygiene
+A.19|viessmann|Temperaturwächter hat angesprochen
+A.21|viessmann|Warnung: Anlagendruck im Hydraulikkreis
+A.25|viessmann_6221420|Kommunikation gestört
+A.27|viessmann_6221420|Batterieladung gering
+A.28|viessmann_6221420|Stellantrieb kurzgeschlossen
+A.29|viessmann_6221420|Interne Sicherung defekt
+A.30|viessmann_6221420|Kein Anlegetemperatursensor am Heizungsvorlauf
+A.31|viessmann_6221420|Abgeschaltet: Vorlauftemperatur zu hoch
+A.32|viessmann_6221420|Abgeschaltet: Kondensationsgefahr
+A.62|viessmann|Warnung: PWM-Signal der Heizkreispumpe im Heiz-/Kühlkreis 1
+A.63|viessmann|Warnung: PWM-Signal der Heizkreispumpe im Heiz-/Kühlkreis 2
+A.65|viessmann|Trockenlauf der Heizkreispumpe im Heiz-/Kühlkreis 2
+A.66|viessmann|Heizkreispumpe im Heiz-/Kühlkreis 1 dreht nicht
+A.68|viessmann|Heizkreispumpe im Heiz-/Kühlkreis 2 dreht nicht
+A.70|viessmann|Warnung: Kugelhahn-Filter der Außeneinheit
+A.71|viessmann|Verdichter: Strom zu hoch
+A.72|viessmann|Warnung: Strom im Leistungsfaktor-Korrekturfilter
+A.73|viessmann|Verdichterdrehzahl: Frequenz weicht ab
+A.74|viessmann|Sekundärkreis verliert Druck
+A.75|viessmann|Sekundärkreis: Druckspitzen
+A.80|viessmann|Ventilator dreht nicht (blockiert)
+A.81|viessmann|Verdampfer überträgt zu wenig Wärme
+A.82|viessmann|Drucksensor eines CAN-BUS-Teilnehmers gestört
+A.83|viessmann|Speichertemperatursensor liefert fehlerhaftes Signal
+A.84|viessmann|Warnung: Signal des Rücklauftemperatursensors im Sekundärkreis
+A.85|viessmann|Warnung: Signal des Vorlauftemperatursensors im Sekundärkreis
+A.86|viessmann|Warnung: Signal des Vorlauftemperatursensors im Heiz-/Kühlkreis 1
+A.87|viessmann|Warnung: Signal des Vorlauftemperatursensors im Heiz-/Kühlkreis 2
+A.91|viessmann|Kältekreis zeitweise abgeschaltet
+A.93|viessmann|Heißgasdruck unplausibel
+A.94|viessmann|Sauggasdruck unplausibel
+A.96|viessmann|Sekundärkreis enthält Luft
+A.99|viessmann|Sekundärkreis: Vorlauftemperatur zu gering
+A.100|viessmann|Einstellungen wurden gelöscht
+A.101|viessmann|Heißgastemperatur unplausibel
+A.102|viessmann|Sauggastemperatur unplausibel
+A.109|viessmann|Ist-Kesseltemperatur zu gering
+A.110|viessmann|Warnung: Temperatur am externen Wärmeerzeuger 1
+A.111|viessmann|Warnung: Temperatur am externen Wärmeerzeuger 2
+A.130|vieventlog|Warnschwelle Einsatzgrenzen für Kühlbetrieb unterschritten
+A.152|viessmann|Wallbox: Überlastschutz inaktiv
+A.153|viessmann|Laden ohne PV-Optimierung
+A.159|viessmann|Inverter läuft mit Werkseinstellung
+A.162|viessmann|Inverter: Zwischenkreis mit Überspannung
+A.163|viessmann|Inverter-Zwischenkreis: Spannung zu hoch
+A.164|viessmann|Warnung: Gleichspannung im Inverter-Zwischenkreis
+A.174|viessmann|Temperatur im Innenraum zu hoch
+P.1|viessmann|Wartung nach Zeitintervall demnächst fällig
+P.4|viessmann|Heizwasser muss nachgefüllt werden
+P.8|viessmann|Wartung nach Betriebsstunden demnächst fällig
+P.34|viessmann|Heizwasserfilter warten: Filter im Kugelhahn und bauseitigen Filter reinigen
+P.35|vieventlog|Zeitintervall für Filterwechsel ist abgelaufen
+F.1|viessmann|Vorlauftemperatursensor unterbrochen
+F.2|viessmann|Vorlauftemperatursensor kurzgeschlossen
+F.3|viessmann|Rücklauftemperatursensor unterbrochen
+F.4|viessmann|Rücklauftemperatursensor kurzgeschlossen
+F.7|viessmann|Speichertemperatursensor unterbrochen
+F.8|viessmann|Speichertemperatursensor kurzgeschlossen
+F.13|viessmann|Außentemperatursensor unterbrochen
+F.14|viessmann|Außentemperatursensor kurzgeschlossen
+F.23|viessmann_6179923|Puffertemperatursensor Mitte unterbrochen
+F.24|viessmann_6179923|Puffertemperatursensor Mitte kurzgeschlossen
+F.33|viessmann|Primäreintrittstemperatursensor der Wärmepumpe unterbrochen
+F.34|viessmann|Primäreintrittstemperatursensor der Wärmepumpe kurzgeschlossen
+F.74|viessmann|Anlagendruck im Hydraulikkreis zu gering
+F.75|viessmann|Hydraulikkreis ohne Volumenstrom
+F.77|viessmann_6221420|Datenspeicher ist inkonsistent
+F.78|viessmann|Bedienteil nicht erreichbar
+F.87|viessmann|Anlagendruck zu hoch
+F.91|viessmann|DIO: Kommunikation gestört
+F.92|viessmann|ADIO: Kommunikation gestört
+F.100|viessmann|PlusBus: Spannung fehlerhaft
+F.101|viessmann|PlusBus: Kurzschluss
+F.111|viessmann|Flüssiggastemperatursensor (Heizen) unterbrochen
+F.112|viessmann|Flüssiggastemperatursensor (Heizen) kurzgeschlossen
+F.117|viessmann|Sauggastemperatursensor am Verdampfer unterbrochen
+F.118|viessmann|Sauggastemperatursensor am Verdampfer kurzgeschlossen
+F.121|viessmann|Wechselrichter: Kommunikation gestört
+F.123|viessmann|Flüssiggastemperatursensor am Verflüssiger unterbrochen
+F.124|viessmann|Flüssiggastemperatursensor am Verflüssiger kurzgeschlossen
+F.134|viessmann|Inverter: Kommunikation gestört
+F.147|viessmann|Sauggastemperatursensor am Verdichter unterbrochen
+F.148|viessmann|Sauggastemperatursensor am Verdichter kurzgeschlossen
+F.149|viessmann|Flüssiggastemperatursensor (Kühlen) unterbrochen
+F.150|viessmann|Flüssiggastemperatursensor (Kühlen) kurzgeschlossen
+F.151|viessmann|Heißgastemperatursensor unterbrochen
+F.152|viessmann|Heißgastemperatursensor kurzgeschlossen
+F.155|viessmann|Elektronisches Expansionsventil 1 gestört
+F.156|viessmann|Elektronisches Expansionsventil 2 gestört
+F.160|viessmann|CAN-BUS: Kommunikation gestört
+F.425|viessmann|Uhrzeit konnte nicht synchronisiert werden
+F.430|viessmann|Gateway: Kommunikation gestört
+F.431|viessmann|KNX: Kommunikation gestört
+F.454|viessmann|Softwareversion passt nicht
+F.472|viessmann|Energiezähler nicht erreichbar
+F.518|viessmann_6179923|Funk-Fernbedienung: Kommunikation gestört
+F.519|viessmann|BACnet: Kommunikation gestört
+F.520|viessmann|Modbus: Kommunikation gestört
+F.542|viessmann_6179923|Vorlauftemperatursensor Heiz-/Kühlkreis 1 mit Mischer unterbrochen
+F.543|viessmann_6179923|Vorlauftemperatursensor Heiz-/Kühlkreis 1 mit Mischer kurzgeschlossen
+F.544|viessmann|Vorlauftemperatursensor Heizkreis 2 unterbrochen
+F.545|viessmann|Vorlauftemperatursensor Heizkreis 2 kurzgeschlossen
+F.546|viessmann|Vorlauftemperatursensor Heizkreis 3 unterbrochen
+F.547|viessmann|Vorlauftemperatursensor Heizkreis 3 kurzgeschlossen
+F.548|viessmann|Vorlauftemperatursensor Heizkreis 4 unterbrochen
+F.549|viessmann|Vorlauftemperatursensor Heizkreis 4 kurzgeschlossen
+F.578|viessmann|Raumtemperatursensor der Funk-Fernbedienung unterbrochen
+F.616|viessmann|Steuergeräteverbund: Softwarestände passen nicht zusammen
+F.685|viessmann|Elektronikmodul HPMU: Kommunikation gestört
+F.686|viessmann|Kältekreisregler: Kommunikation gestört
+F.687|viessmann|EHCU: Kommunikation gestört
+F.728|viessmann_6221420|Temperatursensor defekt
+F.729|viessmann_6221420|Hardwarefehler
+F.730|viessmann_6221420|Motor gestört
+F.731|viessmann_6221420|Heizkörper kühlt nicht ab
+F.732|viessmann_6221420|Batterieladung gering
+F.733|viessmann_6221420|Anlegesensor für die Vorlauftemperatur defekt
+F.734|viessmann_6221420|Anlegesensor für die Rücklauftemperatur defekt
+F.735|viessmann_6221420|Feuchtigkeitssensor kurzgeschlossen
+F.736|viessmann_6221420|Temperatur-, Feuchtigkeits- oder CO2-Sensor defekt
+F.744|viessmann|Bedienteil ist inkompatibel
+F.745|viessmann|Systemkonfiguration ist inkompatibel
+F.747|viessmann|Bedieneinheit: interner Fehler
+F.748|viessmann|Bedienteil: Touchfeld gestört
+F.749|viessmann|Steuergeräte: Firmwarestände passen nicht zusammen
+F.764|viessmann|Störung bei einem anderen CAN-BUS-Teilnehmer
+F.765|viessmann|Anderer CAN-BUS-Teilnehmer nicht erreichbar
+F.770|viessmann|Vorlauftemperatursensor im Sekundärkreis unterbrochen
+F.771|viessmann|Vorlauftemperatursensor im Sekundärkreis kurzgeschlossen
+F.772|viessmann|Temperatursensor im Ölsumpf des Verdichters unterbrochen
+F.773|viessmann|Temperatursensor im Ölsumpf des Verdichters kurzgeschlossen
+F.788|viessmann|4/3-Wege-Ventil: Unterbrechung
+F.790|viessmann|4/3-Wege-Ventil mechanisch defekt
+F.791|viessmann|Heizwasser-Durchlauferhitzer: Phase 1 ausgefallen
+F.792|viessmann|Heizwasser-Durchlauferhitzer: Phase 2 ausgefallen
+F.793|viessmann|Heizwasser-Durchlauferhitzer: Phase 3 ausgefallen
+F.797|viessmann|Umwälzpumpe Heizkreis 1 mechanisch defekt
+F.798|viessmann|Umwälzpumpe Heizkreis 2 mechanisch defekt
+F.799|viessmann|Umwälzpumpe Heizkreis 1: elektrischer Fehler
+F.800|viessmann|Umwälzpumpe Heizkreis 2: elektrischer Fehler
+F.801|viessmann|Umkehrventil des Kältekreises arbeitet fehlerhaft
+F.808|viessmann|Unterer Ventilator gestört
+F.812|viessmann|Oberer Ventilator gestört
+F.819|viessmann|Expansionsventil 1 unterbrochen
+F.820|viessmann|Expansionsventil 2 unterbrochen
+F.823|viessmann|Expansionsventil 1 kurzgeschlossen
+F.824|viessmann|Expansionsventil 2 kurzgeschlossen
+F.830|viessmann|Inverter: Stromsensor gestört
+F.831|viessmann|Inverter: Stromsensor des Leistungsfaktor-Korrekturfilters (PFC) gestört
+F.832|viessmann|Inverter: Temperatursensor (IPM) defekt
+F.833|viessmann|Inverter: Temperatursensor des Leistungsfaktor-Korrekturfilters (PFC) gestört
+F.834|viessmann|Inverter: Phasenfehler auf der Netzseite
+F.835|viessmann|Inverter falsch parametriert
+F.836|viessmann|Inverter: Überstrom (Laststrom zu hoch)
+F.837|viessmann|Inverter: Phasenanschluss zum Verdichter fehlerhaft
+F.838|viessmann|Inverter wird fehlerhaft angesteuert
+F.839|viessmann|Verdichter sitzt fest (blockiert)
+F.840|viessmann|Inverter: Phasenströme am Verdichter ungleich
+F.841|viessmann|Drehmoment des Verdichters zu hoch
+F.842|viessmann|Inverter: Kurzschluss im internen Leistungsmodul
+F.843|viessmann|Inverter: Überstromabschaltung des Leistungsfaktor-Korrekturfilters (PFC)
+F.844|viessmann|Inverter: interne Referenzspannung fehlerhaft
+F.845|viessmann|Inverter: fehlerhafte Parametrierung
+F.846|viessmann|Inverter: Drehfeld des Verdichters läuft verkehrt herum
+F.847|viessmann|Inverter-Stromsensor misst gleichbleibenden Verdichterstrom
+F.848|viessmann|Inverter-Stromsensor misst schwankenden Verdichterstrom
+F.864|viessmann|Abtauen wurde nicht erfolgreich abgeschlossen
+F.865|viessmann|Kältekreis: Abschaltung wegen Hochdruck
+F.866|viessmann|Kältekreis: Abschaltung wegen Niederdruck
+F.875|viessmann|Verbundenes Hauptgerät nicht erreichbar
+F.876|viessmann|Kombisensor Volumenstrom/Temperatur unterbrochen
+F.881|viessmann|Kältekreis: Sicherheitsabschaltung
+F.909|viessmann|Viessmann Energiemanagement (HEMS) liefert keine Daten
+F.910|viessmann|Mehr als ein Hauptgerät gefunden
+F.912|viessmann|Inverter: Innenraumtemperatursensor gestört
+F.923|viessmann|Energiezähler 1 liefert keine Daten
+F.924|viessmann|Energiezähler 2 liefert keine Daten
+F.925|viessmann|Energiezähler 3 liefert keine Daten
+F.926|viessmann|Energiezähler 4 liefert keine Daten
+F.927|viessmann|Energiezähler 5 liefert keine Daten
+F.928|viessmann|Energiezähler 6 liefert keine Daten
+F.929|viessmann|Energiezähler 7 liefert keine Daten
+F.930|viessmann|Energiezähler 8 liefert keine Daten
+F.931|viessmann|Energiezähler 9 liefert keine Daten
+F.932|viessmann|Energiezähler 10 liefert keine Daten
+F.933|viessmann|Energiezähler 11 liefert keine Daten
+F.934|viessmann|Energiezähler 12 liefert keine Daten
+F.935|viessmann|Energiezähler 13 liefert keine Daten
+F.936|viessmann|Energiezähler 14 liefert keine Daten
+F.937|viessmann|Energiezähler 15 liefert keine Daten
+F.938|viessmann|Wechselrichter 1 liefert keine Daten
+F.939|viessmann|Wechselrichter 2 liefert keine Daten
+F.940|viessmann|Wechselrichter 3 liefert keine Daten
+F.941|viessmann|Wechselrichter 4 liefert keine Daten
+F.942|viessmann|Wechselrichter 5 liefert keine Daten
+F.943|viessmann|Wechselrichter 6 liefert keine Daten
+F.944|viessmann|Verbraucher 1 liefert keine Daten
+F.945|viessmann|Verbraucher 2 liefert keine Daten
+F.946|viessmann|Verbraucher 3 liefert keine Daten
+F.947|viessmann|Verbraucher 4 liefert keine Daten
+F.948|viessmann|Verbraucher 5 liefert keine Daten
+F.949|viessmann|Verbraucher 6 liefert keine Daten
+F.950|viessmann|Verbraucher 7 liefert keine Daten
+F.951|viessmann|Verbraucher 8 liefert keine Daten
+F.952|viessmann|Verbraucher 9 liefert keine Daten
+F.953|viessmann|Verbraucher 10 liefert keine Daten
+F.954|viessmann|Verbraucher 11 liefert keine Daten
+F.955|viessmann|Verbraucher 12 liefert keine Daten
+F.956|viessmann|Verbraucher 13 liefert keine Daten
+F.957|viessmann|Verbraucher 14 liefert keine Daten
+F.958|viessmann|Verbraucher 15 liefert keine Daten
+F.959|viessmann|Erzeuger 1 liefert keine Daten
+F.960|viessmann|Erzeuger 2 liefert keine Daten
+F.961|viessmann|Erzeuger 3 liefert keine Daten
+F.962|viessmann|Erzeuger 4 liefert keine Daten
+F.963|viessmann|Erzeuger 5 liefert keine Daten
+F.964|viessmann|Erzeuger 6 liefert keine Daten
+F.965|viessmann|Batteriemodul 1 liefert keine Daten
+F.966|viessmann|Batteriemodul 2 liefert keine Daten
+F.967|viessmann|Batteriemodul 3 liefert keine Daten
+F.968|viessmann|Batteriemodul 4 liefert keine Daten
+F.969|viessmann|Batteriemodul 5 liefert keine Daten
+F.970|viessmann|Batteriemodul 6 liefert keine Daten
+F.983|viessmann|Inverter: EEPROM defekt
+F.984|viessmann|Elektronisches Expansionsventil 1: Ansteuerung mehrfach elektrisch gestört
+F.985|viessmann|Elektronisches Expansionsventil 2: Ansteuerung mehrfach elektrisch gestört
+F.990|viessmann|Temperatursensor der hydraulischen Weiche kurzgeschlossen
+F.991|viessmann|Temperatursensor der hydraulischen Weiche unterbrochen
+F.992|viessmann|Temperatursensor am Heiz-/Kühlwasser-Pufferspeicher kurzgeschlossen
+F.993|viessmann|Temperatursensor am Heizwasser-Pufferspeicher kurzgeschlossen
+F.994|viessmann|Temperatursensor am Heizwasser-Pufferspeicher kurzgeschlossen
+F.995|viessmann|Temperatursensor am Heizwasser-Pufferspeicher unterbrochen
+F.996|viessmann|Temperatursensor am Kühlwasser-Pufferspeicher kurzgeschlossen
+F.997|viessmann|Temperatursensor am Kühlwasser-Pufferspeicher unterbrochen
+F.998|viessmann|Kältekreisregler erreicht EHCU bzw. Volumenstromsignal nicht
+F.1006|viessmann|Zu viele Starts der Wärmepumpe (Startzähler überschritten)
+F.1007|viessmann|Wärmepumpe gesperrt (verriegelt)
+F.1008|viessmann|Zu viele Geräte am Hauptsteuergerät
+F.1009|viessmann|Elektrische Verdichterheizung der Wärmepumpe gestört
+F.1010|viessmann|Wasserdrucksensor gestört
+F.1011|viessmann|Hochdrucksensor im Kältekreis gestört
+F.1012|viessmann|Niederdrucksensor im Kältekreis gestört
+F.1034|viessmann|Externer CAN-BUS: Kommunikation gestört
+F.1035|viessmann|Interner CAN-BUS: Kommunikation gestört
+F.1045|viessmann|Externer Wärme-/Kälteerzeuger 1 gestört
+F.1049|viessmann|Externes 3/2-Wege-Mischventil (Bivalenzbetrieb) arbeitet fehlerhaft
+F.1050|viessmann|Temperatursensor am externen Wärme-/Kälteerzeuger 1 kurzgeschlossen
+F.1051|viessmann|Temperatursensor am externen Wärme-/Kälteerzeuger 1 unterbrochen
+F.1054|viessmann|Externer Wärme-/Kälteerzeuger 1 zu heiß (Maximaltemperatur überschritten)
+F.1056|viessmann|Inverter: Relais im Zwischenkreis defekt
+F.1057|viessmann|Kältekreis: Hochdrucksensor gestört
+F.1074|viessmann|Kältekreisumkehr nicht möglich: Druckdifferenz zu klein
+F.1076|viessmann|Zu viele Verdichterstarts bei zu niedriger Öltemperatur
+F.1077|viessmann|Mindestlaufzeit des Verdichters wiederholt unterschritten
+F.1078|viessmann|Volumenstrom beim Verdichteranlauf wiederholt zu gering
+F.1080|viessmann|Temperatur am Verdampfer zu niedrig
+F.1105|viessmann|Erweiterungsmodul unterstützt Kühlen auf Heiz-/Kühlkreis 1 nicht
+F.1106|viessmann|Erweiterungsmodul unterstützt Kühlen auf Heiz-/Kühlkreis 2 nicht
+F.1107|viessmann|Erweiterungsmodul unterstützt Kühlen auf Heiz-/Kühlkreis 3 nicht
+F.1108|viessmann|Erweiterungsmodul unterstützt Kühlen auf Heiz-/Kühlkreis 4 nicht
+F.1129|viessmann|Wechselrichter meldet eine Störung
+F.1130|viessmann|Datenlogger nicht erreichbar
+F.1131|viessmann|LAN-Verbindung gestört
+F.1132|viessmann|Wechselrichter: Spitzenleistung reicht nicht aus
+F.1140|viessmann|Führungs-Wärmepumpe ist aus
+F.1172|viessmann|Inverter: ungleiche Verdichterströme erkannt
+F.1173|viessmann|Inverter: zu viele Sicherheitsabschaltungen über Interlock-Eingang 1
+F.1174|viessmann|Verdichter zwangsweise abgeschaltet: Interlock-Eingang 2 aktiv
+F.1175|viessmann|Inverter: zu viele Sicherheitsabschaltungen über Interlock-Eingang 2
+F.1179|viessmann|Inverter: Sicherheitsabschaltung wegen Phasenfehler auf der Netzseite
+F.1180|viessmann|Inverter: interner Erdungsfehler (sicherheitsrelevant)
+F.1181|viessmann|Verdichter abgeschaltet: überlagerter Gleichstrom
+F.1182|viessmann|Verdichter abgeschaltet: thermischer Überlastschutz
+F.1183|viessmann|Verdichter läuft nicht an
+F.1184|viessmann|Inverter: Messung der Netzspannung gestört
+F.1186|viessmann|Inverter: Stromsensor mit Offsetfehler
+F.1187|viessmann|Inverter: Stromsensor außerhalb des gültigen Bereichs
+F.1191|viessmann|Sensor am Interlock-Eingang 1 gestört
+F.1192|viessmann|Sensor am Interlock-Eingang 2 gestört
+F.1194|viessmann|Inverter: Überstrom im internen Leistungsmodul
+F.1195|viessmann|Inverter überlastet
+F.1196|viessmann|Inverter: Analog/Digital-Umsetzer gestört
+F.1216|viessmann|Verbindung zur Führungs-Wärmepumpe verloren
+F.1217|viessmann|Verbindung zur Folge-Wärmepumpe verloren
+F.1254|viessmann|Verdichter abgeschaltet: thermischer Überlastschutz nach mehrfachem Anlaufen
+F.1259|viessmann|Modbus zwischen Kältekreisregler (VCMU) und Inverter gestört
+F.1310|viessmann_6221420|CO2-Sensor defekt

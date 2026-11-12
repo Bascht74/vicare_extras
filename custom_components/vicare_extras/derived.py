@@ -7,26 +7,26 @@ history timeline. Inputs, all from the cached feature list:
 
 * ``device.messages.status.raw``: the status messages that are active right
   now. Observed on a Vitocal 250-A: every code appears once with the time it
-  became active, and codes that end (e.g. S.123 "Wärmepumpe aus" when the
+  became active, and codes that end (e.g. S.123 "heat pump off" when the
   heat pump starts) disappear from the list. The event history confirms the
   model: each ``device-message-status`` event carries ``active: true/false``.
 * ``heating.valves.fourThreeWay.position``: where the 4/3-way valve points.
 * ``heating.outdoor.defrosting``, ``heating.compressors.N`` and
   ``heating.secondaryCircuit.operation.state`` as fallback.
 
-Mapping (Viessmann texts from service manual 6200041)::
+Mapping (meaning of the codes as in Viessmann's service manual 6200041)::
 
     heating.outdoor.defrosting.active == true          -> defrost
     newest active code of S.123 ... S.129:
-        S.123 Wärmepumpe aus                           -> off
-        S.124 Wärmepumpe Vorlaufphase                  -> preflow
-        S.125 Wärmepumpe im Heizbetrieb
+        S.123 heat pump off                            -> off
+        S.124 heat pump in its pre-run phase           -> preflow
+        S.125 heat pump heating
               valve position is a hot water position   -> dhw
               otherwise                                -> heating
-        S.126 Wärmepumpe im Kühlbetrieb                -> cooling
-        S.127 Wärmepumpe: Abtauen vorbereiten          -> defrost
-        S.128 Wärmepumpe im Abtaubetrieb               -> defrost
-        S.129 Wärmepumpe Nachlaufphase                 -> afterflow
+        S.126 heat pump cooling                        -> cooling
+        S.127 heat pump prepares defrosting            -> defrost
+        S.128 heat pump defrosting                     -> defrost
+        S.129 heat pump in its run-on phase            -> afterflow
     none of these codes active (fallback, coarser):
         no compressor active                           -> off
         valve position is a hot water position         -> dhw

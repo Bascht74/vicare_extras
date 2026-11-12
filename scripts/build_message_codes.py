@@ -3,12 +3,12 @@
 
 Run from the repository root:  python scripts/build_message_codes.py
 
-Inputs (plain "CODE|TEXT" lines, "#" starts a comment):
-  scripts/message_sources/viessmann_6200041_de.txt   Viessmann service manual
-  scripts/message_sources/vieventlog_de.txt          ViEventLog error_codes.go
+Input: scripts/message_sources/messages_de.txt with one "CODE|SOURCE|TEXT"
+line per message ("#" starts a comment). The texts are this project's own
+wording; SOURCE says where the meaning comes from (see the header of that
+file). Sources that are not confirmed by a Viessmann document are marked
+``"verified": false`` and the integration shows their texts as unverified.
 
-The Viessmann text wins. ViEventLog texts are only taken for codes the
-Viessmann document does not list, and are marked with source "vieventlog".
 With --check the script only verifies that the JSON file is up to date.
 """
 
@@ -20,26 +20,53 @@ import re
 import sys
 
 ROOT = Path(__file__).resolve().parent.parent
-SOURCES = ROOT / "scripts" / "message_sources"
+SOURCE_FILE = ROOT / "scripts" / "message_sources" / "messages_de.txt"
 TARGET = ROOT / "custom_components" / "vicare_extras" / "data" / "message_codes.json"
 CODE = re.compile(r"^([A-Z])\.0*(\d+)$")
 
-META = {
+NOTE = (
+    "Wording by the ViCare Extras project (not copied from any manual). "
+    "'source' names where the meaning of a code comes from; entries with "
+    "'verified': false are not confirmed by a Viessmann document."
+)
+
+SOURCES = {
     "viessmann": {
-        "title": (
-            "Serviceanleitung für die Fachkraft: Viessmann One Base. "
-            "Systemkonfiguration und Diagnose für Wärmepumpen mit Viessmann One Base"
+        "verified": True,
+        "meaning_from": (
+            "Viessmann service manual 'Viessmann One Base. Systemkonfiguration und "
+            "Diagnose für Wärmepumpen mit Viessmann One Base', 6200041 "
+            "(DE 6/2024 and DE 7/2024), Vitocal 150-A, 151-A, 250-A, 252-A"
         ),
-        "document": "6200041, DE 6/2024",
-        "products": "Vitocal 150-A, 151-A, 250-A, 252-A",
-        "language": "de",
+    },
+    "viessmann_6221420": {
+        "verified": True,
+        "meaning_from": (
+            "Viessmann service manual 'Einzelraumregelung mit ViCare Smart "
+            "Climate', 6221420, DE 2/2025"
+        ),
+    },
+    "viessmann_6179923": {
+        "verified": True,
+        "meaning_from": (
+            "Viessmann service manual for heat pumps with Viessmann One Base, "
+            "6179923, DE 3/2022 (Vitocal 200-S/222-S, 250-A/252-A, 250-AH)"
+        ),
     },
     "vieventlog": {
-        "title": "ViEventLog, error_codes.go",
-        "url": "https://github.com/mschneider82/vieventlog",
-        "commit": "bd40a11e4789c381d5e3ff1712c039dbdcb1a1b9",
-        "license": "MIT, Copyright (c) 2025 Matthias Schneider",
-        "language": "de",
+        "verified": False,
+        "meaning_from": (
+            "ViEventLog, error_codes.go, commit bd40a11 "
+            "(https://github.com/mschneider82/vieventlog, MIT, "
+            "Copyright (c) 2025 Matthias Schneider); text as in that project"
+        ),
+    },
+    "fhem": {
+        "verified": False,
+        "meaning_from": (
+            "FHEM module 98_vitoconnect.pm, commit 38dac8d "
+            "(https://github.com/fhem/fhem-mirror); text as in that project"
+        ),
     },
 }
 
@@ -52,28 +79,25 @@ def normalize(code: str) -> str:
     return f"{match.group(1)}.{int(match.group(2))}"
 
 
-def read(name: str) -> dict[str, str]:
-    result: dict[str, str] = {}
-    for number, line in enumerate((SOURCES / name).read_text(encoding="utf-8").splitlines(), 1):
+def build() -> dict:
+    codes: dict[str, dict[str, object]] = {}
+    for number, line in enumerate(SOURCE_FILE.read_text(encoding="utf-8").splitlines(), 1):
         if not line.strip() or line.startswith("#"):
             continue
-        code, _, text = line.partition("|")
-        if not text.strip():
-            raise ValueError(f"{name}:{number}: no text")
-        result.setdefault(normalize(code), text.strip())
-    return result
-
-
-def build() -> dict:
-    viessmann = read("viessmann_6200041_de.txt")
-    vieventlog = read("vieventlog_de.txt")
-    codes: dict[str, dict[str, str]] = {}
-    for code, text in viessmann.items():
-        codes[code] = {"de": text, "source": "viessmann"}
-    for code, text in vieventlog.items():
-        codes.setdefault(code, {"de": text, "source": "vieventlog"})
+        parts = line.split("|", 2)
+        if len(parts) != 3 or not parts[2].strip():
+            raise ValueError(f"{SOURCE_FILE.name}:{number}: expected CODE|SOURCE|TEXT")
+        code, source, text = normalize(parts[0]), parts[1].strip(), parts[2].strip()
+        if source not in SOURCES:
+            raise ValueError(f"{SOURCE_FILE.name}:{number}: unknown source {source!r}")
+        if code in codes:
+            raise ValueError(f"{SOURCE_FILE.name}:{number}: {code} listed twice")
+        entry: dict[str, object] = {"de": text, "source": source}
+        if not SOURCES[source]["verified"]:
+            entry["verified"] = False
+        codes[code] = entry
     ordered = dict(sorted(codes.items(), key=lambda item: (item[0][0], int(item[0][2:]))))
-    return {"version": 1, "sources": META, "codes": ordered}
+    return {"version": 2, "note": NOTE, "sources": SOURCES, "codes": ordered}
 
 
 def main() -> int:

@@ -19,6 +19,7 @@ class ConfigEntry(Generic[_T]):
         self.entry_id = entry_id
         self.state = state
         self.runtime_data = None
+        self.options = {}
         self._on_unload = []
 
     def async_on_unload(self, func):
@@ -46,3 +47,22 @@ class ConfigFlow:
 
     def async_create_entry(self, *, title, data, **kwargs):
         return {"type": "create_entry", "title": title, "data": data}
+
+
+class OptionsFlow:
+    def __init__(self):
+        self.config_entry = None
+
+    def add_suggested_values_to_schema(self, data_schema, suggested_values):
+        self.suggested_values = dict(suggested_values or {})
+        return data_schema
+
+    def async_show_form(self, *, step_id, data_schema=None, **kwargs):
+        return {"type": "form", "step_id": step_id, "data_schema": data_schema}
+
+    def async_create_entry(self, *, data, **kwargs):
+        return {"type": "create_entry", "data": data}
+
+
+class OptionsFlowWithReload(OptionsFlow):
+    automatic_reload = True

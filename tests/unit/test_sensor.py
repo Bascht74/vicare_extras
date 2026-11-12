@@ -131,13 +131,13 @@ def test_messages_sensor_is_decoded() -> None:
 
     assert entity.native_value == "S.134"  # the state stays the raw code
     attributes = entity.extra_state_attributes
-    assert attributes["newest_status_text"] == "4/3-Wege-Ventil Leerlauf"
+    assert attributes["newest_status_text"] == "4/3-Wege-Ventil in Leerlaufstellung"
     assert [(m["errorCode"], m["text"]) for m in attributes["status"]] == [
-        ("S.134", "4/3-Wege-Ventil Leerlauf"),
-        ("S.123", "Wärmepumpe aus"),
-        ("S.165", "Wärmepumpe: Systemstatus Regelung"),
+        ("S.134", "4/3-Wege-Ventil in Leerlaufstellung"),
+        ("S.123", "Wärmepumpe ist aus"),
+        ("S.165", "Systemstatus der Wärmepumpe: Regelung"),
     ]
-    assert attributes["info"][0]["text"] == "Smart Grid: Normalbetrieb aktiv"
+    assert attributes["info"][0]["text"] == "Smart Grid im Normalbetrieb"
     assert attributes["service"] == []
     assert {"status", "info", "service"} <= entity._unrecorded_attributes
 
@@ -145,15 +145,30 @@ def test_messages_sensor_is_decoded() -> None:
 def test_last_status_message_sensor() -> None:
     platforms, _ = vitocal()
     entity = platforms.sensor("last_status_message")
-    assert entity.native_value == "Wärmepumpe im Heizbetrieb"
+    assert entity.native_value == "Wärmepumpe heizt"
     assert entity.extra_state_attributes == {
         "code": "S.125",
-        "timestamp": "2026-01-15T10:21:00.000Z",
+        "device_time": "2026-01-15T10:21:00.000Z",  # passed on unconverted
         "source": "viessmann",
+        "verified": True,
     }
 
 
 def test_last_status_message_shows_raw_code_when_unknown() -> None:
+    features = [
+        fakes.feature(
+            "device.messages.status.raw",
+            fakes.messages(("S.999", "2026-01-15T10:00:00.000Z", "status")),
+        )
+    ]
+    hass, _ = fakes.make_hass(fakes.gateway_payload(features))
+    entity = Platforms(hass).setup().sensor("last_status_message")
+    assert entity.native_value == "S.999"
+    assert entity.extra_state_attributes["source"] is None
+    assert entity.extra_state_attributes["verified"] is None
+
+
+def test_last_status_message_marks_unverified_texts() -> None:
     features = [
         fakes.feature(
             "device.messages.status.raw",
@@ -162,8 +177,13 @@ def test_last_status_message_shows_raw_code_when_unknown() -> None:
     ]
     hass, _ = fakes.make_hass(fakes.gateway_payload(features))
     entity = Platforms(hass).setup().sensor("last_status_message")
-    assert entity.native_value == "S.1"
-    assert entity.extra_state_attributes["source"] is None
+    assert entity.native_value == "S.1 (ungeprüft: Netzspannung eingeschaltet)"
+    assert entity.extra_state_attributes == {
+        "code": "S.1",
+        "device_time": "2026-01-15T10:00:00.000Z",
+        "source": "fhem",
+        "verified": False,
+    }
 
 
 def test_active_status_messages_sensor() -> None:
@@ -175,10 +195,13 @@ def test_active_status_messages_sensor() -> None:
     assert attributes["count"] == 9  # S.165 is active on two bus participants
     assert attributes["codes"] == ["S.1", "S.115", "S.120", "S.125", "S.165", "S.217", "S.218", "S.219"]
     texts = {m["errorCode"]: m["text"] for m in attributes["messages"]}
-    assert texts["S.115"] == "4/3-Wege-Ventil in Position „Trinkwassererwärmung“"
-    assert texts["S.120"] == "Smart Grid: Normalbetrieb aktiv"
-    assert texts["S.217"] == "Heizwasser-Durchlauferhitzer: Stufe 1 inaktiv"
-    assert texts["S.1"] is None  # not in any source: raw code only
+    assert texts["S.115"] == "4/3-Wege-Ventil steht auf Trinkwassererwärmung"
+    assert texts["S.120"] == "Smart Grid im Normalbetrieb"
+    assert texts["S.217"] == "Heizwasser-Durchlauferhitzer: Stufe 1 aus"
+    assert texts["S.1"] == "Netzspannung eingeschaltet"
+    flags = {m["errorCode"]: m.get("verified") for m in attributes["messages"]}
+    assert flags["S.1"] is False  # no Viessmann document confirms this text
+    assert flags["S.115"] is None
     assert "messages" in entity._unrecorded_attributes
 
 
@@ -605,8 +628,8 @@ def test_device_lookup_failure_does_not_break_setup(monkeypatch) -> None:
 def test_update_listeners_are_removed_on_unload() -> None:
     platforms, _ = vitocal()
     discovery_listeners = len(platforms.coordinator._listeners) - len(platforms.entities)
-    assert discovery_listeners == 2  # one per platform
-    assert len(platforms.entry._on_unload) == 2
+    assert discovery_listeners == 3  # one per platform
+    assert len(platforms.entry._on_unload) == 3
     for unsubscribe in platforms.entry._on_unload:
         unsubscribe()
     assert len(platforms.coordinator._listeners) == len(platforms.entities)

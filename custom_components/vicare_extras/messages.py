@@ -1,10 +1,14 @@
 """Decode Viessmann One Base message codes (S., I., A., P., F.).
 
 The table lives in ``data/message_codes.json`` (built by
-``scripts/build_message_codes.py``). Primary source is Viessmann's service
-manual 6200041; texts marked ``vieventlog`` fill codes that manual does not
-list. Unknown codes degrade gracefully: the text is ``None`` and callers show
-the raw code.
+``scripts/build_message_codes.py`` from ``scripts/message_sources/``).
+
+The texts are this project's own wording. ``source`` says where the meaning
+of a code comes from: ``viessmann*`` entries follow Viessmann service
+manuals. Entries of other projects (``vieventlog``, ``fhem``) are not
+confirmed by a Viessmann document; they carry ``"verified": false`` and are
+shown as ``S.427 (ungeprüft: ...)``. Unknown codes degrade gracefully: the
+text is ``None`` and callers show the raw code.
 
 No Home Assistant imports. ``load_table`` reads a file, so Home Assistant
 calls it once in the executor during setup; afterwards lookups are in memory.
@@ -61,11 +65,17 @@ def load_table() -> dict[str, dict[str, str]]:
     return codes
 
 
+UNVERIFIED_WORD = {"de": "ungeprüft"}
+UNVERIFIED_WORD_DEFAULT = "unverified"
+
+
 def describe(code: Any, language: str = "de") -> dict[str, Any]:
-    """Return code, text, source and category for a message code.
+    """Return code, text, source, verified and category for a message code.
 
     The text is taken in the requested language and falls back to German
-    (the only language the sources provide). Unknown codes get text None.
+    (the only language of the table). Unknown codes get text None.
+    ``verified`` is False for texts no Viessmann document confirms, True for
+    the others and None for unknown codes.
     """
     normalized = normalize_code(code)
     raw = code if isinstance(code, str) else None
@@ -75,20 +85,38 @@ def describe(code: Any, language: str = "de") -> dict[str, Any]:
         "code": normalized or raw,
         "text": text,
         "source": entry.get("source") if text else None,
+        "verified": (entry.get("verified") is not False) if text else None,
         "category": category(code),
     }
 
 
+def _display(info: dict[str, Any], language: str) -> str | None:
+    """Return the text to show for a described code (None when unknown)."""
+    if not info["text"]:
+        return None
+    if info["verified"] is False:
+        word = UNVERIFIED_WORD.get(language[:2].lower(), UNVERIFIED_WORD_DEFAULT)
+        return f"{info['code']} ({word}: {info['text']})"
+    return info["text"]
+
+
 def label(code: Any, language: str = "de") -> str | None:
-    """Return the text of a code, or the raw code when it is unknown."""
+    """Return what to show for a code.
+
+    The text for confirmed codes, ``S.427 (ungeprüft: text)`` for texts that
+    are not confirmed, and the raw code when the code is unknown.
+    """
     info = describe(code, language)
-    return info["text"] or info["code"]
+    return _display(info, language) or info["code"]
 
 
 def decode_entries(
     entries: list[dict[str, Any]], language: str = "de"
 ) -> list[dict[str, Any]]:
-    """Add ``text`` (and ``source``) to message entries with an errorCode."""
+    """Add ``text`` and ``source`` to message entries with an errorCode.
+
+    Entries whose text is not confirmed also get ``"verified": False``.
+    """
     decoded: list[dict[str, Any]] = []
     for entry in entries:
         info = describe(entry.get("errorCode"), language)
@@ -96,6 +124,8 @@ def decode_entries(
         item["text"] = info["text"]
         if info["source"]:
             item["source"] = info["source"]
+        if info["verified"] is False:
+            item["verified"] = False
         decoded.append(item)
     return decoded
 
@@ -112,8 +142,10 @@ def decode_event(event: dict[str, Any], language: str = "de") -> dict[str, Any]:
     The raw event is kept as it is; these keys are added when possible:
 
     ``decoded``  for ``device-message-*`` / ``device-error`` events: code,
-                 text, source, category and the ``active`` flag of the body.
-    ``summary``  one readable line. Messages: ``S.123: Wärmepumpe aus``.
+                 text, source, verified, category and the ``active`` flag of
+                 the body.
+    ``summary``  one readable line. Messages: ``S.123: Wärmepumpe ist aus``,
+                 unconfirmed texts ``S.427 (ungeprüft: ...)``.
                  ``feature-changed``: ``<feature>: <command>(<arguments>)``.
     """
     result = dict(event)
@@ -130,9 +162,12 @@ def decode_event(event: dict[str, Any], language: str = "de") -> dict[str, Any]:
             info["active"] = body["active"]
         result["decoded"] = info
         if info["code"]:
-            result["summary"] = (
-                f"{info['code']}: {info['text']}" if info["text"] else info["code"]
-            )
+            if not info["text"]:
+                result["summary"] = info["code"]
+            elif info["verified"] is False:
+                result["summary"] = _display(info, language)
+            else:
+                result["summary"] = f"{info['code']}: {info['text']}"
     elif event_type == "feature-changed" and body.get("featureName"):
         summary = str(body["featureName"])
         if command := body.get("commandName"):

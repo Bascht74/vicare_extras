@@ -8,14 +8,21 @@ daneben (eigene Domain `vicare_extras`). Sie verwendet die Anmeldung, die die
 eingebaute Integration bereits hergestellt hat, und braucht deshalb keine
 eigenen Zugangsdaten.
 
-- **Nur lesend.** Es werden nie Befehle an die Heizung geschickt.
-- **Keine eigenen regelmäßigen API-Abfragen.** Alle Sensoren lesen
+- **Sensoren lesen nur.** Sensoren und Binärsensoren schicken nie Befehle an
+  die Heizung.
+- **Befehle nur auf Wunsch.** Seit Version 0.3.0 gibt es Klima-Entitäten für
+  Räume und Heizkörperthermostate. Wird dort die Solltemperatur geändert,
+  sendet ViCare Extras genau diesen einen Befehl – nie von sich aus und nie
+  nach Zeitplan. Die Integration ist damit nicht mehr rein lesend.
+- **Keine eigenen regelmäßigen API-Abfragen.** Alle Entitäten lesen
   ausschließlich Daten, die die eingebaute Integration ohnehin schon abgerufen
   hat.
 - **Ereignishistorie nur auf Anforderung**, über eine Aktion.
 - **Meldungen im Klartext.** Statusmeldungen (S), Informationen (I), Warnungen
-  (A), Wartungsmeldungen (P) und Störungen (F) werden anhand der
-  Viessmann-Serviceanleitung dekodiert.
+  (A), Wartungsmeldungen (P) und Störungen (F) werden dekodiert. Die Bedeutung
+  stammt aus Viessmann-Serviceanleitungen, die Formulierungen sind eigene.
+- **Abfrageintervall einstellbar.** Auf Wunsch fragt die eingebaute
+  Integration seltener ab; nur so lassen sich API-Aufrufe sparen.
 
 ## Was live bestätigt ist
 
@@ -44,14 +51,23 @@ Mit Version 0.2.0 (gleicher Stand, nach einem Neustart von Home Assistant):
 - Ein Update über den Marketplace wird erst nach einem **Neustart von Home
   Assistant** wirksam; ein Neuladen des Eintrags genügt nicht.
 
+Version 0.3.0 (Abfrageintervall, Klima-Entitäten, neu formulierte
+Meldungstabelle) ist **noch nicht in einer laufenden Instanz geprüft**, siehe
+[Teststand](#teststand).
+
 Bekannte Einschränkungen:
 
-- Die Zeitstempel in `device.messages.*.raw` sind offenbar die Uhrzeit des
-  Geräts (Ortszeit, als UTC gekennzeichnet). Die Zeiten in den Attributen der
-  Meldungs-Sensoren können deshalb um die Zeitzone und die Abweichung der
-  Geräteuhr verschoben sein. Die Ereignishistorie ist davon nicht betroffen.
-- Raum-Entitäten konnten nur gegen nachgebaute Daten geprüft werden, siehe
-  [Teststand](#teststand).
+- **Gerätezeit.** Die Zeitstempel in `device.messages.*.raw` sind die Uhrzeit
+  des Geräts: Ortszeit, aber als UTC gekennzeichnet (`…Z`). An der geprüften
+  Anlage ging die Geräteuhr außerdem etwa 4 Minuten vor. ViCare Extras
+  rechnet diese Zeiten nicht um, sondern gibt sie unverändert weiter; die
+  eigenen Attribute heißen deshalb `device_time` und
+  `newest_status_device_time`. Die Zeiten der Ereignishistorie sind dagegen
+  echte UTC-Zeiten.
+- Räume, Klima-Entitäten und Heizkörperthermostate konnten nur gegen
+  nachgebaute Daten geprüft werden. Der Raumregler der geprüften Anlage
+  (Modell `E3_RoomControl_One_05`) liefert nur `rooms.features.*` (8
+  Features) und keine Räume; dort entstehen keine Raum-Entitäten.
 
 ## Entitäten
 
@@ -69,7 +85,9 @@ Allgemeines:
 - Momentanwerte (Temperaturen, Leistungen, Drehzahlen, Prozentwerte) haben
   `state_class: measurement` und damit Langzeitstatistik.
 - Die Werte erscheinen bis zu etwa eine Minute später als bei der eingebauten
-  Integration.
+  Integration (mit verlängertem
+  [Abfrageintervall](#abfrageintervall-der-eingebauten-integration) bis zu
+  zwei Minuten).
 - „Standard aktiv: nein“ heißt: Die Entität wird angelegt, ist aber
   deaktiviert und kann unter Einstellungen → Geräte & Dienste aktiviert
   werden. Das betrifft Einstellwerte und selten Nützliches.
@@ -91,13 +109,13 @@ Verlaufs-Zeitleiste zusammen. Mögliche Zustände: `off` (Aus), `preflow`
 | Bedingung | Zustand |
 | --- | --- |
 | `heating.outdoor.defrosting` aktiv | `defrost` |
-| neueste aktive Statusmeldung S.123 „Wärmepumpe aus“ | `off` |
-| S.124 „Wärmepumpe Vorlaufphase“ | `preflow` |
-| S.125 „Wärmepumpe im Heizbetrieb“, 4/3-Wege-Ventil auf Warmwasser | `dhw` |
+| neueste aktive Statusmeldung S.123 (Wärmepumpe ist aus) | `off` |
+| S.124 (Vorlaufphase) | `preflow` |
+| S.125 (Wärmepumpe heizt), 4/3-Wege-Ventil auf Warmwasser | `dhw` |
 | S.125, 4/3-Wege-Ventil in anderer Stellung | `heating` |
-| S.126 „Wärmepumpe im Kühlbetrieb“ | `cooling` |
-| S.127 „Abtauen vorbereiten“, S.128 „Wärmepumpe im Abtaubetrieb“ | `defrost` |
-| S.129 „Wärmepumpe Nachlaufphase“ | `afterflow` |
+| S.126 (Wärmepumpe kühlt) | `cooling` |
+| S.127 (Abtauen wird vorbereitet), S.128 (Wärmepumpe taut ab) | `defrost` |
+| S.129 (Nachlaufphase) | `afterflow` |
 | keine dieser Meldungen: kein Verdichter aktiv | `off` |
 | … Verdichter aktiv, Ventil auf Warmwasser | `dhw` |
 | … Verdichter aktiv, Sekundärkreis im Kühlbetrieb | `cooling` |
@@ -111,11 +129,11 @@ Vorlauf und Nachlauf sind nur über die Statusmeldungen erkennbar.
 
 - **Meldungen**: Zustand = Code der neuesten Statusmeldung (z. B. `S.125`);
   Attribute `status`, `info`, `service` (je Eintrag `errorCode`, `timestamp`,
-  `priority`, `text`, ggf. `source`), `*_count`, `newest_status_timestamp`,
-  `newest_status_text`.
+  `priority`, `text`, ggf. `source` und `verified: false`), `*_count`,
+  `newest_status_device_time`, `newest_status_text`.
 - **Letzte Statusmeldung**: Zustand = Klartext der neuesten Statusmeldung
-  (z. B. „Wärmepumpe im Heizbetrieb“), für Zeitleisten; Attribute `code`,
-  `timestamp`, `source`.
+  (z. B. „Wärmepumpe heizt“), für Zeitleisten; Attribute `code`,
+  `device_time`, `source`, `verified`.
 - **Aktive Statusmeldungen**: Zustand = alle derzeit aktiven Statuscodes
   (z. B. `S.115, S.120, S.125, S.165, S.217, S.218, S.219`); Attribute
   `count`, `codes`, `messages` (mit Klartext).
@@ -127,34 +145,80 @@ die **derzeit aktiven** Statusmeldungen: jeder Code einmal, mit dem Zeitpunkt,
 seit dem er gilt; beendete Meldungen verschwinden. Das ist aus den Daten
 abgeleitet, nicht aus einer Viessmann-Dokumentation.
 
+Alle Zeitangaben dieser Sensoren (`timestamp` in den Listen, `device_time`,
+`newest_status_device_time`) sind **Gerätezeit**: die Ortszeit der
+Wärmepumpe, von der API fälschlich mit `Z` (UTC) gekennzeichnet. Sie werden
+unverändert weitergegeben und nicht umgerechnet. Wer sie in einer Vorlage als
+Zeit verwendet, sollte das `Z` ignorieren, z. B. mit
+`{{ state_attr('sensor.…_letzte_statusmeldung', 'device_time')[:19] }}`.
+
 Der Binärsensor **Heizstab aktiv** gibt `heating.heatingRod.active` wieder. Im
 geprüften Datenstand war der Wert `true`, während alle drei Stufen als inaktiv
 gemeldet waren – er bedeutet also vermutlich „vorhanden/freigegeben“, nicht
 „heizt gerade“. Für „heizt gerade“ ist **Heizstab aktive Stufen** der bessere
 Sensor.
 
-#### Quellen der Meldungstexte
+#### Meldungstexte: Herkunft und Verlässlichkeit
 
 Die Tabelle liegt in `custom_components/vicare_extras/data/message_codes.json`
-(542 Codes) und wird von `scripts/build_message_codes.py` aus zwei Textdateien
-unter `scripts/message_sources/` erzeugt. Jeder Eintrag trägt seine Quelle:
+(500 Codes) und wird von `scripts/build_message_codes.py` aus
+`scripts/message_sources/messages_de.txt` erzeugt.
 
-| Quelle | Codes | Bemerkung |
-| --- | --- | --- |
-| `viessmann` | 470 (S 113, I 90, A 44, P 4, F 219) | Viessmann „Serviceanleitung für die Fachkraft: Viessmann One Base. Systemkonfiguration und Diagnose für Wärmepumpen mit Viessmann One Base“, 6200041, DE 6/2024 (Vitocal 150-A, 151-A, 250-A, 252-A), Kapitel „Meldungen“ |
-| `vieventlog` | 72 (S 56, F 11, A 2, I 2, P 1) | [ViEventLog](https://github.com/mschneider82/vieventlog) (MIT, © 2025 Matthias Schneider), nur für Codes, die in der Viessmann-Anleitung fehlen |
+**Die Texte sind eigene Formulierungen dieses Projekts.** Aus den
+Viessmann-Unterlagen stammt nur die *Bedeutung* eines Codes, nicht der
+Wortlaut; die Anleitungen selbst und deren Textauszüge liegen nicht im
+Repository. `source` nennt je Eintrag, woher die Bedeutung kommt:
 
-- Die Viessmann-Texte wurden maschinell aus dem PDF ausgelesen und nicht
-  Zeile für Zeile gegen das PDF korrekturgelesen. Störungen und Warnungen
-  wurden zweimal ausgelesen (Inhaltsverzeichnis und Kapitel) mit identischem
-  Ergebnis; 249 von 266 Codes, die auch ViEventLog kennt, stimmen mit dessen
-  Text überein.
-- Die `vieventlog`-Einträge sind unbestätigt. Ein Teil davon (S.10–S.92,
-  F.5–F.23) sieht nach allgemeinen Platzhaltertexten aus und passt nicht zum
-  Nummernschema der Viessmann-Anleitung.
-- Texte gibt es nur auf Deutsch; bei englischer Oberfläche wird ebenfalls der
-  deutsche Text gezeigt.
-- Unbekannte Codes (an der Anlage gesehen: `S.1`) bleiben als Code stehen.
+| `source` | Codes | Bedeutung aus | geprüft |
+| --- | --- | --- | --- |
+| `viessmann` | 470 (S 113, I 90, A 44, P 4, F 219) | Viessmann-Serviceanleitung „Viessmann One Base. Systemkonfiguration und Diagnose für Wärmepumpen mit Viessmann One Base“, 6200041 (DE 6/2024 und DE 7/2024; Vitocal 150-A, 151-A, 250-A, 252-A) | ja |
+| `viessmann_6221420` | 18 (F 11, A 7) | Viessmann-Serviceanleitung „Einzelraumregelung mit ViCare Smart Climate“, 6221420, DE 2/2025 (Meldungen der Thermostate, Sensoren und Fußbodenverteiler) | ja |
+| `viessmann_6179923` | 5 (F.23, F.24, F.518, F.542, F.543) | Viessmann-Serviceanleitung für Wärmepumpen mit Viessmann One Base, 6179923, DE 3/2022 | ja |
+| `vieventlog` | 6 (S.119, S.427, A.130, I.94, I.95, P.35) | [ViEventLog](https://github.com/mschneider82/vieventlog) (MIT, © 2025 Matthias Schneider); Text wie dort | **nein** |
+| `fhem` | 1 (S.1) | FHEM-Modul `98_vitoconnect.pm`; Text wie dort | **nein** |
+
+Was das für die Anzeige heißt:
+
+- Einträge mit Viessmann-Quelle erscheinen als Klartext, z. B.
+  „Wärmepumpe heizt“.
+- Einträge, die **keine Viessmann-Unterlage bestätigt**, tragen in der Tabelle
+  `"verified": false` und erscheinen als
+  `S.427 (ungeprüft: Leistungsbegrenzung durch den Netzbetreiber nach § 14a
+  EnWG)`. In Listen-Attributen und in der Ereignishistorie steht der Text in
+  `text`, dazu `verified: false`. So bleibt der Code sichtbar, und der Text
+  wird nicht als gesichert ausgegeben.
+- Codes ohne Eintrag bleiben als Code stehen (z. B. `S.999`).
+- Texte gibt es nur auf Deutsch; bei englischer Oberfläche wird der deutsche
+  Text gezeigt (der Zusatz heißt dann „unverified“).
+
+Was geprüft wurde (Stand 12.11.2026):
+
+- ViEventLog kennt 72 Codes, die in der Anleitung 6200041 fehlen. Davon ist
+  **1 bestätigt** (A.27, Anleitung 6221420), **4 widersprechen** einer
+  Viessmann-Anleitung und wurden durch deren Bedeutung ersetzt (F.23, F.518,
+  F.542, F.543; Anleitung 6179923), **67 sind unbestätigt**.
+- Von den unbestätigten wurden **61 entfernt**: die Blöcke S.10–S.15,
+  S.20–S.25, S.30–S.35, S.40–S.43, S.50–S.53, S.61–S.63, S.70–S.72,
+  S.80–S.82, S.90–S.92, S.100–S.105, S.110, S.111, S.160, S.168,
+  S.170–S.172, S.180, S.191, S.192 (durchnummerierte, allgemein gehaltene
+  Texte, die nicht zum Nummernschema der Viessmann-Anleitung passen) sowie
+  F.5, F.10–F.12 und F.20–F.22 (passen nicht zum Schema der
+  Sensor-Störungen in der Viessmann-Anleitung). Diese Codes erscheinen als
+  Code. **6 bleiben als „ungeprüft“** (siehe Tabelle), weil sie konkret und
+  plausibel sind, sich aber nicht belegen ließen.
+- **S.1** steht in keiner der drei Viessmann-Anleitungen. Das FHEM-Modul
+  nennt „Netzspannung eingeschaltet“; das passt zur Beobachtung an der Anlage
+  (S.1 trägt den Zeitpunkt des Einschaltens), ist aber nicht belegt und
+  deshalb als ungeprüft markiert. Die Meldungstabelle des FHEM-Moduls ist im
+  Übrigen eine Kopie der ViEventLog-Tabelle und damit keine unabhängige
+  Quelle.
+- Bei den 266 Codes, die sowohl die Anleitung 6200041 als auch ViEventLog
+  kennen, weicht ViEventLog bei 11 in der Bedeutung ab (F.13, F.454, F.472,
+  F.519, F.686, F.687, F.770, F.771, F.788, S.118, I.120) und ergänzt bei
+  I.149 einen Hinweis zur Firmware. ViCare Extras folgt dort der
+  Viessmann-Anleitung.
+- Die Bedeutungen wurden maschinell aus den PDFs ausgelesen und anschließend
+  umformuliert, aber nicht Zeile für Zeile gegen die PDFs korrekturgelesen.
 
 ### Zeitprogramme
 
@@ -185,22 +249,103 @@ beim Abtauen ist der Wert nur eingeschränkt aussagekräftig.
   Energie-Dashboard bitte die Sensoren der eingebauten Integration verwenden.
 - Listen-Attribute werden nicht in der Recorder-Datenbank gespeichert.
 
-### Räume (ViCare Smart Climate)
+### Räume und Heizkörperthermostate (ViCare Smart Climate)
 
-Räume liefert die Viessmann-API am virtuellen Gerät `RoomControl-1` (Typ
-`roomControl`) als Features `rooms.<n>` (Name, Typ) und `rooms.<n>.*`. Die
-eingebaute Integration richtet dieses Gerät nicht ein. ViCare Extras legt
-deshalb **je Raum ein eigenes Gerät** an (Name = Raumname aus der API, sonst
-„Room n“) mit den unten aufgeführten Entitäten.
+So ist die Einzelraumregelung aufgebaut (Viessmann-Serviceanleitung 6221420,
+PyViCare 2.63.0 und dessen Testdaten):
 
-- Thermostate, Klimasensoren und Fußbodenverteiler sind eigene
-  Zigbee-Geräte (`trv.*`, `device.sensors.*`, `device.power.battery`). Deren
-  Ventilstellung, Temperatur, Feuchte und Batteriestand stellt bereits die
-  eingebaute Integration bereit; sie werden hier nicht doppelt angelegt.
-- **Nicht an einer echten Anlage geprüft.** Die Raum-Features sind aus
-  PyViCare 2.63.0 (`PyViCareRoomControl.py` und dessen Testdaten) und
-  ViEventLog abgeleitet. Ein Raumregler ohne Räume (nur `rooms.features.*`)
-  erzeugt keine Entitäten.
+- **Räume** liefert die Viessmann-API am virtuellen Gerät `RoomControl-1`
+  (Typ `roomControl`) als Features `rooms.<n>` (Name, Typ, `actors`) und
+  `rooms.<n>.*`. Die eingebaute Integration richtet dieses Gerät nicht ein.
+  ViCare Extras legt deshalb **je Raum ein eigenes Gerät** an (Name = Raumname
+  aus der API, sonst „Room n“).
+- **Heizkörperthermostate, Klimasensoren und Fußbodenthermostate** sind
+  eigene Zigbee-Geräte (`trv.*`, `fht.*`, `device.sensors.*`,
+  `device.power.battery`). Sie werden in der ViCare-App einem Raum
+  zugeordnet; `rooms.<n>.actors` nennt die Geräte-IDs. Diese Geräte richtet
+  die eingebaute Integration ein, mit Sensoren für Raumtemperatur,
+  Solltemperatur, Feuchte, Ventilstellung und Batterie. ViCare Extras legt
+  davon nichts doppelt an.
+- **Geregelt wird der Raum.** Alle Thermostate eines Raums folgen dessen
+  Solltemperatur; ein Thermostat hat kein eigenes Zeitprogramm. Eine
+  Änderung direkt am Thermostat gilt laut Anleitung nur vorübergehend (24 h
+  mit Viessmann One Base, 2 h mit Vitoconnect), danach gilt wieder das
+  Zeitprogramm des Raums. Die Raumtemperatur ist der Mittelwert der
+  Klimasensoren des Raums, ohne Klimasensor der Mittelwert der Thermostate.
+
+Die Thermostate gehören in Home Assistant zur eingebauten Integration und
+lassen sich deshalb nicht als Untergeräte unter das Raum-Gerät hängen. Die
+Zuordnung steht in Attributen: `actors` an der Raum-Klima-Entität, `room` an
+der Thermostat-Klima-Entität.
+
+#### Klima-Entitäten
+
+| | Raum | Heizkörperthermostat |
+| --- | --- | --- |
+| Gerät | Raum-Gerät von ViCare Extras | vorhandenes Gerät der eingebauten Integration |
+| Name | wie das Gerät (Raumname) | wie das Gerät |
+| Ist-Temperatur | `rooms.<n>.sensors.temperature` | `device.sensors.temperature`, nur bei `status: connected` |
+| Luftfeuchtigkeit | `rooms.<n>.sensors.humidity` | – |
+| Solltemperatur | erstes Feature mit ausführbarem Befehl `setTemperature`: `…temperature.levels.normal.perceived`, dann `…temperature.levels.normal.heating`, dann `…operating.programs.normalHeating` | `trv.temperature` mit Befehl `setTargetTemperature` |
+| Grenzen, Schrittweite | aus dem Befehl der API (`min`, `max`, `stepping`) | ebenso |
+| Betriebsart | nur `heat` | nur `heat` |
+| Aktion | `rooms.<n>.operating.state` → `demand` (`heating`, `cooling`, sonst Leerlauf) | Heizen, solange `trv.valve.position` über 0 liegt |
+| Attribute | `setpoint`, `setpoint_feature`, `setpoint_writable`, `level`, `demand`, `actors` | `setpoint`, `setpoint_feature`, `setpoint_writable`, `valve_position`, `room` |
+
+- Eine Klima-Entität entsteht nur, wenn eine Solltemperatur lesbar ist.
+- **Geschrieben wird nur, was die API als ausführbar meldet** (`isExecutable:
+  true` im `commands`-Objekt des Features). Fehlt ein solcher Befehl, hat die
+  Entität keine Solltemperatur-Einstellung; der Sollwert steht dann im
+  Attribut `setpoint`.
+- Ein Befehl wird **nur** gesendet, wenn in Home Assistant die Solltemperatur
+  geändert wird (Oberfläche, Automation, `climate.set_temperature`). Jeder
+  Befehl ist **ein API-Aufruf**. Danach zeigt die Entität den gesendeten Wert,
+  bis die eingebaute Integration das nächste Mal abgefragt hat; die Sensoren
+  (auch die der eingebauten Integration) zeigen den neuen Sollwert erst nach
+  dieser Abfrage. Meldet die API dann noch den alten Wert, springt die
+  Anzeige bis zur folgenden Abfrage zurück.
+- Der Befehl geht über die Anmeldung der eingebauten Integration (PyViCare).
+  Deren Zwischenspeicher wird dabei bewusst **nicht** geleert: Sonst würde die
+  eingebaute Integration gleich danach alles neu abrufen – ein zweiter
+  API-Aufruf je Befehl.
+- Werte außerhalb der Grenzen der API werden abgelehnt, ohne dass ein Aufruf
+  gesendet wird. Lehnt die API einen Befehl ab oder ist das Limit erschöpft,
+  erscheint eine Fehlermeldung in Home Assistant.
+- Die Solltemperatur des Raums ist die der Stufe **Normal**. Gilt gerade
+  „Reduziert“ oder „Komfort“, wirkt eine Änderung erst, wenn wieder „Normal“
+  gilt; die aktive Stufe steht im Attribut `level`. Zeitprogramme und Stufen
+  werden nicht umgeschaltet.
+- Ob eine über die API gesetzte Solltemperatur eines **Thermostats** wie eine
+  Änderung am Gerät nur vorübergehend gilt, ist nicht bekannt. Dauerhaft
+  sinnvoll ist die Einstellung am Raum.
+- **Ist-Temperatur des Thermostats:** Meldet ein Thermostat keine eigene
+  Temperatur (oder `status` ist nicht `connected`), bleibt die Ist-Temperatur
+  leer; die Entität funktioniert trotzdem. Was das Thermostat liefert, zeigt:
+
+  ```yaml
+  action: vicare_extras.get_features
+  data:
+    device_type: zigbee
+    prefix: device.sensors.temperature
+  response_variable: ergebnis
+  ```
+
+  Enthält die Antwort für das Thermostat kein Feature
+  `device.sensors.temperature` oder darin `status: notConnected`, gibt es
+  keine Ist-Temperatur. Ohne `prefix` zeigt derselbe Aufruf alle Features der
+  Zigbee-Geräte, mit `full: true` auch die angebotenen Befehle.
+
+**Nicht an einer echten Anlage geprüft.** Räume, Thermostate und das Senden
+von Befehlen sind aus PyViCare 2.63.0 (Code und Testdaten
+`RoomControl.json`, `gatewayWithDevices/heatbox2/Vitodens-300-W-WB3D-with-TRV.json`,
+`zigbee_zk03840_trv.json`, `zigbee_zk03838_fht_*.json`,
+`zigbee_zk03839_cs.json`), ViEventLog und der Serviceanleitung 6221420
+abgeleitet. In den PyViCare-Testdaten bietet nur
+`rooms.<n>.operating.programs.normalHeating` den Befehl `setTemperature` an;
+ViEventLog sendet ihn an `…temperature.levels.normal.perceived`. Deshalb
+nimmt ViCare Extras das erste Feature, das den Befehl als ausführbar meldet.
+Ob die API die Befehle so annimmt, ist offen. Ein Raumregler ohne Räume (nur
+`rooms.features.*`) erzeugt keine Entitäten.
 
 ### Liste aller Entitäten
 
@@ -291,6 +436,13 @@ Erzeugt mit `python scripts/list_entities.py`.
 | binary_sensor | Fenster |  | ja | `rooms.{n}.sensors.openWindow` → `value` / `rooms.{n}.sensors.window.openState` → `value` |
 | binary_sensor | Kondensationsrisiko |  | ja | `rooms.{n}.condensationRisk` → `value` |
 | binary_sensor | Kindersicherung |  | ja | `rooms.{n}.childLock` → `active` |
+
+**Klima (Räume und Heizkörperthermostate)**
+
+| Plattform | Gerät | Ist-Temperatur | Soll-Temperatur | Befehl | Aktion |
+| --- | --- | --- | --- | --- | --- |
+| climate | Raum (eigenes Gerät) | `rooms.{n}.sensors.temperature` → `value` | `rooms.{n}.temperature.levels.normal.perceived` → `temperature` / `rooms.{n}.temperature.levels.normal.heating` → `temperature` / `rooms.{n}.operating.programs.normalHeating` → `temperature` | `setTemperature` | `rooms.{n}.operating.state` → `demand` |
+| climate | Heizkörperthermostat (Gerät der eingebauten Integration) | `device.sensors.temperature` → `value` (nur bei `status: connected`) | `trv.temperature` → `value` | `setTargetTemperature` | `trv.valve.position` → `position` > 0 |
 
 ## Aktion `vicare_extras.get_features`
 
@@ -416,11 +568,12 @@ events:
     origin: system
     decoded:                                  # von ViCare Extras ergänzt
       code: S.123
-      text: Wärmepumpe aus
+      text: Wärmepumpe ist aus
       source: viessmann
+      verified: true                          # false: Text unbestätigt
       category: status                        # status/info/warning/maintenance/fault
       active: true
-    summary: "S.123: Wärmepumpe aus"          # von ViCare Extras ergänzt
+    summary: "S.123: Wärmepumpe ist aus"      # von ViCare Extras ergänzt
   - eventType: feature-changed
     body:
       featureName: heating.circuits.1.operating.modes.active
@@ -433,7 +586,9 @@ events:
 Die Felder von Viessmann bleiben unverändert. Ergänzt werden `decoded` (bei
 `device-message-*` und `device-error`) und `summary` (zusätzlich bei
 `feature-changed`). Unbekannte Codes haben `text: null` und den Code als
-`summary`.
+`summary`; unbestätigte Texte haben `verified: false` und eine `summary` der
+Form `S.1 (ungeprüft: …)`. Die Zeiten der Ereignishistorie sind echte
+UTC-Zeiten (anders als die Gerätezeit in `device.messages.*.raw`).
 
 Bekannte Ereignistypen laut Viessmann-Dokumentation – Anlagenebene:
 `installation-address-changed`, `invitation-accepted`, `invitation-terminated`,
@@ -476,16 +631,75 @@ Kontingent teilt sich ViCare Extras mit der eingebauten Integration.
   Gateway. Weil das Intervall erst nach Abschluss jeder Abfrage neu beginnt,
   sind es in der Praxis etwas weniger. Dazu kommen einige Aufrufe bei jedem
   Neustart oder Neuladen. **Die Reserve ist also klein.**
-- Alle Sensoren, Binärsensoren und `get_features`: **0 Aufrufe**, immer.
+- Alle Sensoren, Binärsensoren, Klima-Entitäten (lesend) und `get_features`:
+  **0 Aufrufe**, immer.
 - `get_event_history`: **1 Aufruf je Seite**, höchstens `max_pages`. Falls der
   erste Pfad mit „nicht gefunden“ antwortet, kommt einmalig 1 Aufruf für den
   Ausweichpfad hinzu; der funktionierende Pfad wird bis zum nächsten Neustart
   gemerkt.
+- Solltemperatur an einer Klima-Entität ändern: **1 Aufruf je Änderung**.
 
 Empfehlung: `max_pages: 1` verwenden, die Aktion nicht in kurzen Abständen
 automatisieren und `api_calls` in der Antwort beachten. Ist das Limit
 erschöpft, meldet die Aktion das mit dem Zeitpunkt der Rücksetzung – und auch
 die eingebaute Integration bekommt bis dahin keine Daten mehr.
+
+### Abfrageintervall der eingebauten Integration
+
+**Die Sensoren von ViCare Extras kosten keine Aufrufe.** Sie seltener
+aktualisieren zu lassen, spart deshalb nichts. Sparen lässt sich nur, indem die
+*eingebaute* Integration seltener abfragt. Dafür gibt es eine Option:
+
+**Einstellungen → Geräte & Dienste → ViCare Extras → Konfigurieren →
+„Abfrageintervall der ViCare-Integration“** (Sekunden, 60 bis 900).
+
+| Intervall | Aufrufe pro Tag (ein Gateway) |
+| --- | --- |
+| leer (Standard, 60 s) | bis 1440 |
+| 90 s | bis 960 |
+| 120 s | bis 720 |
+| 300 s | bis 288 |
+
+- **Leer lassen** heißt: ViCare Extras fasst die eingebaute Integration nicht
+  an. Das ist die Voreinstellung.
+- **Setzen und Löschen wirken ohne Neustart.** Beim Speichern wird nur der
+  Eintrag von ViCare Extras neu geladen. Die eingebaute Integration verwendet
+  den neuen Wert ab ihrer nächsten Abfrage, also nach höchstens einem alten
+  Intervall. Wird das Feld geleert (oder ViCare Extras entfernt bzw.
+  deaktiviert), gilt wieder der ursprüngliche Wert (60 s je Gateway).
+- Das Intervall wird nie *kürzer* als das, was die eingebaute Integration
+  selbst festlegt (bei zwei Gateways z. B. 120 s). Ein kleinerer Wert bleibt
+  dann wirkungslos.
+- Lädt die eingebaute Integration neu, setzt ViCare Extras den Wert innerhalb
+  von höchstens zwei Minuten erneut.
+- Alle Werte in Home Assistant – auch die der eingebauten Integration –
+  werden entsprechend seltener aktualisiert. Die Entitäten von ViCare Extras
+  folgen dem Intervall: Sie schauen jeweils 5 Sekunden früher nach, als die
+  eingebaute Integration abfragt (55 s bei 60 s, 85 s bei 90 s), höchstens
+  aber alle 120 Sekunden – ohne API-Aufruf. Ihre Werte erscheinen damit bis
+  zu ein Intervall (höchstens zwei Minuten) später als bei der eingebauten
+  Integration.
+- Im Protokoll steht je Änderung eine Zeile auf Stufe „info“:
+  `Poll interval of the ViCare integration set to 90 s (was 60 s)` bzw.
+  `Poll interval of the ViCare integration restored to 60 s`. Home Assistant
+  zeigt Info-Zeilen nur, wenn sie eingeschaltet sind:
+
+  ```yaml
+  logger:
+    logs:
+      custom_components.vicare_extras: info
+  ```
+
+  Ohne diese Einstellung zeigt die Diagnose (siehe [Fehlersuche](#fehlersuche))
+  unter `poll_interval` die Option, das Intervall der eingebauten Integration
+  und das eigene.
+
+Technisch setzt ViCare Extras dafür `update_interval` am Koordinator der
+eingebauten Integration und verlängert die Cache-Dauer von PyViCare
+entsprechend (sonst würde ein Lesezugriff zwischen zwei Abfragen erneut
+abrufen). Passt die innere Struktur einer künftigen Home-Assistant-Version
+nicht mehr, wird nichts verändert und einmalig eine Warnung protokolliert.
+**Nicht in einer laufenden Instanz geprüft**, siehe [Teststand](#teststand).
 
 ## Installation
 
@@ -502,9 +716,9 @@ Voraussetzungen: Home Assistant **2026.11.1 oder neuer**, die Integration
    nicht, Home Assistant neu starten.
 
 Live wurde Version 0.1.0 über den Marketplace installiert; dabei war kein
-Neustart nötig. Nach einem **Update** auf eine neue Version Home Assistant neu
-starten, falls die neuen Entitäten nicht erscheinen – bereits geladener
-Python-Code wird sonst nicht ersetzt.
+Neustart nötig. Nach einem **Update** auf eine neue Version muss Home
+Assistant **neu gestartet** werden; ein Neuladen des Eintrags genügt nicht,
+weil bereits geladener Python-Code sonst nicht ersetzt wird.
 
 ### Manuell
 
@@ -524,7 +738,13 @@ Python-Code wird sonst nicht ersetzt.
 3. Den Dialog bestätigen. Eingaben sind nicht nötig.
 
 Die Entitäten erscheinen danach beim Gerät der Wärmepumpe (Räume als eigene
-Geräte), die Aktionen unter **Entwicklerwerkzeuge → Aktionen**.
+Geräte, Klima-Entitäten der Heizkörperthermostate bei deren Geräten), die
+Aktionen unter **Entwicklerwerkzeuge → Aktionen**.
+
+### Optionen
+
+Über **Konfigurieren** am Eintrag gibt es eine einzige, freiwillige Option:
+das [Abfrageintervall der eingebauten Integration](#abfrageintervall-der-eingebauten-integration).
 
 ### Entfernen
 
@@ -539,14 +759,20 @@ und neu starten. Die eingebaute Integration bleibt unberührt.
   in Betrieb genommenes Gateway liefert entsprechend wenig. `last_n_days` kann
   daran nichts ändern.
 - **Abhängigkeit von Interna.** ViCare Extras greift auf interne Strukturen der
-  eingebauten Integration (`runtime_data`) und auf den internen
-  Zwischenspeicher von PyViCare (`_cache`) zu. Ein Home-Assistant-Update kann
+  eingebauten Integration (`runtime_data`, für die Intervall-Option auch
+  `coordinator.update_interval`) und von PyViCare (`_cache`,
+  `_cacheDuration`, für Befehle `setProperty`) zu. Ein Home-Assistant-Update kann
   das brechen. In dem Fall werden die Entitäten „nicht verfügbar“ bzw. die
   Einrichtung wird wiederholt und die Aktionen melden einen klaren Fehler; die
   eingebaute Integration wird davon nicht beeinträchtigt.
 - Entitäten gibt es nur für Geräte vom Typ `heating`, die die eingebaute
-  Integration einrichtet, und für Räume eines Raumreglers. `get_features`
-  erreicht alle Geräte des Kontos.
+  Integration einrichtet, für Räume eines Raumreglers und (nur Klima) für
+  Heizkörperthermostate, die die eingebaute Integration einrichtet.
+  `get_features` erreicht alle Geräte des Kontos.
+- **Befehle** gibt es nur für die Solltemperatur von Räumen und
+  Heizkörperthermostaten. Betriebsarten, Zeitprogramme, Stufen, Warmwasser
+  usw. werden nicht geschaltet. Die Option für das Abfrageintervall greift in
+  die eingebaute Integration ein (siehe oben); alles andere liest nur.
 - Der Betriebszustand und die Liste der aktiven Statusmeldungen beruhen auf
   der Beobachtung, dass `device.messages.status.raw` die aktiven Meldungen
   enthält (siehe oben).
@@ -555,15 +781,16 @@ und neu starten. Die eingebaute Integration bleibt unberührt.
 - Features auf Gateway-Ebene, die keinem Gerät zugeordnet sind (z. B.
   `gateway.devices`), gibt `get_features` nicht zurück.
 - Hält die eingebaute Integration gerade keine Daten (kurz während ihrer
-  minütlichen Abfrage oder bei einer Störung der Viessmann-API), wartet
+  regelmäßigen Abfrage oder bei einer Störung der Viessmann-API), wartet
   `get_features` einige Sekunden und meldet sonst einen Fehler, statt selbst
   abzufragen. Die Entitäten behalten ihren letzten Wert bis zu 15 Minuten.
 - Von der Ereignishistorie wird nur die Version `v2` verwendet. `v3`, die
   Parameter `date`, `timestamp` und `origins` sowie die Export-Schnittstelle
   sind nicht umgesetzt.
 - Die Viessmann-API nennt in ihrer Dokumentation eine Schnittstelle „Service
-  Documents / Error Database“. Sie wird nicht verwendet; die Meldungstexte
-  stammen aus der mitgelieferten Tabelle.
+  Documents / Error Database“ (das FHEM-Modul `98_vitoconnect.pm` fragt sie
+  je Störungscode ab). Sie wird nicht verwendet, weil jede Abfrage ein
+  API-Aufruf wäre; die Meldungstexte stammen aus der mitgelieferten Tabelle.
 
 ## Fehlersuche
 
@@ -574,8 +801,15 @@ und neu starten. Die eingebaute Integration bleibt unberührt.
   haben sich geändert; ViCare Extras muss angepasst werden.
 - **Einrichtung wird wiederholt / Entitäten fehlen**: Unter Einstellungen →
   Geräte & Dienste → ViCare Extras → ⋮ → **Diagnose herunterladen** steht, ob
-  Daten gefunden wurden und welche Features vorhanden sind. Die Diagnose
-  enthält keine Token, Seriennummern oder Anlagen-IDs.
+  Daten gefunden wurden, welche Features vorhanden sind und welche
+  Abfrageintervalle gelten. Die Diagnose enthält keine Token, Seriennummern,
+  Anlagen-IDs oder Zigbee-Adressen.
+- **Klima-Entität fehlt**: Es wurde keine Solltemperatur gefunden. Mit
+  `get_features` (`vicare_device_id: RoomControl-1` bzw. `device_type: zigbee`)
+  prüfen, welche Features das Gerät liefert.
+- **Solltemperatur lässt sich nicht einstellen**: Die API meldet für dieses
+  Feature keinen ausführbaren Befehl (Attribut `setpoint_writable: false`).
+  Mit `get_features` und `full: true` sind die angebotenen Befehle sichtbar.
 - Ausführliche Protokollierung:
 
   ```yaml
@@ -589,34 +823,49 @@ und neu starten. Die eingebaute Integration bleibt unberührt.
 
 ## Teststand
 
-Ausgeführt (ohne Home Assistant, ohne Netzwerk):
+Ausgeführt (ohne Home Assistant, ohne Netzwerk, ohne Viessmann-API):
 
 - `python -m py_compile` für alle Dateien unter Python 3.13 und 3.14,
 - `python scripts/check_consistency.py` (JSON, Übersetzungen en/de,
   Entitätsnamen und Zustände, Fehlertexte und Platzhalter, `services.yaml`,
-  Icons, Manifest, Meldungstabelle),
+  Icons, Manifest, Options-Dialog, Plattformen, Meldungstabelle samt
+  Kennzeichnung unbestätigter Texte),
+- `python scripts/build_message_codes.py --check` (Tabelle passt zur
+  Textdatei),
 - `python scripts/check_ha_imports.py <core-checkout>` gegen Core 2026.11.1
   (alle importierten Home-Assistant-Namen existieren dort),
-- `pytest tests/unit`: Logik der Aktionen, des Koordinators und der Entitäten
-  mit nachgebildeten PyViCare-Objekten gegen **vereinfachte Nachbildungen** von
+- `pytest tests/unit`: Logik der Aktionen, des Koordinators, der Entitäten,
+  der Klima-Entitäten, der Befehle und des Abfrageintervalls mit
+  nachgebildeten PyViCare-Objekten gegen **vereinfachte Nachbildungen** von
   Home Assistant (`tests/unit/stubs`). Grundlage ist
   `tests/fixtures/vitocal250a_features.json`: Aufbau (Feature-Namen,
   Eigenschaften, Einheiten, Auswahlwerte, Meldungscodes) von einer echten
   Vitocal 250-A, Kennungen und Zählerstände ersetzt. Mit
   `PYVICARE_SRC=<PyViCare-Checkout>` zusätzlich gegen den echten
-  PyViCare-Code 2.63.0 (Cache-Verhalten, Fehlerbehandlung von `get()`).
+  PyViCare-Code 2.63.0 (Cache-Verhalten, Fehlerbehandlung von `get()`,
+  Senden eines Befehls über `setProperty` an eine nachgebildete
+  HTTP-Sitzung) und gegen dessen Testdaten für Räume und Zigbee-Geräte.
 
-Nicht ausgeführt:
+Nicht ausgeführt bzw. nicht geprüft:
 
 - `pytest tests/ha` (Tests mit echtem Home Assistant; benötigt
   `pytest-homeassistant-custom-component` und `PyViCare`),
-- Raum-Entitäten gegen eine echte Anlage mit Räumen,
-- Version 0.2.0 in einer laufenden Instanz (0.1.0 lief dort, siehe oben).
+- Version 0.3.0 in einer laufenden Instanz (0.2.0 lief dort, siehe oben),
+- der Options-Dialog und das Abfrageintervall in einem echten Home Assistant
+  (insbesondere, dass die eingebaute Integration danach tatsächlich seltener
+  abfragt),
+- Klima-Entitäten, Räume und Heizkörperthermostate an einer echten Anlage,
+- das Senden eines Befehls an die Viessmann-API.
 
 `tests/unit` und `tests/ha` müssen getrennt gestartet werden.
 
 ## Lizenz
 
 MIT, siehe [LICENSE](LICENSE). Kein offizielles Produkt von Viessmann oder
-Home Assistant. Meldungstexte: Viessmann Climate Solutions (Serviceanleitung
-6200041) und ViEventLog (MIT).
+Home Assistant.
+
+Meldungstexte: eigene Formulierungen; die Bedeutung der Codes folgt den
+Viessmann-Serviceanleitungen 6200041, 6221420 und 6179923 (Viessmann Climate
+Solutions). Sieben als ungeprüft gekennzeichnete Texte stammen aus
+[ViEventLog](https://github.com/mschneider82/vieventlog) (MIT, © 2025
+Matthias Schneider) bzw. dem FHEM-Modul `98_vitoconnect.pm`.

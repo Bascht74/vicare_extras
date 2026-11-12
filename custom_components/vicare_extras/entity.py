@@ -14,7 +14,13 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from . import specs
 from .bridge import DeviceRef
-from .const import DEVICE_TYPE_HEATING, DEVICE_TYPE_ROOM_CONTROL, DOMAIN, VICARE_DOMAIN
+from .const import (
+    DEVICE_TYPE_HEATING,
+    DEVICE_TYPE_ROOM_CONTROL,
+    DEVICE_TYPE_ZIGBEE,
+    DOMAIN,
+    VICARE_DOMAIN,
+)
 from .coordinator import DeviceSnapshot, ViCareExtrasCoordinator
 
 _LOGGER = logging.getLogger(__name__)
@@ -69,6 +75,9 @@ def iter_targets(
                 Target(device, room, specs.room_name(snapshot.features, room)),
                 snapshot.features,
             )
+    elif device.device_type == DEVICE_TYPE_ZIGBEE:
+        # Radiator thermostats; the climate platform decides by the features.
+        yield specs.SCOPE_TRV, Target(device), snapshot.features
 
 
 @callback

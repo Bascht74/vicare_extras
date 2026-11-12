@@ -11,6 +11,7 @@ from homeassistant.helpers.device_registry import DeviceEntry, DeviceRegistry
 from ..vicare_fakes import *  # noqa: F403
 from ..vicare_fakes import (
     HEAT_PUMP_IDENTIFIER,
+    TRV_IDENTIFIER,
     VICARE_ENTRY_ID,
     FakeCachedService,
     make_runtime_data,
@@ -87,12 +88,14 @@ def make_hass(
     *,
     empty_cache: bool = False,
     register_device: bool = True,
+    with_trv: bool = False,
+    service: FakeCachedService | None = None,
 ) -> tuple[FakeHass, FakeCachedService]:
     """Return a hass with one loaded vicare entry."""
     hass = FakeHass()
     entry = ConfigEntry(domain="vicare", entry_id=VICARE_ENTRY_ID)
     entry.runtime_data, service = make_runtime_data(
-        payload, oauth_manager, empty_cache=empty_cache
+        payload, oauth_manager, empty_cache=empty_cache, with_trv=with_trv, service=service
     )
     hass.config_entries.entries.append(entry)
     if register_device:
@@ -103,6 +106,14 @@ def make_hass(
                 config_entry_id=VICARE_ENTRY_ID,
             )
         )
+        if with_trv:
+            hass.device_registry.add(
+                DeviceEntry(
+                    id="ha-device-trv",
+                    identifiers={("vicare", TRV_IDENTIFIER)},
+                    config_entry_id=VICARE_ENTRY_ID,
+                )
+            )
     return hass, service
 
 
@@ -113,18 +124,21 @@ def vicare_entry(hass: FakeHass) -> ConfigEntry:
 class Platforms:
     """The sensor and binary sensor platforms set up against a fake hass."""
 
-    def __init__(self, hass: FakeHass) -> None:
+    def __init__(self, hass: FakeHass, options: dict[str, Any] | None = None) -> None:
         from custom_components.vicare_extras.coordinator import ViCareExtrasCoordinator
 
         self.hass = hass
         self.entry = ConfigEntry(domain="vicare_extras", entry_id="extras")
+        self.entry.options = dict(options or {})
         self.coordinator = ViCareExtrasCoordinator(hass, self.entry)
         self.sensors: list[Any] = []
         self.binary_sensors: list[Any] = []
+        self.climates: list[Any] = []
 
     def _adder(self, target: list[Any]):
         def add(entities: list[Any]) -> None:
             for entity in entities:
+                entity.hass = self.hass  # set by Home Assistant when added
                 target.append(entity)
                 # Real Home Assistant subscribes the entity when it is added.
                 self.coordinator.async_add_listener(entity._handle_coordinator_update)
@@ -138,7 +152,7 @@ class Platforms:
         return self
 
     async def _async_setup(self) -> None:
-        from custom_components.vicare_extras import binary_sensor, sensor
+        from custom_components.vicare_extras import binary_sensor, climate, sensor
 
         await self.coordinator.async_config_entry_first_refresh()
         self.entry.runtime_data = self.coordinator
@@ -146,6 +160,7 @@ class Platforms:
         await binary_sensor.async_setup_entry(
             self.hass, self.entry, self._adder(self.binary_sensors)
         )
+        await climate.async_setup_entry(self.hass, self.entry, self._adder(self.climates))
 
     def refresh(self) -> None:
         import asyncio
@@ -154,7 +169,7 @@ class Platforms:
 
     @property
     def entities(self) -> list[Any]:
-        return [*self.sensors, *self.binary_sensors]
+        return [*self.sensors, *self.binary_sensors, *self.climates]
 
     @staticmethod
     def _index(entities: list[Any]) -> dict[str, Any]:

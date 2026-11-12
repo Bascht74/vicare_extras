@@ -46,8 +46,9 @@ def test_room_entities() -> None:
         "room_window_open",
         "room_condensation_risk",
         "room_child_lock",
+        "climate",
     }
-    assert len(platforms.entities) == 11
+    assert len(platforms.entities) == 12
 
     temperature = entities["room_temperature"]
     assert temperature.native_value == 21.4
@@ -93,7 +94,7 @@ def test_each_room_gets_its_own_device() -> None:
     assert second.device_info.identifiers == {("vicare_extras", f"{ROOM_CONTROL}_room_2")}
     assert second.device_info.name == "Room 2"  # the API gave no name
     assert first.translation_placeholders == {}
-    assert len(room_entities(platforms, 0)) == len(room_entities(platforms, 2)) == 11
+    assert len(room_entities(platforms, 0)) == len(room_entities(platforms, 2)) == 12
 
 
 def test_room_control_without_rooms_creates_nothing() -> None:
@@ -125,7 +126,12 @@ def test_room_sensor_without_value_is_not_created() -> None:
     entities = room_entities(platforms, 1)
 
     # Alternative feature names are used; the unconnected sensor is skipped.
-    assert set(entities) == {"room_humidity", "room_window_open", "room_setpoint_normal_heating"}
+    assert set(entities) == {
+        "room_humidity",
+        "room_window_open",
+        "room_setpoint_normal_heating",
+        "climate",
+    }
     assert entities["room_setpoint_normal_heating"].native_value == 20
     assert entities["room_window_open"].is_on is False
 
@@ -147,8 +153,8 @@ def test_room_sensor_without_value_is_not_created() -> None:
 
 def test_rooms_and_heat_pump_together() -> None:
     platforms, service = setup(fakes.room_features(0), fakes.vitocal_features())
-    assert len(room_entities(platforms, 0)) == 11
-    assert len(platforms.entities) == 64 + 11
+    assert len(room_entities(platforms, 0)) == 12
+    assert len(platforms.entities) == 64 + 12
     heat_pump = platforms.sensor("heat_production_current")
     assert heat_pump.device_info is None
     assert heat_pump.device_entry is not None

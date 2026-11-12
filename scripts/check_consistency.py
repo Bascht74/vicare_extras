@@ -9,8 +9,12 @@ Checks
 * every error key raised in the code exists in all translations and the
   placeholders passed in the code match the ones used in the messages;
 * entity keys of specs.py, their names (placeholders), enum states, icons,
-  services.yaml fields, action schemas and config flow keys agree with the
-  translations; the message code table is valid and up to date;
+  services.yaml fields, action schemas, config flow and options flow keys
+  agree with the translations;
+* the message code table is valid, up to date, marks unconfirmed texts and
+  is built from this project's own wording file only;
+* the platforms set up in __init__.py exist, and the climate entities'
+  unique id suffix does not collide with an entity key;
 * manifest.json has the keys Home Assistant and HACS need.
 """
 
@@ -191,6 +195,8 @@ for language, content in all_texts.items():
                 check(set(PLACEHOLDER.findall(name)) == expected_placeholders(key), f"{language}: entity.{domain}.{key}: name '{name}' must use placeholders {sorted(expected_placeholders(key))}")
             states = set(value.get("state", {}))
             check(states == enum_states.get(key, set()), f"{language}: entity.{domain}.{key}: states differ: missing {sorted(enum_states.get(key, set()) - states)}, unknown {sorted(states - enum_states.get(key, set()))}")
+    unknown_domains = set(content.get("entity", {})) - {"sensor", "binary_sensor"}
+    check(not unknown_domains, f"{language}: entity translations for unknown platforms {sorted(unknown_domains)}")
 icons = loaded[COMPONENT / "icons.json"]
 check(set(icons["entity"]["sensor"]) <= sensor_keys, "icons.json has unknown sensor keys")
 check(set(icons["entity"].get("binary_sensor", {})) <= binary_keys, "icons.json has unknown binary sensor keys")
@@ -200,10 +206,31 @@ table_path = COMPONENT / "data" / "message_codes.json"
 table = loaded.get(table_path, {})
 codes = table.get("codes", {})
 check(len(codes) > 400, "message code table is missing or too small")
+table_sources = table.get("sources", {})
+for name, meta in table_sources.items():
+    check(isinstance(meta.get("verified"), bool), f"message table: source {name} needs 'verified': true/false")
+    check(bool(meta.get("meaning_from")), f"message table: source {name} needs 'meaning_from'")
+    # Only Viessmann documents count as confirmation.
+    check(meta.get("verified") is name.startswith("viessmann"), f"message table: source {name}: 'verified' must be true exactly for Viessmann documents")
 for code, entry in codes.items():
     check(re.fullmatch(r"[AFIPS]\.[1-9]\d*", code) is not None, f"message table: bad code {code!r}")
-    check(bool(entry.get("de")), f"message table: {code} has no German text")
-    check(entry.get("source") in table.get("sources", {}), f"message table: {code} has unknown source")
+    text = entry.get("de") or ""
+    check(bool(text), f"message table: {code} has no German text")
+    source = entry.get("source")
+    check(source in table_sources, f"message table: {code} has unknown source")
+    source_verified = table_sources.get(source, {}).get("verified")
+    # Unconfirmed texts must carry the flag, confirmed ones must not.
+    check(
+        ("verified" in entry) is (source_verified is False) and entry.get("verified", False) is False,
+        f"message table: {code}: 'verified': false must be set exactly for unconfirmed sources",
+    )
+    if str(source).startswith("viessmann"):
+        # Own wording: no quotation marks of the manuals, no trailing period.
+        check(not set(text) & set('„“”"'), f"message table: {code} contains quotation marks")
+        check(text == text.strip() and not text.endswith("."), f"message table: {code}: untidy text {text!r}")
+source_files = sorted(path.name for path in (ROOT / "scripts" / "message_sources").iterdir())
+check(source_files == ["messages_de.txt"], f"scripts/message_sources must only hold messages_de.txt (own wording), found {source_files}")
+check("verified" in (COMPONENT / "messages.py").read_text(encoding="utf-8"), "messages.py does not handle 'verified'")
 import subprocess  # noqa: E402
 
 built = subprocess.run([sys.executable, str(ROOT / "scripts" / "build_message_codes.py"), "--check"], capture_output=True, text=True, check=False)
@@ -243,13 +270,72 @@ for service, definition in services_yaml.items():
 for language, content in all_texts.items():
     check(set(content.get("services", {})) == set(services_yaml), f"{language}: translated actions differ from services.yaml")
 
-# --- config flow --------------------------------------------------------------
-flow_source = (COMPONENT / "config_flow.py").read_text(encoding="utf-8")
+# --- config flow and options flow ---------------------------------------------
+flow_tree = sources[COMPONENT / "config_flow.py"]
+flow_steps: dict[str, set[str]] = {"config": set(), "options": set()}
+flow_aborts: dict[str, set[str]] = {"config": set(), "options": set()}
+for node in flow_tree.body:
+    if not isinstance(node, ast.ClassDef):
+        continue
+    bases = {getattr(base, "id", getattr(base, "attr", "")) for base in node.bases}
+    section = "options" if any(base.startswith("OptionsFlow") for base in bases) else "config"
+    for call in ast.walk(node):
+        if not isinstance(call, ast.Call):
+            continue
+        for keyword in call.keywords:
+            if isinstance(keyword.value, ast.Constant) and keyword.arg == "step_id":
+                flow_steps[section].add(keyword.value.value)
+            if isinstance(keyword.value, ast.Constant) and keyword.arg == "reason":
+                flow_aborts[section].add(keyword.value.value)
+check(flow_steps["config"] == {"user"}, f"config flow steps: {sorted(flow_steps['config'])}")
+check(flow_steps["options"] == {"init"}, f"options flow steps: {sorted(flow_steps['options'])}")
+# Keys of OPTIONS_SCHEMA: vol.Optional(CONST) / vol.Required(CONST).
+option_fields: set[str] = set()
+for node in flow_tree.body:
+    if isinstance(node, ast.Assign) and getattr(node.targets[0], "id", None) == "OPTIONS_SCHEMA":
+        option_fields = {
+            const_values[call.args[0].id]
+            for call in ast.walk(node.value)
+            if isinstance(call, ast.Call)
+            and getattr(call.func, "attr", None) in ("Optional", "Required")
+            and isinstance(call.args[0], ast.Name)
+        }
+check(bool(option_fields), "config_flow.py: OPTIONS_SCHEMA has no fields")
 for language, content in all_texts.items():
-    for reason in re.findall(r'reason="(\w+)"', flow_source):
-        check(reason in content["config"]["abort"], f"{language}: config.abort.{reason} missing")
-    for step in re.findall(r'step_id="(\w+)"', flow_source):
-        check(step in content["config"]["step"], f"{language}: config.step.{step} missing")
+    for section in ("config", "options"):
+        texts = content.get(section, {})
+        for reason in flow_aborts[section]:
+            check(reason in texts.get("abort", {}), f"{language}: {section}.abort.{reason} missing")
+        check(set(texts.get("step", {})) == flow_steps[section], f"{language}: {section}.step keys {sorted(texts.get('step', {}))} != {sorted(flow_steps[section])}")
+    init = content.get("options", {}).get("step", {}).get("init", {})
+    check(bool(init.get("title")) and bool(init.get("description")), f"{language}: options.step.init needs title and description")
+    check(set(init.get("data", {})) == option_fields, f"{language}: options.step.init.data {sorted(init.get('data', {}))} != schema {sorted(option_fields)}")
+    check(set(init.get("data_description", {})) == option_fields, f"{language}: options.step.init.data_description {sorted(init.get('data_description', {}))} != schema {sorted(option_fields)}")
+option_min, option_max = const_values.get("MIN_VICARE_POLL_INTERVAL"), const_values.get("MAX_VICARE_POLL_INTERVAL")
+check(option_min == 60 and option_max == 900, "poll interval option must be limited to 60..900 s")
+for language, content in all_texts.items():
+    description = content["options"]["step"]["init"]["data_description"].get("vicare_poll_interval", "")
+    check(str(option_min) in description and str(option_max) in description, f"{language}: the poll interval description must name the limits {option_min} and {option_max}")
+
+# --- platforms ----------------------------------------------------------------
+platforms: list[str] = []
+for node in sources[COMPONENT / "__init__.py"].body:
+    target = node.target if isinstance(node, ast.AnnAssign) else (node.targets[0] if isinstance(node, ast.Assign) else None)
+    if getattr(target, "id", None) == "PLATFORMS":
+        platforms = [item.attr.lower() for item in node.value.elts]
+check(sorted(platforms) == ["binary_sensor", "climate", "sensor"], f"PLATFORMS is {platforms}")
+for platform in platforms:
+    check((COMPONENT / f"{platform}.py").is_file(), f"platform file {platform}.py missing")
+climate_values = {
+    target.id: node.value.value
+    for node in sources[COMPONENT / "climate.py"].body
+    if isinstance(node, ast.Assign) and isinstance(node.value, ast.Constant)
+    for target in node.targets
+    if isinstance(target, ast.Name)
+}
+climate_suffix = climate_values.get("UNIQUE_SUFFIX")
+check(climate_suffix == "climate", "climate.py: UNIQUE_SUFFIX must stay 'climate' (unique ids)")
+check(climate_suffix not in all_keys, "climate unique id suffix collides with an entity key")
 
 # --- manifest -----------------------------------------------------------------
 manifest = loaded[COMPONENT / "manifest.json"]

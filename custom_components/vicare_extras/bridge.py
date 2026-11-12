@@ -17,7 +17,9 @@ PyViCare 2.63.0:
 
 Nothing in here calls a PyViCare method that can perform a request: the cache
 is only looked at (``_cache`` is read, never refreshed), so using this module
-costs zero API calls.
+costs zero API calls. Commands (``commands.py``) and the poll interval option
+(``polling.py``) are the only places that touch the built-in integration
+beyond reading.
 """
 
 from __future__ import annotations
@@ -48,6 +50,9 @@ class DeviceRef:
     # integration, None for devices the built-in integration does not set up.
     identifier: str | None
     service: Any = field(compare=False, repr=False)
+    # PyViCare's ViCareDeviceAccessor (installation, gateway, device id); only
+    # needed to send a command through ``service.setProperty``.
+    accessor: Any = field(default=None, compare=False, repr=False)
 
     @property
     def key(self) -> tuple[str, str, str]:
@@ -146,6 +151,7 @@ def _device_ref(
             else None
         ),
         service=service,
+        accessor=accessor,
     )
 
 

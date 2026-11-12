@@ -2,9 +2,13 @@
 
 Companion of Home Assistant's built-in ``vicare`` integration. It reuses the
 PyViCare client the built-in integration has authenticated (through the
-``runtime_data`` of the loaded ``vicare`` config entry) and is strictly
-read-only: it never sends a command to the heating system and never performs
-an API request on its own schedule.
+``runtime_data`` of the loaded ``vicare`` config entry) and never performs an
+API request on its own schedule.
+
+Sensors, binary sensors and both actions are read-only. The climate entities
+(rooms, radiator thermostats) send a command only when the user changes a
+target temperature. The optional poll interval changes how often the built-in
+integration polls.
 """
 
 from __future__ import annotations
@@ -19,7 +23,11 @@ from .const import DOMAIN
 from .coordinator import ViCareExtrasConfigEntry, ViCareExtrasCoordinator
 from .services import async_setup_services
 
-PLATFORMS: list[Platform] = [Platform.BINARY_SENSOR, Platform.SENSOR]
+PLATFORMS: list[Platform] = [
+    Platform.BINARY_SENSOR,
+    Platform.CLIMATE,
+    Platform.SENSOR,
+]
 
 CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
 
@@ -39,6 +47,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: ViCareExtrasConfigEntry)
     not loaded (or its data is not readable); Home Assistant then retries.
     """
     coordinator = ViCareExtrasCoordinator(hass, entry)
+    # Put the poll interval of the built-in integration back on unload, which
+    # also happens when the option is changed or cleared (the entry reloads).
+    # Registered before the first refresh, which already applies the option:
+    # Home Assistant also runs these callbacks when the setup fails.
+    entry.async_on_unload(coordinator.poll_manager.restore)
     await coordinator.async_config_entry_first_refresh()
     entry.runtime_data = coordinator
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)

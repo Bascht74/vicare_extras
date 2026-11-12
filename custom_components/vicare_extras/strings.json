@@ -283,8 +283,8 @@
           "info_count": {
             "name": "Number of info messages"
           },
-          "newest_status_timestamp": {
-            "name": "Newest status message at"
+          "newest_status_device_time": {
+            "name": "Newest status message since (device time)"
           },
           "service": {
             "name": "Service messages"
@@ -493,6 +493,12 @@
     "cache_unsupported": {
       "message": "The PyViCare client of the Viessmann ViCare integration has no readable feature cache. This version of ViCare Extras does not match the installed Home Assistant version."
     },
+    "command_failed": {
+      "message": "The Viessmann API rejected the command: {reason}"
+    },
+    "command_not_available": {
+      "message": "The Viessmann API offers no command to change this value."
+    },
     "device_not_found": {
       "message": "No ViCare device matches the selection."
     },
@@ -523,11 +529,28 @@
     "unexpected_error": {
       "message": "Unexpected error while calling the Viessmann API: {error}"
     },
+    "value_out_of_range": {
+      "message": "The value {value} is outside the range the Viessmann API accepts ({min} to {max})."
+    },
     "vicare_incompatible": {
       "message": "The data of the Viessmann ViCare integration has an unexpected structure ({detail}). This version of ViCare Extras does not match the installed Home Assistant version."
     },
     "vicare_not_loaded": {
       "message": "The Viessmann ViCare integration is not set up or not loaded."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "ViCare Extras options",
+        "description": "The sensors of ViCare Extras never cause API calls. The only way to save calls is to let the built-in Viessmann ViCare integration poll less often.",
+        "data": {
+          "vicare_poll_interval": "Poll interval of the ViCare integration"
+        },
+        "data_description": {
+          "vicare_poll_interval": "Seconds between two polls of the built-in integration (60 to 900). Leave empty to keep its own interval (60 s per gateway). Applies without a restart; the built-in integration uses the new value after its next poll."
+        }
+      }
     }
   },
   "services": {

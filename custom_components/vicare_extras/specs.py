@@ -20,6 +20,7 @@ from typing import Any
 
 SCOPE_HEATING = "heating"
 SCOPE_ROOM = "room"
+SCOPE_TRV = "trv"
 
 PLATFORM_SENSOR = "sensor"
 PLATFORM_BINARY_SENSOR = "binary_sensor"

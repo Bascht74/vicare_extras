@@ -85,7 +85,7 @@ async def test_sensors_attach_to_the_vicare_device(hass: HomeAssistant, vicare) 
     assert "state_class" not in state.attributes
     assert state.attributes["day"][0] == 2.6
     assert hass.states.get(by_key["messages"].entity_id).state == "S.134"
-    assert hass.states.get(by_key["last_status_message"].entity_id).state == "4/3-Wege-Ventil Leerlauf"
+    assert hass.states.get(by_key["last_status_message"].entity_id).state == "4/3-Wege-Ventil in Leerlaufstellung"
     assert hass.states.get(by_key["operating_state"].entity_id).state == "off"
     assert service.api_calls == 0
 
@@ -98,7 +98,8 @@ async def test_vitocal_entities_and_rooms(hass: HomeAssistant, vicare) -> None:
 
     registry = er.async_get(hass)
     entities = er.async_entries_for_config_entry(registry, entry.entry_id)
-    assert len(entities) == 46 + 18 + 11
+    # 46 sensors, 18 binary sensors, 11 room entities and the room's climate entity.
+    assert len(entities) == 46 + 18 + 11 + 1
     on_heat_pump = [entity for entity in entities if entity.device_id == vicare_device.id]
     assert len(on_heat_pump) == 46 + 18
     room_devices = dr.async_entries_for_config_entry(dr.async_get(hass), entry.entry_id)
@@ -159,3 +160,115 @@ async def test_get_event_history_action(hass: HomeAssistant, vicare) -> None:
             DOMAIN, "get_event_history", {}, blocking=True, return_response=True
         )
     assert err.value.translation_key == "rate_limited"
+
+
+async def test_options_flow_sets_and_clears_the_poll_interval(hass: HomeAssistant, vicare) -> None:
+    """Setting and clearing the option takes effect without a restart."""
+    from datetime import timedelta  # noqa: PLC0415
+
+    vicare_entry, service, _, _ = vicare
+    builtin = vicare_entry.runtime_data.devices[0].coordinator
+    entry = await _setup_extras(hass)
+    assert builtin.update_interval == timedelta(seconds=60)
+
+    result = await hass.config_entries.options.async_init(entry.entry_id)
+    assert result["type"] is FlowResultType.FORM
+    assert result["step_id"] == "init"
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"], {"vicare_poll_interval": 90}
+    )
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    await hass.async_block_till_done()
+    assert entry.options == {"vicare_poll_interval": 90}
+    assert entry.state is ConfigEntryState.LOADED  # reloaded
+    assert builtin.update_interval == timedelta(seconds=90)
+    assert service._cacheDuration == 150
+
+    # Clearing the field removes the option and restores the original values.
+    result = await hass.config_entries.options.async_init(entry.entry_id)
+    result = await hass.config_entries.options.async_configure(result["flow_id"], {})
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    await hass.async_block_till_done()
+    assert entry.options == {}
+    assert builtin.update_interval == timedelta(seconds=60)
+    assert service._cacheDuration == 60
+    assert service.api_calls == 0
+
+
+async def test_climate_entities_and_set_temperature(hass: HomeAssistant) -> None:
+    """A room and a radiator thermostat; setting a temperature is one command."""
+    vicare_entry = MockConfigEntry(domain="vicare", title="ViCare", data={})
+    vicare_entry.add_to_hass(hass)
+    payload = fakes.gateway_payload(
+        [],
+        fakes.room_features(
+            0, writable="temperature.levels.normal.perceived", actors=(fakes.TRV_DEVICE_ID,)
+        ),
+        fakes.trv_features(),
+    )
+    service = fakes.FakeCommandService(payload)
+    runtime_data, _ = fakes.make_runtime_data(with_trv=True, service=service)
+
+    async def fake_setup_entry(hass: HomeAssistant, config_entry) -> None:
+        config_entry.runtime_data = runtime_data
+
+    with (
+        patch("homeassistant.components.vicare.async_setup_entry", fake_setup_entry),
+        patch("homeassistant.components.vicare.async_unload_entry", return_value=None),
+    ):
+        assert await hass.config_entries.async_setup(vicare_entry.entry_id)
+        await hass.async_block_till_done()
+        registry = dr.async_get(hass)
+        trv_device = registry.async_get_or_create(
+            config_entry_id=vicare_entry.entry_id,
+            identifiers={("vicare", fakes.TRV_IDENTIFIER)},
+            manufacturer="Viessmann",
+            name="Thermostat Wohnzimmer",
+        )
+        entry = await _setup_extras(hass)
+
+        entities = er.async_entries_for_config_entry(er.async_get(hass), entry.entry_id)
+        climates = {e.unique_id: e for e in entities if e.domain == "climate"}
+        room = climates[f"{fakes.GATEWAY_SERIAL}_RoomControl-1_room_0-climate"]
+        trv = climates[f"{fakes.TRV_IDENTIFIER}-climate"]
+        assert trv.device_id == trv_device.id  # attached to the built-in device
+        assert room.device_id != trv_device.id
+
+        state = hass.states.get(room.entity_id)
+        assert state.state == "heat"
+        assert state.attributes["temperature"] == 21
+        assert state.attributes["current_temperature"] == 21.4
+        assert state.attributes["min_temp"] == 8
+        assert state.attributes["max_temp"] == 30
+        assert state.attributes["actors"] == [fakes.TRV_DEVICE_ID]
+
+        await hass.services.async_call(
+            "climate",
+            "set_temperature",
+            {"entity_id": room.entity_id, "temperature": 22.5},
+            blocking=True,
+        )
+        assert service.commands == [
+            (
+                "RoomControl-1",
+                "rooms.0.temperature.levels.normal.perceived",
+                "setTemperature",
+                {"targetTemperature": 22.5},
+            )
+        ]
+        assert service.cache_clears == 0
+        assert hass.states.get(room.entity_id).attributes["temperature"] == 22.5
+
+        await hass.services.async_call(
+            "climate",
+            "set_temperature",
+            {"entity_id": trv.entity_id, "temperature": 20},
+            blocking=True,
+        )
+        assert service.commands[-1] == (
+            fakes.TRV_DEVICE_ID,
+            "trv.temperature",
+            "setTargetTemperature",
+            {"temperature": 20},
+        )
+        assert service.api_calls == 0

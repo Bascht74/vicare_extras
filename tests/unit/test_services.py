@@ -121,11 +121,12 @@ def test_event_history_decodes_messages_and_keeps_raw_events() -> None:
 
     events = call(hass, "get_event_history")["events"]
 
-    assert events[0]["summary"] == "S.123: Wärmepumpe aus"
+    assert events[0]["summary"] == "S.123: Wärmepumpe ist aus"
     assert events[0]["decoded"] == {
         "code": "S.123",
-        "text": "Wärmepumpe aus",
+        "text": "Wärmepumpe ist aus",
         "source": "viessmann",
+        "verified": True,
         "category": "status",
         "active": True,
     }
